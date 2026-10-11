@@ -116,9 +116,10 @@ function panel(k) {
       <p class="ctx">提交时会自动附上：你的名字、当前是学生端还是机构端、正在用的账号或场景、页面、时间和版本号。不会收集其他信息。</p></div></div>`; }
   if (k === 'mine') { const q = ST.mine.filter(x => !x.sent).length;
     $('#pn').innerHTML = `<div class="pn"><div class="ph"><b>我的意见（${ST.mine.length}）</b><button class="x" data-do="close">×</button></div><div class="pb">
-      ${q ? `<p class="where" style="margin:0 0 10px">有 ${q} 条还没发送出去${FB_URL ? '，联网后会自动重试' : '（意见表还没接通）'}。也可以点下面「导出」把文件发给项目组。</p>` : ''}
+      ${q ? `<p class="where" style="margin:0 0 10px">有 ${q} 条还没发送出去${FB_URL ? '，联网后会自动重试' : '（意见表还没接通）'}。也可以点下面「下载」把文件发给项目组。</p>` : ''}
       ${ST.mine.slice().reverse().map(x => `<div class="item"><b>${esc(x.类型)}</b><span class="st ${x.sent ? 'ok' : 'q'}">${x.sent ? '已提交' : '待发送'}</span><div>${esc(x.意见)}</div><small>${esc(x.端)} · ${esc(x.页面 || '')}${x.位置 ? ' · 「' + esc(x.位置.slice(0, 30)) + '」' : ''} · ${esc(x.时间.slice(5, 16).replace('T', ' '))}</small></div>`).join('') || '<p style="color:#8a8170">还没有提过意见。</p>'}
-      <div class="row" style="justify-content:space-between">${q && FB_URL ? '<button class="btn" data-do="retry">重新发送</button>' : '<span></span>'}<button class="btn" data-do="export" ${ST.mine.length ? '' : 'disabled'}>导出（备用）</button></div></div></div>`; }
+      <div class="row" style="justify-content:space-between">${FB_URL ? `<button class="btn pri" data-do="resend" ${ST.mine.length ? '' : 'disabled'}>发送到 Google 表单</button>` : '<span></span>'}<button class="btn" data-do="export" ${ST.mine.length ? '' : 'disabled'}>下载</button></div>
+      ${FB_URL ? '<p class="ctx">「发送到 Google 表单」会把上面全部意见再发一次，表格里已有的不会重复记录。</p>' : ''}</div></div>`; }
 }
 function startPick() { ST.fb = ST.fb || {}; ST.fb.text = ($('#fbTxt') || {}).value || ST.fb.text || ''; ST.fb.side = ST.side; panel(null); $('#picking').classList.add('on'); post(ST.side, { t: 'pick' }); }
 function cancelPick() { post(ST.side, { t: 'unpick' }); $('#picking').classList.remove('on'); panel('fb'); }
@@ -131,13 +132,13 @@ async function send() {
     位置: f.el ? f.el.text : '', 元素路径: f.el ? f.el.path : '', 账号或场景: ctx.账号 || ctx.场景 || '', 页面: ctx.页面 || '', 上下文: JSON.stringify(ctx), 屏幕: `${innerWidth}×${innerHeight}`, sent: false };
   ST.mine.push(rec); store.set('ly_fb_' + VER, ST.mine); ST.fb = null; panel(null); bar(); flush(true);
 }
-async function flush(toastIt) {
-  const q = ST.mine.filter(x => !x.sent);
+async function flush(toastIt, all) {
+  const q = all ? ST.mine.slice() : ST.mine.filter(x => !x.sent);
   if (!q.length) return;
   if (!FB_URL) { if (toastIt) syncNote2('已保存在本机。意见表接通后会自动发送'); return; }
   for (const r of q) { try { const { sent, ...body } = r; await fetch(FB_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }); r.sent = true; } catch (e) { break; } }
   store.set('ly_fb_' + VER, ST.mine); bar(); if (ST.panel === 'mine') panel('mine');
-  if (toastIt) syncNote2(q.every(x => x.sent) ? '谢谢！意见已提交' : '网络不通，意见已保存在本机，稍后会自动重试');
+  if (toastIt) syncNote2(q.every(x => x.sent) ? (all ? `已把 ${q.length} 条意见发送到 Google 表单` : '谢谢！意见已提交') : '网络不通，意见已保存在本机，稍后会自动重试');
 }
 function syncNote2(t) { const n = $('#sync'); n.textContent = t; n.classList.add('on'); clearTimeout(n._t); n._t = setTimeout(() => n.classList.remove('on'), 3200); }
 function exportMine() {
@@ -152,7 +153,7 @@ document.addEventListener('click', e => {
   const t = e.target.closest('[data-type]'); if (t) { ST.fb.type = t.dataset.type; ST.fb.text = $('#fbTxt').value; return panel('fb'); }
   const d = e.target.closest('[data-do]'); if (!d) return;
   ({ rename: () => askName(true), ovClose: () => $('#ov').innerHTML = '', nameOk, fb: () => { if (!ST.name) return askName(); ST.fb = ST.fb && ST.fb.side === ST.side ? ST.fb : { side: ST.side }; panel('fb'); },
-    mine: () => panel(ST.panel === 'mine' ? null : 'mine'), close: () => { ST.fb = null; panel(null); }, pick: startPick, unpick: cancelPick, send, retry: () => flush(true), export: exportMine })[d.dataset.do]();
+    mine: () => panel(ST.panel === 'mine' ? null : 'mine'), close: () => { ST.fb = null; panel(null); }, pick: startPick, unpick: cancelPick, send, retry: () => flush(true), resend: () => flush(true, true), export: exportMine })[d.dataset.do]();
 });
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'nm') nameOk(); if (e.key === 'Escape' && $('#picking').classList.contains('on')) cancelPick(); });
 function boot() {

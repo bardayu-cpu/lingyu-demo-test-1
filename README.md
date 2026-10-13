@@ -4,4 +4,4 @@
 
 - 在线打开：https://bardayu-cpu.github.io/lingyu-demo-test-1/
 - 演示数据全部为虚构。
-- 当前版本：v1.11
+- 当前版本：v1.12

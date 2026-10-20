@@ -79,11 +79,47 @@ def slots(browser):
     finally:
         context.close()
 
+def conflicts(browser):
+    context, page, admin, student = trial(browser)
+    try:
+        bid = book_lin(admin, student)
+        student.evaluate("reset('B');prepare('book');S.day=6;render()")
+        wait(student, "slotState(0,6,2)==='taken'")
+        check(student.locator('button.tm.full[disabled]').filter(has_text='14:00').count() >= 1, 'B1-1 occupied time is disabled for another student')
+        before = student.evaluate('JSON.stringify(S.bk)')
+        student.evaluate("ACT.pickSlot('c1:6:2');ACT.bookSubmit();render()")
+        check(student.evaluate('JSON.stringify(S.bk)') == before and student.evaluate('S.modal') is None, 'B1-1 forced pick/submit leaves booking unchanged and closes modal')
+        check('这个时间刚被约走了，请换一个' in student.inner_text('#toast'), 'B1-1 forced submission explains the conflict')
+        # A time selected while open can also be occupied before Submit is pressed.
+        student.evaluate("ACT.pickSlot('c1:6:1');render()")
+        check(student.evaluate('S.modal') == 'submit', 'B1-1 open time can be selected before it is occupied')
+        admin.evaluate("setSlot('c1',7,1,'bk');render()")
+        wait(student, "slotState(0,6,1)==='taken'")
+        student.evaluate('ACT.bookSubmit();render()')
+        check(student.evaluate('JSON.stringify(S.bk)') == before, 'B1-1 submit rechecks a time occupied after picking')
+        result = admin.evaluate("LY_in({t:'book',core:'chen',cid:'c1',date:DD(7).toISOString(),ti:2,kind:'预咨询'})")
+        admin.evaluate("ACT.btab('man');render()")
+        other = admin.evaluate("BOOK.filter(b=>b.sid===CORE.chen.id&&b.day===7&&b.t===2&&b.st==='confirm').slice(-1)[0]")
+        check(other['clash'] == bid and '时段冲突' in result, 'B1-1 admin retains a conflicting application with owner id and message')
+        check(admin.evaluate("SCHM.c1['10/21'][2]") == 'bk', 'B1-1 conflict does not change the reserved slot')
+        check(admin.locator('.bkpin .pill.r').filter(has_text='时段冲突').count() == 1, 'B1-1 pending row shows a red conflict pill')
+        admin.evaluate('(id)=>{ACT.bOk(id);render()}', bid)
+        admin.evaluate('(id)=>{ACT.bOk(id);render()}', other['id'])
+        check(admin.evaluate('(id)=>BOOK.find(b=>b.id===id).st', bid) == 'ok' and admin.evaluate('(id)=>BOOK.find(b=>b.id===id).st', other['id']) == 'confirm', 'B1-1 second conflicting application cannot be confirmed')
+        check('这个时段已经确认给 林晓 了，请改时间或婉拒' in admin.inner_text('#toast'), 'B1-1 duplicate confirmation names the existing student')
+        # The exception for the current student's own held appointment remains usable.
+        student.evaluate("reset('A');prepare('home');S.bk={cid:'c1',di:6,ti:2,kind:'预咨询',st:'待确认'};render();ACT.pickSlot('c1:6:2');render()")
+        check(student.evaluate('S.modal') == 'submit', 'B1-1 current student can reopen their own held time')
+        page.click('[data-side="机构端"]')
+        shot(page, 'B1-1-conflict')
+    finally:
+        context.close()
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--only', choices=['B1-2'])
+    parser.add_argument('--only', choices=['B1-2', 'B1-1'])
     args = parser.parse_args()
-    tests = {'B1-2': slots}
+    tests = {'B1-2': slots, 'B1-1': conflicts}
     with sync_playwright() as p:
         choices = [os.environ.get('CHROMIUM_PATH'), '/opt/pw-browsers/chromium', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome']
         executable = next((c for c in choices if c and Path(c).is_file()), None)

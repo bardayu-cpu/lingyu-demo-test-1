@@ -82,6 +82,19 @@ Object.assign(ACT, {
 if (!RULES.allConfirm) { BOOK.forEach(b => { b.fresh = false; }); RULES.allConfirm = 1; }
 if (typeof LY_in === 'function') {
   const _lyIn19 = LY_in; LY_in = function (ev) { if (ev.t !== 'book') return _lyIn19(ev);
+    const student = LY_CORE()[ev.core], day = lyDay(ev.date);
+    const clash = student && BOOK.find(b => b.sid !== student.id && b.cid === ev.cid && b.day === day && b.t === +ev.ti && ['confirm', 'ok', 'change'].includes(b.st));
+    if (clash) {
+      const old = lyBook(student);
+      if (old) { if (old.cid !== ev.cid || old.day !== day || old.t !== +ev.ti) setSlot(old.cid, old.day, old.t, 'open'); old.st = 'cancelled'; }
+      const b = { id: 'bx' + (BOOK.length + 1), sid: student.id, cid: ev.cid, day, t: +ev.ti, mode: ev.mode || '线下', kind: ev.kind || '预咨询', st: 'confirm', fresh: false, src: ev.inv ? '主动邀约' : '学生端提交', at: new Date(NOW), req: null, intake: { st: 'none', ver: 0 }, clash: clash.id };
+      BOOK.push(b);
+      log(`时段冲突：学生提交预约 ${slotTxt(b)} · ${ST(b.cid).name}，已由 ${nm(SU(clash.sid))} 占用（${clash.id}）`, student, { cat: '预约', k: 'book', sys: 1 });
+      notify(b.cid, '站内', `${nm(student)} 的预约申请有时段冲突，请改时间或婉拒`, b.id);
+      if (S.uid) render();
+      else if (window.parent !== window) window.parent.postMessage({ ly: 1, side: LY_SIDE, t: 'snap', snap: LY_snap() }, '*');
+      return `${student.name} 的预约申请已收到，但时段冲突：这个时间已由 ${nm(SU(clash.sid))} 占用，请老师改时间或婉拒`;
+    }
     const r = _lyIn19(ev), s = LY_CORE()[ev.core], b = s && lyBook(s); if (!b) return r;
     if (b.st === 'ok' && b.fresh) { b.st = 'confirm'; b.fresh = false; if (S.uid) render(); }
     if (ev.inv) b.src = '主动邀约';
@@ -96,6 +109,12 @@ function slotAt(cid, day, t) {
   const row = (SCHED[cid] && SCHED[cid][day]) || (DD(day) && SCHM[cid] && SCHM[cid][dkey(DD(day))]);
   return row && row[t] || 'off';
 }
+const _bOkB1 = ACT.bOk; ACT.bOk = function (id) {
+  const b = BOOK.find(x => x.id === id); if (!b) return;
+  const other = BOOK.find(x => x.id !== b.id && x.cid === b.cid && x.day === b.day && x.t === b.t && ['ok', 'change'].includes(x.st));
+  if (other) return toast(`这个时段已经确认给 ${nm(SU(other.sid))} 了，请改时间或婉拒`);
+  return _bOkB1.apply(this, arguments);
+};
 
 /* ---------- 3. 号池、主动邀约批次（演示数据；数字都是可调的默认值） ---------- */
 RULES.pool = RULES.pool || { inv: 20, hold: 4, ivLv: 3, col: {}, apps: [], R: 120, FIX: 50 };
@@ -160,7 +179,7 @@ const _booking18 = booking; booking = function () { if (isL1()) return _booking1
   const top = `<div class="tabs">${BKT.map(([k, n]) => { const c = k === 'man' ? BOOK.filter(b => b.st === 'confirm' && (S.role === 'L3' || b.cid === me())).length : 0; return `<button class="${tab === k ? 'on' : ''}" data-act="btab" data-arg="${k}">${n}${c ? `<i class="r">${c}</i>` : ''}</button>`; }).join('')}</div>`;
   return top + ({ inv: bkInv, ai: bkAi, man: bkMan, sched: bkSched, pool: bkPool })[tab](); };
 PAGES.booking = booking;
-const bkBtnFix = h => h.replace(/>改约<\/button>/g, '>改时间</button>').replace(/(<button class="btn pri xs" data-act="bOk" data-arg="([^"]+)">确认<\/button>)/g, (m, a, id) => { const b = BOOK.find(x => x.id === id); return `<button class="btn ghost xs" data-act="bOpen" data-arg="${id}">看学生信息</button> ${a}`; });
+const bkBtnFix = h => h.replace(/>改约<\/button>/g, '>改时间</button>').replace(/(<button class="btn pri xs" data-act="bOk" data-arg="([^"]+)">确认<\/button>)/g, (m, a, id) => { const b = BOOK.find(x => x.id === id); return `<button class="btn ghost xs" data-act="bOpen" data-arg="${id}">看学生信息</button> ${b && b.clash ? '<span class="pill r">时段冲突</span> ' : ''}${a}`; });
 
 /* 人工咨询：最上面是待确认的申请，下面是已约、改期取消、待写记录、待办池 */
 const bkMan = () => { const r = S.role; let list = BOOK.slice(); if (r === 'L2') list = list.filter(b => b.cid === me());

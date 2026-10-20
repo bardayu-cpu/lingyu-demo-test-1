@@ -14,6 +14,18 @@ const _slotStateB1 = slotState; slotState = function (ci, di, ti) {
   }
   return 'closed';
 };
+const lyPickOpenB1 = p => p && DATA.counsellors.some(c => c.id === p.cid) && DAYS[p.di] &&
+  ((S.bk && S.bk.cid === p.cid && S.bk.di === p.di && S.bk.ti === p.ti) || slotState(ci(p.cid), p.di, p.ti) === 'open');
+const lyPickTakenB1 = () => { S.pick = null; S.modal = null; toast('这个时间刚被约走了，请换一个'); };
+const _pickSlotB1 = ACT.pickSlot; ACT.pickSlot = function (arg) {
+  const [cid, di, ti] = arg.split(':');
+  if (!lyPickOpenB1({ cid, di: +di, ti: +ti })) return lyPickTakenB1();
+  return _pickSlotB1.apply(this, arguments);
+};
+const _bookSubmitB1 = ACT.bookSubmit; ACT.bookSubmit = function () {
+  if (!lyPickOpenB1(S.pick)) return lyPickTakenB1();
+  return _bookSubmitB1.apply(this, arguments);
+};
 const lyIso = di => di == null || !DAYS[di] ? null : DAYS[di].toISOString();
 function LY_snap() { const b = S.bk, ts = S.tasks || []; S._ly = S._ly || Math.random().toString(36).slice(2);
   return { inst: S._ly, scen: S.scen, core: LY_CK[S.scen], bk: b ? { cid: b.cid, date: lyIso(b.di), ti: b.ti, mode: b.mode, kind: b.kind, inv: !!b.inv, st: b.st, moved: !!b.moved, pend: b.pend ? { type: b.pend.type, date: lyIso(b.pend.di), ti: b.pend.ti } : null, intake: b.intake ? { st: b.intake.st, ver: b.intake.ver || 0, sum: b.intake.sum || null, crisis: !!b.intake.crisis, mode: b.intake.mode || IK_MODE, tk: b.intake.tk || 't1', tv: b.intake.tv || 1, adds: (b.intake.adds || []).map(a => ({ at: a.at, t: a.t })) } : null } : null,

@@ -43,7 +43,7 @@ def shot(page, name):
     if directory:
         path = Path(directory)
         path.mkdir(parents=True, exist_ok=True)
-        page.screenshot(path=str(path / f'{name}.png'), full_page=True)
+        page.screenshot(path=str(path / f'{name}.png'), full_page=True, animations='disabled')
 
 def book_lin(admin, student):
     student.evaluate("ACT.pickSlot('c1:6:2');ACT.bookSubmit();render()")
@@ -139,6 +139,7 @@ def illness(browser):
         admin.locator('[data-act=fset][data-arg="rgt|病假停诊"]').click()
         admin.locator('[data-act=fset][data-arg="rgd|7"]').click()
         admin.locator('[data-act=fset][data-arg="rga|all"]').click()
+        shot(page, 'B1-3-register')
         admin.locator('[data-act=schedRegGo]').click()
         wait(student, 'S.bk===null')
         check(admin.evaluate('(id)=>{const b=BOOK.find(x=>x.id===id);return b.st==="adjust"&&b.adj.why==="老师病假停诊"&&!!b.adj.at}', bid), 'B1-3 confirmed booking becomes adjust with reason and timestamp')
@@ -173,11 +174,49 @@ def illness(browser):
     finally:
         context.close()
 
+def risk_limits(browser):
+    for urgent, text in [(False, '我感到绝望'), (True, '我想死')]:
+        context, page, admin, student = trial(browser)
+        try:
+            page.click('[data-side="机构端"]')
+            admin.evaluate("enter('u1','L1','B1');go('talk');render()")
+            sid = admin.evaluate("STU.find(s=>tkScope(s)&&!CRISES.some(k=>k.sid===s.id&&k.st!=='closed')).id")
+            admin.evaluate("""([sid,text])=>{cwHits=[];ACT.tkNew(sid);Object.assign(S.rec,{mode:'面对面',place:'办公室',result:'已谈',situ:text,sis:false,types:['心理健康']});ACT.recSave('');render()}""", [sid, text])
+            check(admin.evaluate('S.mo && S.mo.startsWith("tkCrisis:")'), f'B1-4 formal record {text} opens the report receipt')
+            kid = admin.evaluate('S.mo.split(":")[1]')
+            crisis = admin.evaluate('(id)=>{const k=CRISES.find(x=>x.id===id);return {urgent:k.urgent,limit:kLim(k),left:cLeft(k),record:k.fromRec}}', kid)
+            check(crisis['urgent'] == urgent, f'B1-4 {text} has the correct urgency')
+            limit = 0.5 if urgent else 4
+            check(crisis['limit'] == limit and limit - 0.15 < crisis['left'] <= limit, f'B1-4 {text} countdown starts near {limit} hours')
+            popup = admin.inner_text('#modal')
+            if urgent:
+                check('已报告紧急情况' in popup and '30 分钟' in popup and '先留在学生身边' in popup, 'B1-4 urgent popup retains the original 30-minute guidance')
+            else:
+                check('已报告，按一般时限处理' in popup and '4 小时内确认接收' in popup and '12 小时升级分管领导' in popup, 'B1-4 general popup separates 4-hour confirmation and 12-hour escalation')
+                check('先留在学生身边' not in popup and '995' not in popup, 'B1-4 general popup omits emergency-only guidance')
+            expected_time = '30 分钟' if urgent else '4 小时'
+            check(admin.evaluate('([id,time])=>NOTI.some(n=>n.ref===id&&n.to===dutyNow()&&n.t.includes(time))', [kid, expected_time]), f'B1-4 notification agrees with {expected_time} limit')
+            shot(page, 'B1-4-urgent' if urgent else 'B1-4-general')
+            admin.evaluate('(id)=>{ACT.tkView(id);render()}', crisis['record'])
+            marker = admin.inner_text('.tkrisk')
+            check(('已报告紧急情况' if urgent else '已报告（一般时限）') in marker, f'B1-4 {text} record marker follows its associated crisis')
+            admin.evaluate('(id)=>{const k=CRISES.find(x=>x.id===id);k.esc=1;render()}', kid)
+            progress = admin.evaluate('l1Extras()')
+            check(expected_time + '内未确认' in progress, f'B1-4 counsellor progress uses {expected_time}')
+            admin.evaluate('(id)=>{CRISES.find(x=>x.id===id).esc=0;enter("c5","L3","B1");go("crisis");S.crisis=id;render()}', kid)
+            # Audit actions advance the demo clock by a minute, so urgent time is already below 30.
+            expected_countdown = admin.evaluate('(id)=>"剩 "+Math.max(1,Math.round(cLeft(CRISES.find(x=>x.id===id))*60))+" 分钟"', kid) if urgent else '剩 4 小时'
+            check(expected_countdown in admin.inner_text('#pg'), f'B1-4 center displays the matching countdown for {text}')
+            if not urgent:
+                check(admin.evaluate('(id)=>{const k=CRISES.find(x=>x.id===id),old=RULES.esc;RULES.esc=6;const ok=kLim(k)===6;RULES.esc=old;return ok}', kid), 'B1-4 general limit follows configured RULES.esc')
+        finally:
+            context.close()
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--only', choices=['B1-2', 'B1-1', 'B1-3'])
+    parser.add_argument('--only', choices=['B1-2', 'B1-1', 'B1-3', 'B1-4'])
     args = parser.parse_args()
-    tests = {'B1-2': slots, 'B1-1': conflicts, 'B1-3': illness}
+    tests = {'B1-2': slots, 'B1-1': conflicts, 'B1-3': illness, 'B1-4': risk_limits}
     with sync_playwright() as p:
         choices = [os.environ.get('CHROMIUM_PATH'), '/opt/pw-browsers/chromium', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome']
         executable = next((c for c in choices if c and Path(c).is_file()), None)

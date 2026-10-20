@@ -46,7 +46,10 @@ for name in tests:
         failures, errors = result.get('fails', []), result.get('errs', [])
         if failures or errors:
             failed.append(name)
-        print(f'RESULT {name}: {len(failures)} failed, {len(errors)} browser errors', flush=True)
+        passed = result.get('ok')
+        if not isinstance(passed, int):
+            passed = sum(line.startswith('  OK') for line in result.get('log', []))
+        print(f'RESULT {name}: {passed} passed, {len(failures)} failed, {len(errors)} browser errors', flush=True)
     except Exception as exc:
         failed.append(name)
         print(f'ERROR {name}: {type(exc).__name__}: {exc}', flush=True)

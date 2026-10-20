@@ -1,5 +1,6 @@
 import pathlib, json, sys
 from playwright.sync_api import sync_playwright
+from test_support import pick_open
 F = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else __import__('os').environ['TRIAL_HTML']).as_uri()
 ok = 0; fails = []; errs = []
 def chk(c, m):
@@ -24,9 +25,12 @@ with sync_playwright() as p:
     pg.click('[data-side=学生端]'); chk(pg.locator('iframe[title=学生端]').is_visible(), 'switch back')
     # 联动：学生 B 预约 → 机构端李文队列
     STU.evaluate("reset('B');prepare('book');render()"); pg.wait_for_timeout(100)
-    STU.evaluate("ACT.pickSlot('c1:0:1');ACT.fMode('线下');ACT.bookSubmit();render()"); pg.wait_for_timeout(400)
+    # B1: select an actual opening and assert that exact date/time on the admin side.
+    picked = pick_open(STU, 'c1', 0, 1)
+    expected_day = ADM.evaluate('(date)=>lyDay(date)', picked['date'])
+    STU.evaluate("ACT.fMode('线下');ACT.bookSubmit();render()"); pg.wait_for_timeout(400)
     st = ADM.evaluate("(()=>{const b=BOOK.find(b=>b.sid===CORE.chen.id&&['confirm','ok'].includes(b.st));return b&&{st:b.st,cid:b.cid,day:b.day,t:b.t,src:b.src}})()")
-    chk(st and st['st'] == 'confirm' and st['src'] == '学生端提交' and st['cid'] == 'c1' and st['day'] == 1 and st['t'] == 1, f'v1.19 stu book -> admin confirm (待确认申请) {st}')
+    chk(st and st['st'] == 'confirm' and st['src'] == '学生端提交' and st['cid'] == 'c1' and st['day'] == expected_day and st['t'] == picked['ti'], f'v1.19 stu book -> admin confirm (待确认申请) {st}')
     chk('已联动' in pg.inner_text('#sync'), 'sync toast'); sh('02_sync')
     # v1.13 第一次预约直接成功：学生端已确认；机构端「新预约」点「知道了」
     chk(STU.evaluate("S.bk&&S.bk.st") == '待确认' and STU.evaluate("S.modal") == 'ikWelcome', 'student request + intake welcome')
@@ -43,12 +47,12 @@ with sync_playwright() as p:
     chk(STU.evaluate("S.bk.st") == '已改约' and STU.evaluate("S.modal") == 'moved', 'admin move -> student moved')
     # 婉拒：新预约后婉拒
     STU.evaluate("S.bk=null;S.modal=null;render()"); pg.wait_for_timeout(200)
-    STU.evaluate("prepare('book');ACT.pickSlot('c2:1:0');ACT.bookSubmit();render()"); pg.wait_for_timeout(300)
+    STU.evaluate("prepare('book');render()"); pick_open(STU, 'c2', 1, 0); STU.evaluate("ACT.bookSubmit();render()"); pg.wait_for_timeout(300)
     b2 = ADM.evaluate("BOOK.find(b=>b.sid===CORE.chen.id&&b.st==='confirm')"); chk(b2 and b2['cid'] == 'c2', 'second booking synced')
     ADM.evaluate(f"S.form={{why:'时段冲突'}};ACT.bNoOk('{b2['id']}');render()"); pg.wait_for_timeout(400)
     chk(STU.evaluate("S.bk") is None and STU.evaluate("S.modal") == 'info', 'admin decline -> student informed')
     # 远期日期（机构端 5 天之外）
-    STU.evaluate("prepare('book');ACT.pickSlot('c1:8:0');ACT.bookSubmit();render()"); pg.wait_for_timeout(300)
+    STU.evaluate("prepare('book');render()"); pick_open(STU, 'c1', 8, 0, only_day=True); STU.evaluate("ACT.bookSubmit();render()"); pg.wait_for_timeout(300)
     lbl = ADM.evaluate("(()=>{const b=BOOK.find(b=>b.sid===CORE.chen.id&&b.st==='confirm');return slotTxt(b)})()"); chk(lbl.startswith('10/23'), f'far date label {lbl}')
     ADM.evaluate("go('booking');render()"); chk(True, 'booking page renders')
     # 危机：场景 A 请 UCC 联系 → 林晓进入危机通道

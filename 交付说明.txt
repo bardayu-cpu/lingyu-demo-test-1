@@ -1,0 +1,54 @@
+灵屿 v1.19.2-gpt · 第一批交付说明
+
+基线：bardayu-cpu/lingyu-demo-test-1，forayu 分支的 1a1faced5509460310fbd9902703f34f5c4f0ea9。
+修复分支：gpt-fix-b1，从该提交新建；未使用旧 gpt-fix，没有改写或强推已有提交。
+范围：只实施 B1-2 → B1-1 → B1-3 → B1-4。第二至第五批、优化建议未实施。
+以下源文件路径均相对 _src/；四项均重新打包到根目录 index.html。
+
+交付表
+
+| 条目编号 | 状态 | 改动的文件 | 怎么验证的 | 测试结果 |
+|---|---|---|---|---|
+| B1-2 Q02 | 已修 | 机构端/src/a1_core.js、a24_v119.js；试用版外壳/src/shell.js、stu_bridge.js；两个 build.py；自动测试/fix_b1.py | L3 从周详情开放 10/21 09:00；林晓提交 14:00 后，月排班为 bk、周详情为已预约、陈嘉怡为已约满；婉拒后释放；核对独立学生端回退与 24 小时限制 | 10 项业务检查通过 |
+| B1-1 Q01 | 已修 | 机构端/src/a24_v119.js；试用版外壳/src/stu_bridge.js；自动测试/fix_b1.py | 另一学生的已占按钮禁用；强行 pickSlot/bookSubmit 不改预约；选中后被占时重新拦截；直接送入机构端的冲突申请保留 clash 并显示红色 pill；第二次确认被拦截 | 11 项业务检查通过 |
+| B1-3 Q03 | 已修 | 机构端/src/a24_v119.js、a2_home.js；学生端/src/v119.js；试用版外壳/src/shell.js、stu_bridge.js；自动测试/fix_b1.py、adm19.py | 日期按钮和时段勾选；confirm、ok、change 三种预约均转 adjust；全天排班关闭；L3 和预约老师可看中心调整；学生站内信和弹窗使用 6.8 原话、不扣次数；计划性关闭有预约时不登记，无预约时仅关闭选中时段 | 15 项业务检查通过 |
+| B1-4 Q04 | 已修 | 机构端/src/a1_core.js、a19_talk_center.js、a18_talk_rec.js、a10_l1.js；自动测试/fix_b1.py | 辅导员分别保存含“我感到绝望”和“我想死”的正式记录；核对紧急标志、弹窗、通知、记录详情标记、L1 进度与中心倒计时；一般时限随 RULES.esc 配置变化 | 18 项业务检查通过 |
+| B1-1 未覆盖边界：婉拒冲突申请后的占位 | 没修 | 未扩改机构端/src/a6_act.js 的 ACT.bNoOk | 读代码：该函数无条件 setSlot(..., 'open')，没有检查同一时段是否仍由另一条预约占用 | 指定验收用例通过；这个后续边界未列入说明，保留原逻辑 |
+| B1-3 未覆盖边界：中心调整后的后续改时间/婉拒 | 没修 | 未扩改机构端/src/a6_act.js 的 ACT.bMoveOk、ACT.bNoOk | 读代码：两者都会把旧时段设为 open；adjust 不在 LY_ACTIVE 中，后续同一条改时间也没有说明相应的学生端重新安排事件 | 新增的中心调整行按说明复用原按钮；旧时段重新开放及后续重新安排联动未扩改 |
+| B1-4 未覆盖边界：谈心列表的风险标记 | 没修 | 未扩改机构端/src/a17_talk_ui.js 的 mineH | 截图及代码核对：列表小字仍固定“已报告紧急情况”；说明指定的 a18 记录详情标记已按关联危机改好 | 列表文案未在指定修改点中，保持原样 |
+
+说明要求不自行换方案，所以上述三个未覆盖边界单列为“没修”，没有擅自扩大修改。
+
+最终测试
+
+自动测试/fix_b1.py：54 项业务检查 + 1 项浏览器错误检查，共 55 项通过，0 失败，0 浏览器错误。
+七个原有脚本全部通过，共 274 项断言，0 失败，0 浏览器错误：
+adm19.py 36；stu19.py 20；trial_v119.py 6；trial_ik.py 40；trial.py 29；stu_reg.py 108；adm13.py 35。
+基线 1a1face 的同一套七个原有脚本也先行跑过，全部通过。
+机构端拼接后的 JavaScript 通过 node --check。
+另将完整源码与图片复制到干净目录重新构建，index.html 的 SHA256 与交付版一致：
+d11d77185954df162e424c13d72ba34b0a84780b54af556e32334aa4f786b602
+
+原有测试的必要调整
+
+1. adm19.py 的病假登记输入从自由文本“10/23 下午”改为日期索引 9、时段 2/3；仍断言新增一条登记，没有放宽期望。
+2. trial_v119.py、trial_ik.py、trial.py 原来强行选择被占用或已关闭的固定时段，现在通过 test_support.py 选择同一老师的真实开放时段。原有来源、摘要、状态、确认、改期及通知等业务断言保留。
+3. trial.py 初始预约的固定 day=1、t=1，改为严格核对实际选中的日期和时段；远期预约仍限定 10/23 并核对该日期。
+4. adm13.py、stu_reg.py 仅把 /home/claude 的截图目录换为可配置的相对目录，没有调整业务期望。
+5. run_checks.py 为原脚本提供 macOS/Linux 浏览器路径兼容和失败退出码；CHROMIUM_PATH 可指定浏览器，QA_SHOTS 可指定截图目录。没有改产品逻辑。
+
+构建与资源
+
+完整源码保存在 _src/，目录沿用审查包；21 张图片全部从基线 index.html 的内联 data URI 恢复，没有缺失。
+两个 build.py 已移除 /home/claude/v13 路径，使用脚本相对路径；试用版构建同时写入根目录 index.html。
+运行：
+python3 _src/机构端/build.py
+python3 _src/试用版外壳/build.py
+
+测试需 Python 和 Playwright，另需已安装的 Chrome/Chromium（可用 CHROMIUM_PATH 指定）：
+python3 -m pip install playwright
+python3 _src/自动测试/fix_b1.py
+python3 _src/自动测试/run_checks.py
+
+学生端的独立构建片段在 _src/试用版外壳/trial_parts/stu.html；无外壳时排班照说明回退到原公式。
+产品词库、否定规则、预约确认规则，以及本批之外的产品规则未改动。

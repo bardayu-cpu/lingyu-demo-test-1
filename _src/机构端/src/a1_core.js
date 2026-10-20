@@ -79,8 +79,8 @@ const bLimit = b => SU(b.sid) && curLv(SU(b.sid)) >= 5 ? RULES.lim.book5 : RULES
 const bLeft = b => ['audit', 'confirm'].includes(b.st) ? bLimit(b) - hrs(b.at) : null;
 const auditor = b => b.auditor || SU(b.sid).follower;
 const crisisNew = () => CRISES.filter(k => k.st === 'new').sort((a, b) => a.at - b.at);
-/* 紧急报告（学院 / 他人报告、学生主动求助）按分钟确认；普通危机 12 小时 */
-const kLim = k => k.urgent ? RULES.urgentMin / 60 : 12;
+/* 紧急报告按分钟确认；一般危机按 RULES.esc 小时确认。 */
+const kLim = k => k.urgent ? RULES.urgentMin / 60 : RULES.esc;
 const kEsc = k => k.urgent ? [RULES.urgentMin / 60, 2] : [RULES.esc, RULES.esc2];
 const cLeft = k => kLim(k) - hrs(k.at);
 /* 12 小时内接收率：分母含已超过 12 小时仍未接收的 */

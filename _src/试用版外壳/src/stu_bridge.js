@@ -33,6 +33,7 @@ function LY_snap() { const b = S.bk, ts = S.tasks || []; S._ly = S._ly || Math.r
 function LY_ctx() { return { 端: '学生端', 场景: SCENES[S.scen].name, 页面: ((typeof JUMPS !== 'undefined' && JUMPS.find(j => j[0] === S.page)) || [0, S.page])[1].replace(/^\d+b? /, ''), 弹窗: S.modal || '', 语言: LANG === 'en' ? 'English' : '中文' }; }
 function LY_in(ev) { const b = S.bk; let msg = '';
   if (ev.t === 'confirm' && b && b.st === '待确认') { ACT.zConfirm(); msg = '学生端收到「老师已确认你的预约」'; }
+  else if (ev.t === 'adjust' && b) { ACT.zAdjust(); msg = '学生端收到「中心调整」通知'; }
   else if (ev.t === 'decline' && b && !b.pend) { ACT.zDecline(); msg = '学生端收到「老师这次无法接待」'; }
   else if (ev.t === 'agree' && b && b.pend) { ACT.zPend(); msg = '学生端收到「老师同意了你的申请」'; }
   else if (ev.t === 'deny' && b && b.pend) { const ty = b.pend.type === 'cancel' ? '取消' : '改期'; b.pend = null;

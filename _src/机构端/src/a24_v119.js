@@ -109,6 +109,12 @@ function slotAt(cid, day, t) {
   const row = (SCHED[cid] && SCHED[cid][day]) || (DD(day) && SCHM[cid] && SCHM[cid][dkey(DD(day))]);
   return row && row[t] || 'off';
 }
+BST.adjust = '<span class="pill r">中心调整 · 待重新安排</span>';
+const schedDaysB1 = () => {
+  const today = new Date(NOW); today.setHours(0, 0, 0, 0);
+  const end = new Date(today); end.setDate(end.getDate() + 30);
+  return DXL.map((d, day) => ({ d, day })).filter(x => x.d >= today && x.d <= end && x.d.getDay() % 6);
+};
 const _bOkB1 = ACT.bOk; ACT.bOk = function (id) {
   const b = BOOK.find(x => x.id === id); if (!b) return;
   const other = BOOK.find(x => x.id !== b.id && x.cid === b.cid && x.day === b.day && x.t === b.t && ['ok', 'change'].includes(x.st));
@@ -170,6 +176,13 @@ if (typeof LY_snap === 'function') { const _lySnapSlotsB1 = LY_snap; LY_snap = f
     const key = dkey(d); if (SCHM[cid][key]) o.__slots[cid][key] = SCHM[cid][key].slice();
   }); }); return o;
 }; }
+if (typeof LY_snap === 'function') { const _lySnapAdjustB1 = LY_snap; LY_snap = function () {
+  const o = _lySnapAdjustB1(); o.__adj = {};
+  Object.entries(LY_CORE()).forEach(([key, s]) => {
+    const latest = BOOK.filter(b => b.sid === s.id).slice(-1)[0];
+    if (latest && latest.st === 'adjust') o.__adj[key] = 1;
+  }); return o;
+}; }
 
 /* ---------- 4. 「预约咨询」5 个页签（按学生走的顺序） ---------- */
 const BKT = [['inv', '主动邀约'], ['ai', 'AI 预咨询'], ['man', '人工咨询'], ['sched', '排班表'], ['pool', '号池配置']];
@@ -183,8 +196,8 @@ const bkBtnFix = h => h.replace(/>改约<\/button>/g, '>改时间</button>').rep
 
 /* 人工咨询：最上面是待确认的申请，下面是已约、改期取消、待写记录、待办池 */
 const bkMan = () => { const r = S.role; let list = BOOK.slice(); if (r === 'L2') list = list.filter(b => b.cid === me());
-  const F = { change: b => b.st === 'change', ok: b => b.st === 'ok', record: b => b.st === 'record', pool: b => b.st === 'pool', all: () => true };
-  const subs = [['ok', '已约'], ['change', '改期 / 取消申请'], ['record', '待写记录'], ...(r === 'L3' ? [['pool', '待办池']] : []), ['all', '全部']];
+  const F = { change: b => b.st === 'change', ok: b => b.st === 'ok', adjust: b => b.st === 'adjust', record: b => b.st === 'record', pool: b => b.st === 'pool', all: () => true };
+  const subs = [['ok', '已约'], ['change', '改期 / 取消申请'], ['adjust', '中心调整'], ['record', '待写记录'], ...(r === 'L3' ? [['pool', '待办池']] : []), ['all', '全部']];
   const sub = subs.some(x => x[0] === S.tabs.bsub) ? S.tabs.bsub : 'ok', pend = list.filter(b => b.st === 'confirm');
   const unpub = UNPUB().filter(u => r === 'L3' || u.cid === me()).map(u => `${ST(u.cid).name} ${u.day}`).join('、');
   return (unpub ? `<div class="head n" style="padding:10px 16px">${I('cal')}<div class="grow"><b style="font-size:13.5px">请提前 2 天提交排班：${unpub} 还没有开放任何时段</b></div><button class="btn sec xs" data-act="btab" data-arg="sched">去排班</button></div>` : '') +
@@ -281,9 +294,25 @@ Object.assign(ACT, {
       if (B.list.some(x => x.sid === s.id)) return res.has.push(`${nm(s)}：已在批次里`); if (activeBook(s)) return res.has.push(`${nm(s)}：已有在途预约`);
       B.list.push({ sid: s.id, lv: curLv(s), st: 'new', resp: ivResp(s) }); res.in.push(nm(s)); });
     if (!ids.length) return toast('请勾选学生或粘贴学号'); log(`主动邀约 · 加学生：进入批次 ${res.in.length} · 对不上 ${res.bad.length} · 不走预约队列 ${res.skip.length} · 已有安排 ${res.has.length}`, null, { cat: '预约', obj: '主动邀约' }); S.ivRes = res; S.mo = 'ivRes:'; },
-  schedRegGo() { const F = S.form; if (!F.rgc || !F.rgt || !(F.rgd || '').trim()) return toast('请选老师、类型，写日期'); RULES.schedLog = RULES.schedLog || [];
-    RULES.schedLog.push({ at: new Date(NOW), cid: F.rgc, type: F.rgt, day: F.rgd.trim(), why: (F.rgw || '').trim() }); log(`排班 · ${ST(F.rgc).name} ${F.rgt}：${F.rgd.trim()}`, null, { cat: '预约', obj: '排班' });
-    if (me() !== 'c5') notify('c5', '站内', `${ST(F.rgc).name} 登记了${F.rgt}：${F.rgd.trim()}`, null); S.mo = null; toast('已登记，中心负责人会收到通知'); },
+  schedRegGo() { const F = S.form, day = +F.rgd;
+    if (!SC.includes(F.rgc) || !['改班', '病假停诊', '计划性关时段'].includes(F.rgt) || F.rgd == null || F.rgd === '' || !schedDaysB1().some(x => x.day === day)) return toast('请选老师、类型和日期');
+    const times = F.rga === 'part' ? [...new Set((F.rgts || []).map(Number))].filter(t => Number.isInteger(t) && t >= 0 && t < TIMES.length) : TIMES.map((_, t) => t);
+    if (!times.length) return toast('请至少选一个时段');
+    const affected = BOOK.filter(b => b.cid === F.rgc && b.day === day && times.includes(b.t) && ['confirm', 'ok', 'change'].includes(b.st));
+    if (F.rgt === '计划性关时段' && affected.length) return toast(`这些时段上还有 ${affected.length} 个预约，先改时间或婉拒，再关`);
+    if (F.rgt !== '改班') times.forEach(t => { if (slotAt(F.rgc, day, t) !== 'off') setSlot(F.rgc, day, t, 'off'); });
+    if (F.rgt === '病假停诊') affected.forEach(b => {
+      b.st = 'adjust'; b.adj = { at: new Date(NOW), why: '老师病假停诊' };
+      const s = SU(b.sid), resp = ivResp(s);
+      log(`病假停诊：${slotTxt(b)} 的预约转为中心调整 · 待重新安排`, s, { cat: '预约', k: 'book' });
+      if (resp && resp !== 'c5') notify(resp, '站内', `${nm(s)} 的预约因老师病假停诊转为中心调整 · 待重新安排`, b.id);
+    });
+    const label = `${dayLbl(day)} ${times.length === TIMES.length ? '全天' : times.map(t => TIMES[t]).join('、')}`;
+    RULES.schedLog = RULES.schedLog || [];
+    RULES.schedLog.push({ at: new Date(NOW), cid: F.rgc, type: F.rgt, day: label, slots: times.slice(), why: (F.rgw || '').trim() });
+    log(`排班 · ${ST(F.rgc).name} ${F.rgt}：${label}`, null, { cat: '预约', obj: '排班' });
+    if (me() !== 'c5' || F.rgt === '病假停诊') notify('c5', '站内', `${ST(F.rgc).name} 登记了${F.rgt}：${label}${F.rgt === '病假停诊' ? `，${affected.length} 个预约转为中心调整 · 待重新安排` : ''}`, null);
+    S.mo = null; toast(F.rgt === '病假停诊' ? `已登记，${affected.length} 个预约转为中心调整 · 待重新安排` : '已登记，中心负责人会收到通知'); },
   ivPickT(id) { const L = S.form.ivPick = S.form.ivPick || []; const i = L.indexOf(id); if (i >= 0) L.splice(i, 1); else L.push(id); } });
 const _md19 = modal; modal = function () { const [k, id] = (S.mo || '').split(':'), F = S.form;
   if (k === 'ivSend') { const L = ivMine().filter(x => x.st === 'new' && (id === 'all' || (+id >= 4 ? x.lv >= 4 : x.lv === +id))), P = poolN(), q = Math.max(0, P.can - ivMine().filter(x => ['entry', 'sub', 'ok'].includes(x.st)).length);
@@ -299,7 +328,7 @@ const _md19 = modal; modal = function () { const [k, id] = (S.mo || '').split(':
   if (k === 'ivIk') { const x = ivb().list.find(v => v.sid === id), s = SU(id), it = x && x.ik; if (!it || !it.sum) return _md19();
     if (!it.seen) { it.seen = 1; it.viewed = true; log('查看预咨询摘要（主动邀约）', s, { cat: '查看', noTl: 1 }); }
     return mbox(`预咨询摘要 · ${nm(s)}`, `学生 ${fmt(new Date(it.at))} 发送 · 高危咨询题库`, `<div class="ikform2">${it.sum.map(r => `<div class="${(r.v || '').length > 24 || r.k === 'trouble' ? 'w' : ''}"><label>${esc(r.name)}</label><p>${r.v ? (r.k === 'trouble' ? `「${esc(r.v)}」` : esc(r.v)) : '<span class="note">学生跳过了</span>'}</p></div>`).join('')}</div><p class="note">由预咨询小屿整理、学生本人确认后发送；只收集信息，不评分，不改变等级。每次查看都记入操作记录。</p>`, '', '', '', true); }
-  if (k === 'schedReg') return mbox('改班和停诊登记', '登记后中心负责人会收到通知。', fld('老师', `<div class="opts">${['c1', 'c2', 'c3', 'c4', 'c5'].filter(c => S.role === 'L3' || c === me()).map(c => `<button class="${F.rgc === c ? 'on' : ''}" data-act="fset" data-arg="rgc|${c}">${ST(c).name}</button>`).join('')}</div>`) + fld('类型', `<div class="opts">${['改班', '病假停诊', '计划性关时段'].map(t => `<button class="${F.rgt === t ? 'on' : ''}" data-act="fset" data-arg="rgt|${t}">${t}</button>`).join('')}</div>`) + fld('日期', `<input class="in" style="width:200px" data-bind="form.rgd" value="${esc(F.rgd || '')}" placeholder="例如 10/23 下午">`) + fld('说明（可不写）', `<input class="in" data-bind="form.rgw" value="${esc(F.rgw || '')}">`), '登记', 'schedRegGo', '');
+  if (k === 'schedReg') return mbox('改班和停诊登记', '登记后中心负责人会收到通知。', fld('老师', `<div class="opts">${SC.filter(c => S.role === 'L3' || c === me()).map(c => `<button class="${F.rgc === c ? 'on' : ''}" data-act="fset" data-arg="rgc|${c}">${ST(c).name}</button>`).join('')}</div>`) + fld('类型', `<div class="opts">${['改班', '病假停诊', '计划性关时段'].map(t => `<button class="${F.rgt === t ? 'on' : ''}" data-act="fset" data-arg="rgt|${t}">${t}</button>`).join('')}</div>`) + fld('日期', `<div class="opts">${schedDaysB1().map(x => `<button class="${F.rgd !== '' && F.rgd != null && +F.rgd === x.day ? 'on' : ''}" data-act="fset" data-arg="rgd|${x.day}">${dayLbl(x.day)}</button>`).join('')}</div>`) + fld('时段', `<div class="opts"><button class="${F.rga !== 'part' ? 'on' : ''}" data-act="fset" data-arg="rga|all">全天</button><button class="${F.rga === 'part' ? 'on' : ''}" data-act="fset" data-arg="rga|part">勾选时段</button></div>${F.rga === 'part' ? `<div class="opts">${TIMES.map((t, i) => `<label><input type="checkbox" data-act="fArr" data-arg="rgts|${i}" ${(F.rgts || []).includes(String(i)) ? 'checked' : ''}> ${t}</label>`).join('')}</div>` : ''}`) + fld('说明（可不写）', `<input class="in" data-bind="form.rgw" value="${esc(F.rgw || '')}">`), '登记', 'schedRegGo', '');
   return _md19(); };
 
 /* ---------- 5. 设置：值班表挪走；预咨询只留「放在哪一步」 ---------- */

@@ -43,7 +43,7 @@ with sync_playwright() as p:
     E("ACT.btab('man');render()"); chk(E("RULES.ikt===RULES.iktN"), 'bank resets when leaving'); t = T(); chk('待确认申请' in t and '看学生信息' in t and '改时间' in t and '新预约' not in t, 'pinned applications')
     bid = E("BOOK.find(b=>b.st==='confirm').id"); n = E("AUDIT.length"); E(f"ACT.bOpen('{bid}');render()"); chk(E("!!S.dw") and E("AUDIT.length") > n, 'open application audited')
     E("S.dw=null;ACT.btab('sched');render()"); t = T(); chk('值班表' in t and '改班和停诊登记' in t and '工作量' in t, 'schedule tab')
-    E("S.mo='schedReg:';S.form={rgc:'c1',rgt:'病假停诊',rgd:'10/23 下午'};ACT.schedRegGo();render()"); chk(len(E("RULES.schedLog")) == 1, 'register sick leave')
+    E("S.mo='schedReg:';S.form={rgc:'c1',rgt:'病假停诊',rgd:'9',rga:'part',rgts:['2','3']};ACT.schedRegGo();render()"); chk(len(E("RULES.schedLog")) == 1, 'register sick leave')
     E("ACT.btab('pool');render()"); chk('申请卡（1 待处理）' in T(), 'apply card shown')
     E("ACT.poolR(90);render()"); chk(E("RULES.pool.inv") == 90 and '10 / 90' in E("AUDIT[0].t"), 'ratio change audited')
     E("ACT.poolAppOk(RULES.pool.apps[0].id);render()"); chk(E("RULES.pool.apps[0].st") == 'ok', 'approve apply card')

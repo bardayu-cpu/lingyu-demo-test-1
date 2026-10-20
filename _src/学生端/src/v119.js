@@ -18,6 +18,12 @@ const _ikX19 = ACT.ikX; ACT.ikX = function () { const ik = S.ik; if (ik && ik.in
 function ivGoIk() { const it = S.ivc.ik, real = S.bk; S.ivc.st = 'acc'; S._ivIk = true; S.bk = { intake: it || null };
   try { ikStart(false, !!(it && it.st === 'draft' && it.qs)); } finally { S.bk = real; S._ivIk = false; } S.ik.inv = true; }
 Object.assign(ACT, {
+  zAdjust() { const b = S.bk; if (!b) return;
+    S.bkHist.unshift({ cid: b.cid, at: slotDate(b), kind: b.kind, st: '中心调整' }); S.bk = null;
+    const title = ['预约时间调整', 'Your appointment time has changed'], body = ['原定的时间因老师临时有事取消了，老师会尽快重新和你约。', 'Your original appointment was cancelled because your counsellor became unavailable. They will arrange another time with you as soon as possible.'];
+    addMsg('cal', title, body, 'mybook', true);
+    S.info = { ico: 'cal', title: L(...title), body: L(...body), btn: ['mybook', L('我知道了', 'Got it')] }; S.modal = 'info';
+  },
   zIvc() { S.ivc = { st: 'wait', due: IVC_DUE_(), at: new Date(NOW) };
     addMsg('chat', ['心理中心邀请你聊一聊', 'UCC invites you to talk'], [`接受后，小屿会先花 3 分钟了解一下你最近的情况，然后你可以自己选和老师见面的时间。请在 ${IVC_DUE_()} 前回复。`, `If you accept, Xiaoyu will spend about 3 minutes getting to know how you’ve been, then you can choose a time to meet a counsellor. Please reply by ${IVC_DUE_()}.`], 'ivc'); S.modal = 'ivc'; },
   zIvQ() { S.ivQ = !S.ivQ; toast(S.ivQ ? L('演示：号不够，做完预咨询先排队', 'Demo: no slots, queue after intake') : L('演示：有号，做完预咨询直接选时间', 'Demo: slots available')); },

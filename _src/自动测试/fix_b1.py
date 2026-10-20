@@ -115,11 +115,69 @@ def conflicts(browser):
     finally:
         context.close()
 
+def illness(browser):
+    context, page, admin, student = trial(browser)
+    try:
+        bid = book_lin(admin, student)
+        admin.evaluate('(id)=>{ACT.bOk(id);render()}', bid)
+        wait(student, "S.bk && S.bk.st==='已确认'")
+        operations = student.evaluate('JSON.stringify(S.ops)')
+        # Include all three active states in the affected-slot fixture.
+        admin.evaluate("""(id)=>{
+          const base=BOOK.find(b=>b.id===id), others=STU.filter(s=>!Object.values(LY_CORE()).some(c=>c.id===s.id)).slice(0,2);
+          others.forEach((s,i)=>{BOOK.push({...base,id:'b1_sick_'+i,sid:s.id,t:i,st:i?'change':'confirm',req:i?{type:'取消'}:null});setSlot('c1',7,i,'bk')});render();
+        }""", bid)
+        schedule = admin.evaluate("JSON.stringify(SCHM.c1['10/21'])")
+        log_count = admin.evaluate('(RULES.schedLog||[]).length')
+        admin.evaluate("ACT.mo('schedReg:');S.form={rgc:'c1',rgt:'计划性关时段',rgd:'7',rga:'all'};ACT.schedRegGo();render()")
+        check('这些时段上还有 3 个预约，先改时间或婉拒，再关' in admin.inner_text('#toast'), 'B1-3 planned closure is blocked by active bookings')
+        check(admin.evaluate("JSON.stringify(SCHM.c1['10/21'])") == schedule and admin.evaluate('(RULES.schedLog||[]).length') == log_count, 'B1-3 blocked registration leaves schedule and log unchanged')
+        page.click('[data-side="机构端"]')
+        admin.evaluate("ACT.mo('schedReg:');render()")
+        check(admin.locator('[data-bind="form.rgd"]').count() == 0 and admin.locator('[data-act=fset][data-arg="rgd|0"]').count() == 1, 'B1-3 date buttons replace free text and include today')
+        admin.locator('[data-act=fset][data-arg="rgc|c1"]').click()
+        admin.locator('[data-act=fset][data-arg="rgt|病假停诊"]').click()
+        admin.locator('[data-act=fset][data-arg="rgd|7"]').click()
+        admin.locator('[data-act=fset][data-arg="rga|all"]').click()
+        admin.locator('[data-act=schedRegGo]').click()
+        wait(student, 'S.bk===null')
+        check(admin.evaluate('(id)=>{const b=BOOK.find(x=>x.id===id);return b.st==="adjust"&&b.adj.why==="老师病假停诊"&&!!b.adj.at}', bid), 'B1-3 confirmed booking becomes adjust with reason and timestamp')
+        check(admin.evaluate("BOOK.filter(b=>b.id.startsWith('b1_sick_')).every(b=>b.st==='adjust')"), 'B1-3 pending and change-request bookings are also adjusted')
+        check(admin.evaluate("SCHM.c1['10/21'].every(v=>v==='off')"), 'B1-3 sick leave closes every selected daily slot')
+        wait(student, "[0,1,2,3].every(t=>slotState(0,6,t)==='closed')")
+        check(student.evaluate("S.bkHist[0].st") == '中心调整' and student.evaluate('JSON.stringify(S.ops)') == operations, 'B1-3 history records center adjustment without using cancellation allowance')
+        message = '原定的时间因老师临时有事取消了，老师会尽快重新和你约。'
+        check(student.evaluate('S.inbox[0].d[0]') == message and message in student.inner_text('#modal'), 'B1-3 inbox and popup use the exact agreed text')
+        check(admin.evaluate("NOTI.some(n=>n.to==='c5'&&n.t.includes('中心调整'))&&NOTI.some(n=>n.to===ivResp(CORE.lin)&&n.t.includes('中心调整'))"), 'B1-3 center lead and responsible teacher are notified')
+        check(admin.evaluate('LY_snap().__adj.lin') == 1, 'B1-3 snapshot distinguishes adjustment from decline')
+        admin.evaluate("ACT.btab('man');ACT.bsub('adjust');render()")
+        check('中心调整 · 待重新安排' in admin.inner_text('#pg') and admin.locator(f'[data-arg="bMove:{bid}"]').count() == 1 and admin.locator(f'[data-arg="bNo:{bid}"]').count() == 1, 'B1-3 center lead sees adjustment row and its two actions')
+        shot(page, 'B1-3-center-adjustment')
+        page.click('[data-side="学生端"]')
+        shot(page, 'B1-3-student-notice')
+        admin.evaluate("enter('c1','L2','B1');go('booking');ACT.btab('man');ACT.bsub('adjust');render()")
+        check(admin.locator(f'[data-arg="bMove:{bid}"]').count() == 1, 'B1-3 appointment teacher sees the adjustment')
+        admin.evaluate("enter('c2','L2','B1');go('booking');ACT.btab('man');ACT.bsub('adjust');render()")
+        check(admin.locator(f'[data-arg="bMove:{bid}"]').count() == 0, 'B1-3 another teacher does not see this adjustment row')
+        admin.evaluate("enter('c5','L3','B1');go('booking');ACT.btab('sched');render()")
+        before = admin.evaluate("SCHM.c1['10/23'].slice()")
+        page.click('[data-side="机构端"]')
+        admin.evaluate("ACT.mo('schedReg:');S.form={rgc:'c1',rgt:'计划性关时段',rgd:'9',rga:'part'};render()")
+        admin.locator('input[data-act=fArr][data-arg="rgts|2"]').check()
+        admin.locator('[data-act=schedRegGo]').click()
+        after = admin.evaluate("SCHM.c1['10/23'].slice()")
+        check(after[2] == 'off' and all(after[t] == before[t] for t in [0,1,3]), 'B1-3 selected-slot closure changes only the checked time')
+        before = admin.evaluate("JSON.stringify(SCHM.c1['10/22'])")
+        admin.evaluate("ACT.mo('schedReg:');S.form={rgc:'c1',rgt:'改班',rgd:'8',rga:'all'};ACT.schedRegGo();render()")
+        check(admin.evaluate("JSON.stringify(SCHM.c1['10/22'])") == before, 'B1-3 shift-change registration keeps the existing schedule')
+    finally:
+        context.close()
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--only', choices=['B1-2', 'B1-1'])
+    parser.add_argument('--only', choices=['B1-2', 'B1-1', 'B1-3'])
     args = parser.parse_args()
-    tests = {'B1-2': slots, 'B1-1': conflicts}
+    tests = {'B1-2': slots, 'B1-1': conflicts, 'B1-3': illness}
     with sync_playwright() as p:
         choices = [os.environ.get('CHROMIUM_PATH'), '/opt/pw-browsers/chromium', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome']
         executable = next((c for c in choices if c and Path(c).is_file()), None)

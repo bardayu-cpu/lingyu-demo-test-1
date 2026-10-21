@@ -134,6 +134,18 @@ if (typeof LY_in === 'function') { const _lyInSlotResync = LY_in; LY_in = functi
   return result;
 }; }
 BST.adjust = '<span class="pill r">中心调整 · 待重新安排</span>';
+RULES.offSlots = RULES.offSlots || {};
+LY_ACTIVE.push('adjust');
+const _mSaveOffSlots = ACT.mSave; ACT.mSave = function () {
+  const cid = S.schSel.c, reopening = [];
+  Object.entries(S.mdraft || {}).forEach(([key, row]) => {
+    const day = DXL.findIndex(d => dkey(d) === key);
+    if (day >= 0) row.forEach((v, t) => { if (v === 'open' && slotAt(cid, day, t) !== 'open') reopening.push({ day, t }); });
+  });
+  const result = _mSaveOffSlots.apply(this, arguments);
+  reopening.forEach(({ day, t }) => { if (slotAt(cid, day, t) === 'open') delete RULES.offSlots[`${cid}|${day}|${t}`]; });
+  return result;
+};
 const schedDaysB1 = () => {
   const today = new Date(NOW); today.setHours(0, 0, 0, 0);
   const end = new Date(today); end.setDate(end.getDate() + 30);
@@ -200,14 +212,6 @@ if (typeof LY_snap === 'function') { const _lySnapSlotsB1 = LY_snap; LY_snap = f
     const key = dkey(d); if (SCHM[cid][key]) o.__slots[cid][key] = SCHM[cid][key].slice();
   }); }); return o;
 }; }
-if (typeof LY_snap === 'function') { const _lySnapAdjustB1 = LY_snap; LY_snap = function () {
-  const o = _lySnapAdjustB1(); o.__adj = {};
-  Object.entries(LY_CORE()).forEach(([key, s]) => {
-    const latest = BOOK.filter(b => b.sid === s.id).slice(-1)[0];
-    if (latest && latest.st === 'adjust') o.__adj[key] = 1;
-  }); return o;
-}; }
-
 /* ---------- 4. 「预约咨询」5 个页签（按学生走的顺序） ---------- */
 const BKT = [['inv', '主动邀约'], ['ai', 'AI 预咨询'], ['man', '人工咨询'], ['sched', '排班表'], ['pool', '号池配置']];
 const bkTab = () => { const t = ({ list: 'man' })[S.tabs.booking] || S.tabs.booking; return BKT.some(x => x[0] === t) ? t : S.role === 'L3' ? 'inv' : 'man'; };
@@ -227,7 +231,7 @@ const bkMan = () => { const r = S.role; let list = BOOK.slice(); if (r === 'L2')
   return (unpub ? `<div class="head n" style="padding:10px 16px">${I('cal')}<div class="grow"><b style="font-size:13.5px">请提前 2 天提交排班：${unpub} 还没有开放任何时段</b></div><button class="btn sec xs" data-act="btab" data-arg="sched">去排班</button></div>` : '') +
     `<div class="card bkpin"><h3>${I('inbox')}待确认申请（${pend.length}）<span class="sp"></span><small>学生提交的是申请，老师确认后才算约好</small></h3>${pend.length ? bkBtnFix(bookTable(pend)) : `<div class="empty"><img src="${MASCOT}" alt="">没有等你确认的申请</div>`}
       <p class="note">打开申请能看到这个学生的预咨询摘要、普测结果和档案，能看到哪些按你的账号权限；每次查看记入操作记录。<b>确认</b>后变成正式预约；<b>改时间</b>要学生再确认一次；<b>婉拒</b>写一句原因，学生回到选时间那一步。</p></div>
-    <div class="card"><div class="tabs">${subs.map(([k, n]) => `<button class="${sub === k ? 'on' : ''}" data-act="bsub" data-arg="${k}">${n}<i class="${k === 'pool' && list.filter(F[k]).length ? 'r' : ''}">${list.filter(F[k]).length}</i></button>`).join('')}</div>${bookTable(list.filter(F[sub]))}
+    <div class="card"><div class="tabs">${subs.map(([k, n]) => `<button class="${sub === k ? 'on' : ''}" data-act="bsub" data-arg="${k}">${n}<i class="${['pool', 'adjust'].includes(k) && list.filter(F[k]).length ? 'r' : ''}">${list.filter(F[k]).length}</i></button>`).join('')}</div>${bookTable(list.filter(F[sub]))}
     <p class="note" style="margin-top:10px">规则：所有预约都要老师确认，学生自己约普通号和主动邀约来的学生都一样。提前 24 小时预约；学生每 14 天可改期、取消各 1 次（老师改约不计）。确认时限：危机 ${RULES.lim.book5} 小时，其余 ${RULES.lim.book} 小时；超时自动进入待办池，由中心负责人指派。</p></div>`; };
 
 /* 主动邀约：批次、核对四堆、发邀约卡、进度、容量缺口、申请额度 */
@@ -324,7 +328,7 @@ Object.assign(ACT, {
     if (!times.length) return toast('请至少选一个时段');
     const affected = BOOK.filter(b => b.cid === F.rgc && b.day === day && times.includes(b.t) && ['confirm', 'ok', 'change'].includes(b.st));
     if (F.rgt === '计划性关时段' && affected.length) return toast(`这些时段上还有 ${affected.length} 个预约，先改时间或婉拒，再关`);
-    if (F.rgt !== '改班') times.forEach(t => { if (slotAt(F.rgc, day, t) !== 'off') setSlot(F.rgc, day, t, 'off'); });
+    if (F.rgt !== '改班') times.forEach(t => { RULES.offSlots[`${F.rgc}|${day}|${t}`] = 1; setSlot(F.rgc, day, t, 'off'); });
     if (F.rgt === '病假停诊') affected.forEach(b => {
       b.st = 'adjust'; b.adj = { at: new Date(NOW), why: '老师病假停诊' };
       const s = SU(b.sid), resp = ivResp(s);
@@ -339,6 +343,17 @@ Object.assign(ACT, {
     S.mo = null; toast(F.rgt === '病假停诊' ? `已登记，${affected.length} 个预约转为中心调整 · 待重新安排` : '已登记，中心负责人会收到通知'); },
   ivPickT(id) { const L = S.form.ivPick = S.form.ivPick || []; const i = L.indexOf(id); if (i >= 0) L.splice(i, 1); else L.push(id); } });
 const _md19 = modal; modal = function () { const [k, id] = (S.mo || '').split(':'), F = S.form;
+  if (k === 'bMove') {
+    const b = BOOK.find(x => x.id === id);
+    if (b && b.st === 'adjust') {
+      const today = new Date(NOW); today.setHours(0, 0, 0, 0);
+      const slots = schedDaysB1().filter(x => x.d > today).flatMap(({ day }) => TIMES.map((_, t) => ({ day, t })).filter(x => slotAt(b.cid, x.day, x.t) === 'open'));
+      const choices = slots.map(({ day, t }) => { const value = `${day}-${t}`;
+        return `<button class="${F.slot === value ? 'on' : ''}" data-act="fset" data-arg="slot|${value}">${dayLbl(day)} ${TIMES[t]}</button>`;
+      }).join('');
+      return mbox('重新安排咨询时间', `${nm(SU(b.sid))} · 原定 ${slotTxt(b)}。选择新时间后会直接确认并通知学生，不计入学生的改期次数。`, fld(`${ST(b.cid).name} · 未来 30 天的开放时段`, `<div class="opts">${choices || '<span class="note">这位咨询师未来 30 天没有开放时段，请先补充排班。</span>'}</div>`), slots.length ? '重新安排并通知学生' : '', 'bMoveOk', id, true);
+    }
+  }
   if (k === 'ivSend') { const L = ivMine().filter(x => x.st === 'new' && (id === 'all' || (+id >= 4 ? x.lv >= 4 : x.lv === +id))), P = poolN(), q = Math.max(0, P.can - ivMine().filter(x => ['entry', 'sub', 'ok'].includes(x.st)).length);
     return mbox(`发邀约卡 · ${L.length} 人`, '确认后才发。学生收到的卡上不写原因、等级和「普测筛出」。', `<div class="dbox"><p style="margin:0">「心理中心邀请你聊一聊。接受后，小屿会先花 3 分钟了解一下你最近的情况，然后你可以自己选和老师见面的时间。请在 ${ivDue(2)} 前回复。」<br>[接受] [这次不参加]</p></div><p class="note">按现在的号，接受的人里大约前 ${q} 位能很快拿到人工入口，其余要排队。邀约卡不占号，24 小时提醒一次。</p>`, '确认发送', 'ivSendGo', id); }
   if (k === 'ivApp') return mbox('申请额度', '发给中心负责人，在「号池配置 · 申请卡」里处理。', fld('学院', `<div class="opts">${COLLEGES.map(c => `<button class="${F.apc === c ? 'on' : ''}" data-act="fset" data-arg="apc|${c}">${c}</button>`).join('')}</div>`) + fld('要多少个号', `<input class="in" type="number" min="1" style="width:100px" data-bind="form.apn" value="${esc(F.apn || '')}">`) + fld('为什么', `<textarea data-bind="form.apw" rows="2" placeholder="例如：名单里等着的人多，本周已排满">${esc(F.apw || '')}</textarea>`), '提交', 'ivAppGo', '');

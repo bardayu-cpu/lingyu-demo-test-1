@@ -19,10 +19,23 @@ function ivGoIk() { const it = S.ivc.ik, real = S.bk; S.ivc.st = 'acc'; S._ivIk 
   try { ikStart(false, !!(it && it.st === 'draft' && it.qs)); } finally { S.bk = real; S._ivIk = false; } S.ik.inv = true; }
 Object.assign(ACT, {
   zAdjust() { const b = S.bk; if (!b) return;
-    S.bkHist.unshift({ cid: b.cid, at: slotDate(b), kind: b.kind, st: '中心调整' }); S.bk = null;
+    S.bkHist.unshift({ cid: b.cid, at: slotDate(b), kind: b.kind, mode: b.mode, st: '中心调整' }); S.bk = null;
     const title = ['预约时间调整', 'Your appointment time has changed'], body = ['原定的时间因老师临时有事取消了，老师会尽快重新和你约。', 'Your original appointment was cancelled because your counsellor became unavailable. They will arrange another time with you as soon as possible.'];
     addMsg('cal', title, body, 'mybook', true);
     S.info = { ico: 'cal', title: L(...title), body: L(...body), btn: ['mybook', L('我知道了', 'Got it')] }; S.modal = 'info';
+  },
+  zRearr(ev) { const last = S.bkHist[0], di = DAYS.findIndex(d => d.toDateString() === new Date(ev.date).toDateString());
+    if (!last || di < 0) return;
+    const cid = last.cid, d = DAYS[di], when = `${d.getMonth() + 1}/${d.getDate()} 周${'日一二三四五六'[d.getDay()]} ${DATA.times[ev.ti]}`;
+    S.bk = { cid, di, ti: ev.ti, st: '已确认', kind: last.kind, mode: last.mode || '线下', topics: [], moved: true };
+    const title = ['老师重新为你安排了时间', 'Your counsellor arranged a new time'], body = [`老师重新为你安排了时间：${when}，${whoZ(cid)}。不方便的话可以在「我的预约」里改期。`, `Your counsellor arranged a new time: ${bkWhen(S.bk)}, ${C(cid).name}. You can reschedule in “My appointments” if it does not suit you.`];
+    addMsg('cal', title, body, 'mybook', true);
+    S.info = { ico: 'cal', title: L(...title), body: L(...body), btn: ['mybook', L('查看我的预约', 'My appointments')] }; S.modal = 'info';
+  },
+  zAdjNo() {
+    const title = ['请重新选一个时间', 'Please choose another time'], body = ['老师这次没能重新安排，请重新选一个时间。', 'Your counsellor could not arrange a new time. Please choose another time.'];
+    addMsg('cal', title, body, 'book', true);
+    S.info = { ico: 'cal', title: L(...title), body: L(...body), btn: ['book', L('预约咨询', 'Counselling')] }; S.modal = 'info';
   },
   zIvc() { S.ivc = { st: 'wait', due: IVC_DUE_(), at: new Date(NOW) };
     addMsg('chat', ['心理中心邀请你聊一聊', 'UCC invites you to talk'], [`接受后，小屿会先花 3 分钟了解一下你最近的情况，然后你可以自己选和老师见面的时间。请在 ${IVC_DUE_()} 前回复。`, `If you accept, Xiaoyu will spend about 3 minutes getting to know how you’ve been, then you can choose a time to meet a counsellor. Please reply by ${IVC_DUE_()}.`], 'ivc'); S.modal = 'ivc'; },

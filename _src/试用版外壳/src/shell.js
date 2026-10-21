@@ -45,8 +45,10 @@ function fromStu(p, c) {
 }
 function fromAdm(p, c) {
   if (!p) return []; const ev = [];
-  Object.keys(c).forEach(k => { if (k === '__cfg' || k === '__no' || k === '__inv' || k === '__slots' || k === '__adj') return; const a = p[k], b = c[k]; if (!a) return; if (b && b.id === a.id && !a.iv && b.iv) ev.push({ t: 'intakeViewed', core: k }); const moved = b && (a.day !== b.day || a.t !== b.t);
-    if (!b && c.__adj && c.__adj[k]) ev.push({ t: 'adjust', core: k });
+  Object.keys(c).forEach(k => { if (k === '__cfg' || k === '__no' || k === '__inv' || k === '__slots') return; const a = p[k], b = c[k]; if (!a) return; if (b && b.id === a.id && !a.iv && b.iv) ev.push({ t: 'intakeViewed', core: k }); const moved = b && (a.day !== b.day || a.t !== b.t);
+    if (['confirm', 'ok', 'change'].includes(a.st) && b && b.id === a.id && b.st === 'adjust') ev.push({ t: 'adjust', core: k });
+    else if (a.st === 'adjust' && b && b.id === a.id && b.st === 'ok') ev.push({ t: 'rearr', core: k, date: b.date, ti: b.t });
+    else if (a.st === 'adjust' && !b) ev.push({ t: 'adjNo', core: k });
     else if (a.st === 'confirm' && b && b.id === a.id && b.st === 'ok') ev.push(moved ? { t: 'move', core: k, date: b.date, ti: b.t } : { t: 'confirm', core: k });
     else if (a.st === 'confirm' && !b) ev.push({ t: 'decline', core: k });
     else if (a.st === 'ok' && !b && c.__no && c.__no[k]) ev.push({ t: 'decline', core: k });

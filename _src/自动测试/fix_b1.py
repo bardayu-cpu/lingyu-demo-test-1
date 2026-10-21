@@ -150,7 +150,7 @@ def illness(browser):
         message = '原定的时间因老师临时有事取消了，老师会尽快重新和你约。'
         check(student.evaluate('S.inbox[0].d[0]') == message and message in student.inner_text('#modal'), 'B1-3 inbox and popup use the exact agreed text')
         check(admin.evaluate("NOTI.some(n=>n.to==='c5'&&n.t.includes('中心调整'))&&NOTI.some(n=>n.to===ivResp(CORE.lin)&&n.t.includes('中心调整'))"), 'B1-3 center lead and responsible teacher are notified')
-        check(admin.evaluate('LY_snap().__adj.lin') == 1, 'B1-3 snapshot distinguishes adjustment from decline')
+        check(admin.evaluate('LY_snap().lin.st') == 'adjust' and admin.evaluate('!Object.hasOwn(LY_snap(),"__adj")'), 'B1-3 snapshot tracks the actual adjust state without __adj flags')
         admin.evaluate("ACT.btab('man');ACT.bsub('adjust');render()")
         check('中心调整 · 待重新安排' in admin.inner_text('#pg') and admin.locator(f'[data-arg="bMove:{bid}"]').count() == 1 and admin.locator(f'[data-arg="bNo:{bid}"]').count() == 1, 'B1-3 center lead sees adjustment row and its two actions')
         shot(page, 'B1-3-center-adjustment')
@@ -273,11 +273,99 @@ def resync_review(browser):
     finally:
         context.close()
 
+def sick_lin(admin, student):
+    bid = book_lin(admin, student)
+    admin.evaluate('(id)=>{ACT.bOk(id);render()}', bid)
+    wait(student, "S.bk && S.bk.st==='已确认'")
+    admin.evaluate("ACT.mo('schedReg:');S.form={rgc:'c1',rgt:'病假停诊',rgd:'7',rga:'all'};ACT.schedRegGo();render()")
+    wait(student, 'S.bk===null && S.bkHist[0].st==="中心调整"')
+    return bid
+
+def adjustment_review(browser):
+    for action in ['move', 'future_move', 'decline', 'student_book', 'reopen']:
+        context, page, admin, student = trial(browser)
+        try:
+            operations = student.evaluate('JSON.stringify(S.ops)')
+            first = sick_lin(admin, student)
+            check(admin.evaluate("[0,1,2,3].every(t=>RULES.offSlots['c1|7|'+t]&&SCHM.c1['10/21'][t]==='off')"), f'打回-2 {action}: sick leave records every closed time')
+            check(admin.evaluate('LY_snap().lin.st') == 'adjust' and admin.evaluate('!Object.hasOwn(LY_snap(),"__adj")'), f'打回-2 {action}: snapshot exposes adjust directly')
+            if action in ['move', 'future_move', 'decline']:
+                page.click('[data-side="机构端"]')
+                admin.evaluate("enter('c1','L2','review');go('booking');ACT.btab('man');ACT.bsub('adjust');render()")
+                check(admin.locator('[data-act=bsub][data-arg=adjust] i.r').count() == 1, f'打回-2 {action}: teacher has a red adjustment count')
+                if action in ['move', 'future_move']:
+                    if action == 'move':
+                        new = admin_open(admin)
+                        admin.locator(f'[data-arg="bMove:{first}"]').click()
+                        admin.locator(f'[data-act=fset][data-arg="slot|{new["day"]}-{new["t"]}"]').click()
+                        admin.locator('[data-act=bMoveOk]').click()
+                    else:
+                        new = admin.evaluate("(()=>{for(let day=5;day<10;day++)for(let t=0;t<4;t++)if(slotAt('c1',day,t)==='open')return {day,t,date:DD(day).toISOString()};throw Error('No future opening')})()")
+                        admin.locator(f'[data-arg="bMove:{first}"]').click()
+                        target = admin.locator(f'[data-act=fset][data-arg="slot|{new["day"]}-{new["t"]}"]')
+                        shot(page, '打回-2-下周重新安排选时')
+                        check(target.count() == 1, '打回-2 next-week rearrangement is selectable in the actual modal')
+                        check(admin.locator('[data-act=fset][data-arg^="slot|7-"]').count() == 0, '打回-2 registered sick-leave slots are absent from rearrangement choices')
+                        check('未来 30 天的开放时段' in admin.inner_text('#modal') and admin.locator('[data-act=bMoveOk]').inner_text() == '重新安排并通知学生', '打回-2 modal states the date range and direct notification action')
+                        target.click()
+                        admin.locator('[data-act=bMoveOk]').click()
+                    wait(student, "S.bk && S.bk.st==='已确认'")
+                    booked = student.evaluate('({cid:S.bk.cid,date:DAYS[S.bk.di].toDateString(),ti:S.bk.ti,kind:S.bk.kind})')
+                    expected_date = admin.evaluate('(date)=>new Date(date).toDateString()', new['date'])
+                    check(booked == {'cid': 'c1', 'date': expected_date, 'ti': new['t'], 'kind': '预咨询'}, '打回-2 teacher rearrangement restores the actual confirmed appointment')
+                    check(student.evaluate('S.inbox[0].d[0].startsWith("老师重新为你安排了时间：")') and '李文老师。不方便的话可以在「我的预约」里改期。' in student.inner_text('#modal'), '打回-2 rearrangement reaches both inbox and popup')
+                    check(admin.evaluate('(id)=>{const b=LY_snap().lin;return b.id===id&&b.st==="ok"&&BOOK.filter(x=>x.sid===CORE.lin.id&&LY_ACTIVE.includes(x.st)).length===1}', first), '打回-2 rearrangement keeps the same admin booking and creates no echo request')
+                    page.click('[data-side="学生端"]')
+                    shot(page, f'打回-2-重新安排通知-{action}')
+                    student.evaluate("ACT.close();ACT.go('mybook');render()")
+                    check(student.locator('[data-act=resch]').count() == 1, '打回-2 the restored appointment can continue into rescheduling')
+                else:
+                    admin.locator(f'[data-arg="bNo:{first}"]').click()
+                    admin.locator('[data-act=fset][data-arg^="why|"]').first.click()
+                    admin.locator('[data-act=bNoOk]').click()
+                    wait(student, 'S.info && S.info.body==="老师这次没能重新安排，请重新选一个时间。"')
+                    check(student.evaluate('S.bk') is None and student.evaluate('S.inbox[0].d[0]') == '老师这次没能重新安排，请重新选一个时间。', '打回-2 declining adjustment sends the exact new-time invitation')
+                    check(student.evaluate('S.info.btn[0]') == 'book', '打回-2 decline notification links to counselling booking')
+                    page.click('[data-side="学生端"]')
+                    shot(page, '打回-2-婉拒后重新选时间')
+            elif action == 'student_book':
+                from test_support import pick_open
+                student.evaluate("ACT.close();prepare('book');render()")
+                picked = pick_open(student, 'c1', 6, 2)
+                student.evaluate('ACT.bookSubmit();render()')
+                wait(admin, f'BOOK.find(b=>b.id==={first!r}).st==="cancelled"')
+                check(admin.evaluate('(id)=>{const b=LY_snap().lin;return b&&b.id!==id&&b.st==="confirm"}', first), '打回-2 student rebooking cancels adjust and creates a new pending request')
+                check(admin.evaluate('(date)=>sameDay(new Date(LY_snap().lin.date),new Date(date))', picked['date']), '打回-2 the new pending request uses the student-selected date')
+            else:
+                page.click('[data-side="机构端"]')
+                admin.evaluate("ACT.schPick('c1|10/21');render()")
+                admin.locator('[data-act=mslot][data-arg="10/21|2"]').click()
+                admin.locator('[data-act=mSave]').click()
+                check(admin.evaluate("!RULES.offSlots['c1|7|2']&&[0,1,3].every(t=>RULES.offSlots['c1|7|'+t])"), '打回-2 reopening one saved slot clears only its closure marker')
+                admin.evaluate("slotResync('c1',7,2);render()")
+                wait(student, "slotState(0,6,2)==='open'")
+                check(admin.evaluate("SCHM.c1['10/21'][2]") == 'open', '打回-2 explicit reopening survives later resync')
+            if action != 'reopen':
+                check(admin.evaluate("SCHM.c1['10/21'].every(v=>v==='off')"), f'打回-2 {action}: all original sick-leave slots stay closed')
+                wait(student, "[0,1,2,3].every(t=>slotState(0,6,t)==='closed')")
+            check(student.evaluate('JSON.stringify(S.ops)') == operations, f'打回-2 {action}: center actions do not use student operation allowances')
+        finally:
+            context.close()
+    context, page, admin, student = trial(browser)
+    try:
+        admin.evaluate("ACT.mo('schedReg:');S.form={rgc:'c1',rgt:'计划性关时段',rgd:'9',rga:'part',rgts:['2']};ACT.schedRegGo();slotResync('c1',9,2);render()")
+        check(admin.evaluate("RULES.offSlots['c1|9|2']&&SCHM.c1['10/23'][2]==='off'"), '打回-2 planned closure also persists through resync')
+        first = book_lin(admin, student)
+        admin.evaluate("ACT.mo('schedReg:');S.form={rgc:'c1',rgt:'计划性关时段',rgd:'7',rga:'all'};ACT.schedRegGo();render()")
+        check(admin.evaluate("!RULES.offSlots['c1|7|2']") and admin.evaluate('(id)=>BOOK.find(b=>b.id===id).st', first) == 'confirm', '打回-2 blocked planned closure does not record a false closure')
+    finally:
+        context.close()
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--only', choices=['B1-2', 'B1-1', 'B1-3', 'B1-4', '打回-1'])
+    parser.add_argument('--only', choices=['B1-2', 'B1-1', 'B1-3', 'B1-4', '打回-1', '打回-2'])
     args = parser.parse_args()
-    tests = {'B1-2': slots, 'B1-1': conflicts, 'B1-3': illness, 'B1-4': risk_limits, '打回-1': resync_review}
+    tests = {'B1-2': slots, 'B1-1': conflicts, 'B1-3': illness, 'B1-4': risk_limits, '打回-1': resync_review, '打回-2': adjustment_review}
     with sync_playwright() as p:
         choices = [os.environ.get('CHROMIUM_PATH'), '/opt/pw-browsers/chromium', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome']
         executable = next((c for c in choices if c and Path(c).is_file()), None)

@@ -66,7 +66,7 @@ const _book19 = PAGES.book; PAGES.book = () => { const h = _book19(); if (!S.ivc
   return h.replace(/<div class="xy">[\s\S]*?<\/span><\/div><\/div>/, '').replace('<div class="tabs">', strip + '<div class="tabs">').replace(/<\/div><\/div>\s*$/, fit + '</div></div>'); };
 /* 首页待办：邀约卡、预咨询、排队、选时间 */
 const _homeExtra19 = homeExtra; homeExtra = function () { const R = _homeExtra19(), v = S.ivc;
-  const row = (ico, t, tag, sub, btn) => `<div class="row todo"><span class="mini" style="background:var(--bub)">${I(ico)}</span><div class="grow"><b>${t}</b> ${tag}<small>${sub}</small></div><div class="acts">${btn}</div></div>`;
+  const row = (ico, t, tag, sub, btn) => `<div class="row todo notice-todo" data-act="todoOpen" data-arg="ivc"><span class="mini" style="background:var(--bub)">${I(ico)}</span><div class="grow"><b>${t}</b> ${todoNew('ivc')} ${tag}<small>${sub}</small></div><div class="acts">${btn}</div></div>`;
   if (!v) ;
   else if (v.st === 'wait') R.unshift(row('chat', L('心理中心邀请你聊一聊', 'UCC invites you to talk'), `<span class="pill n">${L('待回复', 'Reply needed')}</span>`, L(`请在 ${ivcDue()} 前回复`, `Please reply by ${ivcDue()}`), `<button class="btn pri sm" data-act="ivcOpen">${L('查看', 'View')}</button>`));
   else if (v.st === 'acc') R.unshift(row('chat', L('和预咨询小屿聊聊', 'Chat with Xiaoyu'), `<span class="pill n">${v.ik && v.ik.st === 'draft' ? L('已保存，没聊完', 'Saved') : L('还没聊', 'Not started')}</span>`, L('大约 3 分钟，聊完就可以选和老师见面的时间', 'About 3 minutes, then you can pick a time to meet'), `<button class="btn pri sm" data-act="ivIkGo">${v.ik && v.ik.st === 'draft' ? L('接着聊', 'Continue') : L('去聊聊', 'Start')}</button>`));
@@ -109,4 +109,23 @@ const _ikCloseB2 = MODALS.ikClose; MODALS.ikClose = function () {
 const _ivStudentConfirmB5 = ACT.zConfirm; ACT.zConfirm = function () {
   const result = _ivStudentConfirmB5.apply(this, arguments);
   if (S.bk && S.bk.inv && S.ivc && S.ivc.st === 'sub') S.ivc.st = 'ok'; return result;
+};
+
+/* B7-2：读过对应消息或打开待办即消除“新”，不另存一份未读状态。 */
+const _goB7 = ACT.go; ACT.go = function (p) {
+  if (p === 'mybook') readTodoMessages('booking');
+  if (p === 'book') readTodoMessages(S.ivc && S.ivc.st === 'entry' && !S.bk ? 'ivc' : 'booking');
+  return _goB7.apply(this, arguments);
+};
+['ivcOpen', 'ivIkGo', 'ivOpen'].forEach(key => { const old = ACT[key]; ACT[key] = function (id) {
+  readTodoMessages(key === 'ivOpen' ? 'inv:' + id : 'ivc'); return old.apply(this, arguments);
+}; });
+ACT.todoOpen = function (group) {
+  const latest = todoMessages(group)[0]; readTodoMessages(group);
+  if (group === 'booking') return ACT.go(S.bk ? 'mybook' : latest ? latest.x.link : 'mybook');
+  if (group.startsWith('inv:')) return ACT.ivOpen(group.slice(4));
+  if (S.ivc && S.ivc.st === 'wait') return ACT.ivcOpen();
+  if (S.ivc && S.ivc.st === 'acc') return ACT.ivIkGo();
+  if (S.ivc && S.ivc.st === 'entry') return ACT.go('book');
+  if (latest) ACT.msgOpen(latest.i);
 };

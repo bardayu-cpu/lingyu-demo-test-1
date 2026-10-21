@@ -56,7 +56,41 @@ def home_messages(browser):
     return c.checks
 
 
-TESTS = {'home': home_messages}
+def todo_badges(browser):
+    c = B7Case(browser, 'B7-2-预约邀约新标记')
+    try:
+        c.login('c1|L2')
+        bid = c.book()
+        c.side('学生端')
+        c.click(c.s, '[data-act=ikNo]')
+        c.click(c.s, '.hd [data-act=go][data-arg=home]')
+        c.click(c.a, f'[data-act=bOk][data-arg="{bid}"]')
+        c.wait(c.s, 'S.bk.st==="已确认"')
+        c.side('学生端')
+        row = c.s.locator('.notice-todo[data-arg=booking]')
+        c.check(row.locator('.todo-new').count() == 1, '老师确认后预约待办显示新')
+        c.click(c.s, '.notice-todo[data-arg=booking] .grow', '点预约待办标题打开')
+        c.check(c.s.evaluate('S.page==="mybook" && !S.inbox.some(x=>!x.read && x.link==="mybook")'), '打开预约行即读对应消息并进入我的预约')
+        c.click(c.s, '.hd [data-act=go][data-arg=home]')
+        c.check(row.locator('.todo-new').count() == 0, '返回首页新标记消失')
+        # A's standalone invitation demo remains allowed; it does not enter the core batch.
+        c.s.locator('#zapT').check()
+        c.click(c.s, '[data-act=zIvc]')
+        c.click(c.s, '#modal [data-act=close]')
+        c.check(c.s.locator('.notice-todo[data-arg=ivc] .todo-new').count() == 1, '未读邀约卡也标新')
+        c.click(c.s, '[data-act=lang]')
+        c.check(c.s.locator('.notice-todo[data-arg=ivc] .todo-new').inner_text() == 'New', '英文新标记')
+        c.click(c.s, '.hd [data-act=inbox]')
+        c.click(c.s, '.msg[data-act=msgOpen]', '在消息中心打开邀约消息')
+        c.click(c.s, '#modal [data-act=close]')
+        c.click(c.s, '.hd [data-act=go][data-arg=home]')
+        c.check(c.s.locator('.notice-todo[data-arg=ivc] .todo-new').count() == 0, '从消息中心阅读后邀约新标记同步消失')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'home': home_messages, 'badges': todo_badges}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

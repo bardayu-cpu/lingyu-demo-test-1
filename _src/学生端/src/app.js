@@ -99,6 +99,11 @@ const msgAgo = at => { const mins = Math.max(0, Math.floor((NOW - at) / 60000));
 function homeMessages() { const list = unreadMsgs(); if (!list.length) return '';
   return `<section class="home-messages" aria-label="${L('新消息', 'New messages')}"><div class="sect">${L('新消息', 'New messages')}<button data-act="inbox">${L('查看全部', 'View all')}</button></div><div class="panel">${list.slice(0, 3).map(({ x, i }) => `<button class="home-msg" data-act="msgOpen" data-arg="${i}"><span class="mi">${I(x.ico, 's')}</span><b>${esc(L(...x.t))}</b><small>${msgAgo(x.at)}</small>${I('right', 's')}</button>`).join('')}${list.length > 3 ? `<button class="home-msg-more" data-act="inbox">${L(`还有 ${list.length - 3} 条 · 查看全部`, `${list.length - 3} more · View all`)}</button>` : ''}</div></section>`;
 }
+const msgForTodo = (x, group) => group === 'ivc' ? x.link === 'ivc' || x.link === 'book' && S.ivc && S.ivc.st === 'entry' && !S.bk
+  : group === 'booking' ? x.link === 'mybook' || x.link === 'book' && !(S.ivc && S.ivc.st === 'entry' && !S.bk) : x.link === group;
+const todoMessages = group => unreadMsgs().filter(({ x }) => msgForTodo(x, group));
+const todoNew = group => todoMessages(group).length ? `<span class="todo-new">${L('新', 'New')}</span>` : '';
+const readTodoMessages = group => S.inbox.forEach(x => { if (msgForTodo(x, group)) x.read = true; });
 /* 危机后的反馈：不提等级，只告诉学生有人会联系、现在可以找谁 */
 function crisisFollow() { if (S.crisisMsg) return; S.crisisMsg = true;
   addMsg('heart', ['大学心理咨询中心会尽快联系你', 'UCC will be in touch soon'], ['谢谢你愿意说出来。UCC 的老师会尽快和你联系。如果你现在感到不安全，请拨打 1767（24 小时）或 995。', 'Thank you for telling us. A UCC counsellor will contact you soon. If you don’t feel safe right now, call 1767 (24 hours) or 995.'], 'help', true); }
@@ -291,13 +296,15 @@ function steps2(t) {
   return `<div class="steps2">${s.join('<i>›</i>')}</div>`;
 }
 /* v1.18：个人中心的待办里先放预约和老师的约谈（表格 S5、S6） */
-function homeExtra() { const R = [], row = (ico, t, tag, sub, btn) => `<div class="row todo"><span class="mini" style="background:var(--bub)">${I(ico)}</span><div class="grow"><b>${t}</b> ${tag}<small>${sub}</small></div><div class="acts">${btn}</div></div>`, b = S.bk;
+function homeExtra() { const R = [], row = (ico, t, tag, sub, btn, group) => `<div class="row todo notice-todo" data-act="todoOpen" data-arg="${group}"><span class="mini" style="background:var(--bub)">${I(ico)}</span><div class="grow"><b>${t}</b> ${todoNew(group)} ${tag}<small>${sub}</small></div><div class="acts">${btn}</div></div>`, b = S.bk;
   if (b && !['已完成', '已取消'].includes(b.st)) { const it = b.intake, ikTodo = b.kind === '预咨询' && !S.owner && (!it || ['none', 'draft'].includes(it.st));
     R.push(row('cal', L(`预约咨询 · ${b.kind}`, b.kind === '预咨询' ? 'Counselling · Intake' : 'Counselling · Session'), `<span class="pill ${b.st === '已确认' && !b.pend ? 'g' : 'n'}">${b.pend ? L('待老师同意', 'Pending') : b.st === '已确认' ? L('已确认', 'Confirmed') : b.st === '已改约' ? L('老师改约', 'Moved') : L('待老师确认', 'Pending')}</span>`,
       `${who(C(b.cid))}${SEP()}${L('咨询时间', 'Time')} ${bkWhen(b)}${ikTodo ? SEP() + L('预咨询小屿还没聊，聊完老师能提前了解你', 'Chat with Xiaoyu first so your counsellor knows you') : it && it.st === 'sent' ? SEP() + L('预咨询已发给老师', 'Intake sent') : ''}`,
-      `<button class="btn ${ikTodo ? 'pri' : 'soft'} sm" data-act="go" data-arg="mybook">${ikTodo ? L('去聊聊', 'Start') : L('查看', 'View')}</button>`)); }
+      `<button class="btn ${ikTodo ? 'pri' : 'soft'} sm" data-act="go" data-arg="mybook">${ikTodo ? L('去聊聊', 'Start') : L('查看', 'View')}</button>`, 'booking')); }
+  else if (todoMessages('booking').length) { const x = todoMessages('booking')[0].x;
+    R.push(row('cal', esc(L(...x.t)), '', esc(L(...x.d)), `<button class="btn soft sm" data-act="todoOpen" data-arg="booking">${L('查看', 'View')}</button>`, 'booking')); }
   (S.invs || []).filter(v => invNeed(v) || v.st === 'ok').forEach(v => R.push(row('chat', L(`${invWho(v)} 约你聊聊`, `${invWho(v)} would like to chat`), `<span class="pill ${invNeed(v) ? 'w' : 'g'}">${invSt(v)[0]}</span>`, `${invWhen(v)} ${invWhere(v)}`,
-    `<button class="btn ${invNeed(v) ? 'pri' : 'soft'} sm" data-act="ivOpen" data-arg="${v.id}">${invNeed(v) ? L('回复', 'Reply') : L('查看', 'View')}</button>`)));
+    `<button class="btn ${invNeed(v) ? 'pri' : 'soft'} sm" data-act="ivOpen" data-arg="${v.id}">${invNeed(v) ? L('回复', 'Reply') : L('查看', 'View')}</button>`, 'inv:' + v.id)));
   return R; }
 function todoRow(t) {
   const d = TD(t);

@@ -1,7 +1,7 @@
 """Batch 4: click checks for invitation counts, configuration, audit and interface."""
 import argparse
 from playwright.sync_api import sync_playwright
-from qa_support import Case, launch
+from qa_support import Case, launch, ROOT
 
 
 def counters(browser):
@@ -221,7 +221,31 @@ def assistant_overlap(browser):
     return c.checks
 
 
-TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications, 'B4-5': audits, 'B4-6': duty_readonly, 'B4-7': high_preview, 'B4-8': application_copy, 'B4-9': assistant_overlap}
+def demo_time(browser):
+    c = Case(browser, 'B4-10-固定演示时间标注')
+    try:
+        label = '演示时间：10/12 周一 10:00'
+        for side in ['学生端','机构端']:
+            c.side(side)
+            c.check(label in c.page.inner_text('#tb'), side + ' 合并版顶栏标明演示时间')
+        standalone = c.context.new_page()
+        standalone.on('pageerror', lambda e: c.errors.append(str(e)))
+        standalone.goto((ROOT / '机构端/灵屿2.0-机构端演示-v1.19.3-gpt.html').as_uri())
+        c.check(label in standalone.inner_text('.demo'), '单独机构端也标出演示时间')
+        standalone.select_option('#roleSel', 'c5|L3')
+        standalone.check('#zapT')
+        standalone.click('[data-act=zTime]')
+        c.check(label in standalone.inner_text('.demo'), '时间快进后标注仍说明初始演示时间')
+        c.steps.append({'操作':'单独机构端登录朱静，勾演示按钮，点击时间+4小时','看到':standalone.inner_text('.demo')})
+        standalone.screenshot(path=str(c.out / '单独机构端演示时间.png'))
+        standalone.close()
+        c.shot('合并版演示时间')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications, 'B4-5': audits, 'B4-6': duty_readonly, 'B4-7': high_preview, 'B4-8': application_copy, 'B4-9': assistant_overlap, 'B4-10': demo_time}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

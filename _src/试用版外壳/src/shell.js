@@ -13,7 +13,7 @@ function bar() {
   const q = ST.mine.filter(x => !x.sent).length;
   $('#tb').innerHTML = `<div class="lg"><img src="${MASCOT}" alt=""><span>灵屿 2.0 试用版 <small>${VER}</small></span></div>
     <div class="seg">${['学生端', '机构端'].map(s => `<button class="${ST.side === s ? 'on' : ''}" data-side="${s}">${s}</button>`).join('')}</div>
-    <span class="fic">演示数据，全部为虚构</span><span class="sp"></span>
+    <span class="fic">演示数据，全部为虚构</span><span class="fic">演示时间：10/12 周一 10:00</span><span class="sp"></span>
     ${ST.name ? `<span class="who">试用人：<b>${esc(ST.name)}</b><button class="lnk" data-do="rename">改</button></span>` : ''}
     <button class="btn" data-do="mine">我的意见 ${ST.mine.length}${q ? `（${q} 条待发送）` : ''}</button>
     ${ST.collect ? `<button class="btn on" data-do="stop">✓ 结束提意见</button>` : '<button class="btn pri" data-do="fb">💬 提意见</button>'}`;

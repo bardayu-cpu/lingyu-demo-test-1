@@ -91,6 +91,14 @@ function reset(scen = 'A') {
 }
 function addFoot(ico, t, go) { S.foot.unshift({ at: new Date(NOW), ico, t, go }); }
 function addMsg(ico, t, d, link, sms) { S.inbox.unshift({ at: new Date(NOW), ico, t, d, link, read: false, sms }); }
+/* 首页和消息中心共用同一条消息、同一个打开动作，避免另记未读状态。 */
+const unreadMsgs = () => S.inbox.map((x, i) => ({ x, i })).filter(({ x }) => !x.read).sort((a, b) => b.x.at - a.x.at);
+const msgAgo = at => { const mins = Math.max(0, Math.floor((NOW - at) / 60000));
+  return mins < 1 ? L('刚刚', 'Just now') : mins < 60 ? L(`${mins} 分钟前`, `${mins} min ago`)
+    : mins < 1440 ? L(`${Math.floor(mins / 60)} 小时前`, `${Math.floor(mins / 60)} h ago`) : L(`${Math.floor(mins / 1440)} 天前`, `${Math.floor(mins / 1440)} d ago`); };
+function homeMessages() { const list = unreadMsgs(); if (!list.length) return '';
+  return `<section class="home-messages" aria-label="${L('新消息', 'New messages')}"><div class="sect">${L('新消息', 'New messages')}<button data-act="inbox">${L('查看全部', 'View all')}</button></div><div class="panel">${list.slice(0, 3).map(({ x, i }) => `<button class="home-msg" data-act="msgOpen" data-arg="${i}"><span class="mi">${I(x.ico, 's')}</span><b>${esc(L(...x.t))}</b><small>${msgAgo(x.at)}</small>${I('right', 's')}</button>`).join('')}${list.length > 3 ? `<button class="home-msg-more" data-act="inbox">${L(`还有 ${list.length - 3} 条 · 查看全部`, `${list.length - 3} more · View all`)}</button>` : ''}</div></section>`;
+}
 /* 危机后的反馈：不提等级，只告诉学生有人会联系、现在可以找谁 */
 function crisisFollow() { if (S.crisisMsg) return; S.crisisMsg = true;
   addMsg('heart', ['大学心理咨询中心会尽快联系你', 'UCC will be in touch soon'], ['谢谢你愿意说出来。UCC 的老师会尽快和你联系。如果你现在感到不安全，请拨打 1767（24 小时）或 995。', 'Thank you for telling us. A UCC counsellor will contact you soon. If you don’t feel safe right now, call 1767 (24 hours) or 995.'], 'help', true); }
@@ -182,7 +190,7 @@ const PAGES = {
     const recs = (SCENES[S.scen].returning ? ['g1', 'g7', 'g9', 'g5'] : ['g1', 'g7', 'g8', 'g6']).map(id => gCard(DATA.garden.find(x => x.id === id))).join('');
     const mv = S.bk && (S.bk.st === '已改约' || S.bk.pend) ? `<div style="margin-top:16px">${bkWarn(S.bk).replace('class="warnbar"', 'class="warnbar" data-act="go" data-arg="mybook" style="cursor:pointer"')}</div>` : '';
     const nx = homeExtra().length;
-    return tpl('p-home', { greet: `${greet()}${SEP()}${esc(prof().name)}`, say: say, mv, todoN: L(`共 ${todo.length + nx} 项`, `${todo.length + nx} item${todo.length + nx === 1 ? '' : 's'}`),
+    return tpl('p-home', { greet: `${greet()}${SEP()}${esc(prof().name)}`, say: say, mv, newMessages: homeMessages(), todoN: L(`共 ${todo.length + nx} 项`, `${todo.length + nx} item${todo.length + nx === 1 ? '' : 's'}`),
       todos: homeExtra().concat(todo.map(todoRow)).join('') || `<div class="empty" style="padding:22px 0">${L('没有待办，照顾好自己。', 'Nothing to do right now. Take care of yourself.')}</div>`, foot, recs });
   },
   intro: () => { const t = S.task, d = TD(t), sc = TS(t), re = sc.filter(s => !t.reused[s.k] && reuseFrom(t, s.k));

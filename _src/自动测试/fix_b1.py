@@ -212,11 +212,72 @@ def risk_limits(browser):
         finally:
             context.close()
 
+def clash_chen(admin):
+    admin.evaluate("LY_in({t:'book',core:'chen',cid:'c1',date:DD(7).toISOString(),ti:2,kind:'预咨询'});render()")
+    return admin.evaluate("BOOK.filter(b=>b.sid===CORE.chen.id&&b.st==='confirm').slice(-1)[0].id")
+
+def admin_open(admin):
+    return admin.evaluate("""(()=>{
+      for(let day=1;day<5;day++) for(let t=0;t<TIMES.length;t++)
+        if(slotAt('c1',day,t)==='open') return {day,t,date:DD(day).toISOString()};
+      throw new Error('No open fixture slot');
+    })()""")
+
+def resync_review(browser):
+    context, page, admin, student = trial(browser)
+    try:
+        first = book_lin(admin, student)
+        second = clash_chen(admin)
+        admin.evaluate('(id)=>{S.form={why:"时段冲突"};ACT.bNoOk(id);render()}', second)
+        check(admin.evaluate("SCHM.c1['10/21'][2]") == 'bk', '打回-1 declining the later conflict keeps the first reservation')
+        check(admin.evaluate('(id)=>{const b=BOOK.find(x=>x.id===id);return b.st==="confirm"&&!b.clash}', first), '打回-1 first pending request is preserved without a conflict marker')
+        student.evaluate("reset('D');prepare('book');S.day=6;render()")
+        wait(student, "slotState(0,6,2)==='taken'")
+        check(student.evaluate("slotBtn(DATA.counsellors[0],6,2,slotState(0,6,2)).includes('已约满')"), '打回-1 Wang sees the time as full after declining Chen')
+        admin.evaluate('(id)=>{S.form={why:"老师临时有安排"};ACT.bNoOk(id);render()}', first)
+        wait(student, "slotState(0,6,2)==='open'")
+        check(admin.evaluate("SCHM.c1['10/21'][2]") == 'open', '打回-1 declining the last application releases the slot')
+    finally:
+        context.close()
+    # Exercise every old-slot mutation path named in the review.
+    for action in ['confirmed_decline', 'move', 'agree_cancel', 'agree_reschedule', 'incoming_cancel', 'incoming_book']:
+        context, page, admin, student = trial(browser)
+        try:
+            first = book_lin(admin, student)
+            if action != 'confirmed_decline':
+                second = clash_chen(admin)
+            if action in ['confirmed_decline', 'move', 'agree_cancel', 'agree_reschedule']:
+                admin.evaluate('(id)=>{ACT.bOk(id);render()}', first)
+            new = admin_open(admin) if action in ['move', 'agree_reschedule', 'incoming_book'] else None
+            if action == 'confirmed_decline':
+                admin.evaluate('(id)=>{S.form={why:"老师临时有安排"};ACT.bNoOk(id);render()}', first)
+                check(admin.evaluate("SCHM.c1['10/21'][2]") == 'open', '打回-1 declining a confirmed booking releases its last held slot')
+            elif action == 'move':
+                admin.evaluate('([id,p])=>{S.form={slot:p.day+"-"+p.t};ACT.bMoveOk(id);render()}', [first, new])
+            elif action in ['agree_cancel', 'agree_reschedule']:
+                admin.evaluate('([id,p,cancel])=>{const b=BOOK.find(x=>x.id===id);b.st="change";b.req=cancel?{type:"取消"}:{type:"改期",day:p.day,t:p.t};ACT.bAgree(id);render()}', [first, new, action == 'agree_cancel'])
+            elif action == 'incoming_cancel':
+                admin.evaluate("LY_in({t:'cancel',core:'lin'});render()")
+            else:
+                admin.evaluate('(p)=>{LY_in({t:"book",core:"lin",cid:"c1",date:p.date,ti:p.t,kind:"预咨询"});render()}', new)
+            if action != 'confirmed_decline':
+                check(admin.evaluate("SCHM.c1['10/21'][2]") == 'bk', f'打回-1 {action} preserves the remaining reservation')
+                check(admin.evaluate('(id)=>!BOOK.find(x=>x.id===id).clash', second), f'打回-1 {action} clears the sole remaining request conflict')
+        finally:
+            context.close()
+    context, page, admin, student = trial(browser)
+    try:
+        first = book_lin(admin, student)
+        admin.evaluate('(id)=>{RULES.offSlots={"c1|7|2":1};S.form={why:"老师临时有安排"};ACT.bNoOk(id);render()}', first)
+        check(admin.evaluate("SCHM.c1['10/21'][2]") == 'off', '打回-1 registered closure takes precedence over release')
+    finally:
+        context.close()
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--only', choices=['B1-2', 'B1-1', 'B1-3', 'B1-4'])
+    parser.add_argument('--only', choices=['B1-2', 'B1-1', 'B1-3', 'B1-4', '打回-1'])
     args = parser.parse_args()
-    tests = {'B1-2': slots, 'B1-1': conflicts, 'B1-3': illness, 'B1-4': risk_limits}
+    tests = {'B1-2': slots, 'B1-1': conflicts, 'B1-3': illness, 'B1-4': risk_limits, '打回-1': resync_review}
     with sync_playwright() as p:
         choices = [os.environ.get('CHROMIUM_PATH'), '/opt/pw-browsers/chromium', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome']
         executable = next((c for c in choices if c and Path(c).is_file()), None)

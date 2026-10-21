@@ -109,6 +109,30 @@ function slotAt(cid, day, t) {
   const row = (SCHED[cid] && SCHED[cid][day]) || (DD(day) && SCHM[cid] && SCHM[cid][dkey(DD(day))]);
   return row && row[t] || 'off';
 }
+/* 打回-1：释放旧时段后，按关闭登记和仍在途的预约重算这一格。 */
+function slotResync(cid, day, t) {
+  const live = BOOK.filter(b => b.cid === cid && b.day === day && b.t === t && ['confirm', 'ok', 'change'].includes(b.st));
+  setSlot(cid, day, t, RULES.offSlots && RULES.offSlots[`${cid}|${day}|${t}`] ? 'off' : live.length ? 'bk' : 'open');
+  if (live.length === 1) delete live[0].clash;
+}
+['bNoOk', 'bMoveOk', 'bAgree'].forEach(name => {
+  const prior = ACT[name]; ACT[name] = function (id) {
+    const b = BOOK.find(x => x.id === id), old = b && { cid: b.cid, day: b.day, t: b.t };
+    const result = prior.apply(this, arguments);
+    if (old) slotResync(old.cid, old.day, old.t);
+    return result;
+  };
+});
+if (typeof LY_in === 'function') { const _lyInSlotResync = LY_in; LY_in = function (ev) {
+  const s = LY_CORE()[ev.core], b = s && ['book', 'cancel'].includes(ev.t) && lyBook(s), old = b && { cid: b.cid, day: b.day, t: b.t };
+  const result = _lyInSlotResync(ev);
+  if (old) {
+    slotResync(old.cid, old.day, old.t);
+    if (S.uid) render();
+    else if (window.parent !== window) window.parent.postMessage({ ly: 1, side: LY_SIDE, t: 'snap', snap: LY_snap() }, '*');
+  }
+  return result;
+}; }
 BST.adjust = '<span class="pill r">中心调整 · 待重新安排</span>';
 const schedDaysB1 = () => {
   const today = new Date(NOW); today.setHours(0, 0, 0, 0);

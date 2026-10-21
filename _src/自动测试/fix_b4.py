@@ -264,7 +264,24 @@ def import_placeholder(browser):
     return c.checks
 
 
-TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications, 'B4-5': audits, 'B4-6': duty_readonly, 'B4-7': high_preview, 'B4-8': application_copy, 'B4-9': assistant_overlap, 'B4-10': demo_time, 'B4-11': import_placeholder}
+def illustrative_capacity(browser):
+    c = Case(browser, 'B4-12-号池示意说明')
+    try:
+        c.login()
+        c.check('演示里的号数是示意，不按实际排班计算。' in c.a.locator('.dbox').filter(has_text='容量缺口').inner_text(), '主动邀约容量缺口标为示意')
+        c.shot('容量缺口示意说明')
+        c.click(c.a, '[data-act=btab][data-arg=pool]')
+        text = c.a.inner_text('#pg')
+        c.check('演示里的号数是示意，不按实际排班计算。' in text, '号池配置标为示意')
+        c.check('已发卡' in c.a.locator('th').all_inner_texts() and '已发邀约' not in c.a.locator('th').all_inner_texts(), '学院列名已发卡')
+        c.check('学院额度管的是人工预约入口；邀约卡不占号、不受额度限制' in text, '说明额度范围和邀约卡规则')
+        c.shot('号池配置示意及学院说明')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications, 'B4-5': audits, 'B4-6': duty_readonly, 'B4-7': high_preview, 'B4-8': application_copy, 'B4-9': assistant_overlap, 'B4-10': demo_time, 'B4-11': import_placeholder, 'B4-12': illustrative_capacity}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

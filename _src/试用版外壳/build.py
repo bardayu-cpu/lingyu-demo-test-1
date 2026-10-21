@@ -1,5 +1,5 @@
 import base64, json, pathlib, sys
-VER = 'v1.19.2-gpt'
+VER = 'v1.19.3-gpt'
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PIC = ROOT / '公共图片'
 SP = pathlib.Path(__file__).resolve().parent

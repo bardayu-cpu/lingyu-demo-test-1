@@ -4,10 +4,15 @@ const opts = (key, arr, dis = []) => `<div class="opts">${arr.map(x => `<button 
 const ta = (key = 'note', ph = '') => `<textarea data-bind="form.${key}" placeholder="${ph}">${esc(S.form[key] || '')}</textarea>`;
 const fld = (label, inner) => `<div class="fld"><label>${label}</label>${inner}</div>`;
 const openSlots = (c, lead = 0) => { const r = []; SCHED[c].forEach((d, di) => d.forEach((v, ti) => { if (v === 'open' && slotDate(di, ti).getTime() > NOW.getTime() + lead * H) r.push(`${di}-${ti}`); })); return r; };
-const slotPick = c => `<div class="opts">${openSlots(c).map(k => { const [d, t] = k.split('-').map(Number); return `<button class="${S.form.slot === k ? 'on' : ''}" data-act="fset" data-arg="slot|${k}">${dayLbl(d)} ${TIMES[t]}</button>`; }).join('') || '<span class="note">这位咨询师本周没有开放时段</span>'}</div>`;
+const slotPick = c => {
+  const today = new Date(NOW); today.setHours(0, 0, 0, 0); const end = new Date(today); end.setDate(end.getDate() + 30);
+  const dates = DXL.map((d, day) => ({ d, day, times: TIMES.map((_, t) => t).filter(t => slotAt(c, day, t) === 'open' && slotDate(day, t) > NOW) })).filter(x => x.d > today && x.d <= end && x.times.length);
+  const chosen = dates.find(x => x.day === S.form.mvDay);
+  return `<div class="opts mvdates">${dates.map(x => `<button class="${chosen === x ? 'on' : ''}" data-act="mvDay" data-arg="${x.day}">${dayLbl(x.day)} · ${x.times.length} 个</button>`).join('') || '<span class="note">未来 30 天没有开放时段，请先补充排班。</span>'}</div>${chosen ? `<div class="opts mvtimes" style="margin-top:12px">${chosen.times.map(t => { const k = `${chosen.day}-${t}`; return `<button class="${S.form.slot === k ? 'on' : ''}" data-act="fset" data-arg="slot|${k}">${TIMES[t]}</button>`; }).join('')}</div>` : '<p class="note" style="margin-top:12px">请先选日期，再选这一天的时间。</p>'}`;
+};
 function modal() {
   const [k, rest] = S.mo.split(':'), id = rest || '', s = SU(id), F = S.form;
-  const box = (h, p, body, ok, okAct, danger) => `<div class="ov" data-act="ovClose"><div class="mo"><h3>${h}</h3>${p ? `<p>${p}</p>` : ''}${body}<div class="acts"><button class="btn sec" data-act="moClose">取消</button>${ok ? `<button class="btn ${danger ? 'red' : 'pri'}" data-act="${okAct}" data-arg="${esc(id)}">${ok}</button>` : ''}</div></div></div>`;
+  const box = (h, p, body, ok, okAct, danger) => `<div class="ov" data-act="ovClose"><div class="mo"><h3>${h}</h3>${p ? `<p>${p}</p>` : ''}${body}<div class="acts"><button class="btn sec" data-act="moClose">取消</button>${ok && (!['bMoveOk', 'assignBOk'].includes(okAct) || S.form.slot) ? `<button class="btn ${danger ? 'red' : 'pri'}" data-act="${okAct}" data-arg="${esc(id)}">${ok}</button>` : ''}</div></div></div>`;
   if (k === 'verify') { const its = OBS(), obs = F.obs || {}, anyY = its.some(x => obs[x] === '有'), left = its.filter(x => !obs[x]).length;
     return `<div class="ov" data-act="ovClose"><div class="mo"><h3>核验 · ${nm(s)}</h3><p>${s.college} · ${s.year} · 完成普测 ${fmt(s.done)}${s.quality ? ` · <span class="pill w">${s.quality}</span>` : ''}</p>
       ${S.role === 'L1' && s.dirs.length ? fld('系统提示需要留意的方面（只显示方向，不含等级和分数）', `<div>${tags(s.dirs)}</div>`) : ''}
@@ -34,7 +39,7 @@ function modal() {
   if (k === 'assist') return box('请人协助', '协助人会收到短信和站内信。他能复制号码、记录联系和处置步骤，但不能结案；结案仍由你负责。', fld('协助人', opts('who', ['李文', 'Maria', 'Daniel', '王磊'])) + fld('想请他做什么（选填）', ta('note', '例如：先联系学生的辅导员确认学生是否在宿舍')), '确认', 'assistOk');
   if (k === 'rec') { const b = BOOK.find(x => x.id === id); return box('写咨询记录', `${nm(SU(b.sid))} · ${b.kind} · ${slotTxt(b)}。记录只给负责咨询师和 L3 看。`, fld('随访结果（必填）', ta()) + fld('建议等级', opts('lv', ['4', '3', '2', '1'])) + fld('接下来', opts('next', ['继续由我跟进', '上报高级咨询师', '转介危机干预或合作医院', '结束并归档'])), '保存记录', 'recOk'); }
   if (k === 'assignB') { const b = BOOK.find(x => x.id === id), w = { 李文: 'c1', Maria: 'c2', Daniel: 'c3' }[F.who]; return box('指派待办池预约', `${nm(SU(b.sid))} · 原定 ${ST(b.cid).name} ${slotTxt(b)}，超时未确认。指派后原时段释放，新时段占用。`, fld('咨询师', opts('who', ['李文', 'Maria', 'Daniel'])) + (w ? fld(`${F.who} 的开放时段`, slotPick(w)) : ''), '指派', 'assignBOk'); }
-  if (k === 'bMove') { const b = BOOK.find(x => x.id === id); return box('改约', `${nm(SU(b.sid))} · 当前 ${slotTxt(b)}。老师改约不计入学生的改期次数。`, fld(`${ST(b.cid).name} 的开放时段`, slotPick(b.cid)), '改约并通知学生', 'bMoveOk'); }
+  if (k === 'bMove') { const b = BOOK.find(x => x.id === id); return box('改时间', `${nm(SU(b.sid))} · 当前 ${slotTxt(b)}。老师改约不计入学生的改期次数。`, fld(`${ST(b.cid).name} 的开放时段`, slotPick(b.cid)), ['confirm', 'adjust'].includes(b.st) ? '发送新时间，等学生确认' : '改时间并通知学生', 'bMoveOk'); }
   if (k === 'auditor') { const b = BOOK.find(x => x.id === id); return box('改派审核人', `${nm(SU(b.sid))} 的预约默认由学院跟进人${ST(SU(b.sid).follower).name}审核。审核只核对身份并同步给咨询师，不涉及评估内容。`, fld('改派给', opts('who', ['周老师', '郑老师'].filter(x => x !== ST(auditor(b)).name))), '改派', 'auditorOk'); }
   if (k === 'bNo') return box('婉拒预约', '婉拒后时段释放，学生可以重新预约，不计次数。', fld('原因', opts('why', ['时段冲突', '建议预约其他咨询师', '需要先完成普测'])) + fld('给学生的话（选填）', ta()), '婉拒', 'bNoOk');
   if (k === 'bDeny') return box('不同意改期 / 取消', '学生会收到你的说明，原预约保持不变。', fld('原因', ta('note', '例如：这周是关键的第二次会谈，建议保持')), '发送', 'bDenyOk');

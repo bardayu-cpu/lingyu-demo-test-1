@@ -13,7 +13,7 @@ import sys
 from playwright.sync_api import BrowserType
 
 ROOT = Path(__file__).resolve().parents[1]
-VER = 'v1.19.2-gpt'
+VER = 'v1.19.3-gpt'
 os.environ.setdefault('ADM_HTML', str(ROOT / '机构端' / f'灵屿2.0-机构端演示-{VER}.html'))
 os.environ.setdefault('STU_HTML', str(ROOT / '试用版外壳/trial_parts/stu.html'))
 os.environ.setdefault('TRIAL_HTML', str(ROOT.parent / 'index.html'))

@@ -27,10 +27,10 @@ Object.assign(ACT, {
   zRearr(ev) { const last = S.bkHist[0], di = DAYS.findIndex(d => d.toDateString() === new Date(ev.date).toDateString());
     if (!last || di < 0) return;
     const cid = last.cid, d = DAYS[di], when = `${d.getMonth() + 1}/${d.getDate()} 周${'日一二三四五六'[d.getDay()]} ${DATA.times[ev.ti]}`;
-    S.bk = { cid, di, ti: ev.ti, st: '已确认', kind: last.kind, mode: last.mode || '线下', topics: [], moved: true };
-    const title = ['老师重新为你安排了时间', 'Your counsellor arranged a new time'], body = [`老师重新为你安排了时间：${when}，${whoZ(cid)}。不方便的话可以在「我的预约」里改期。`, `Your counsellor arranged a new time: ${bkWhen(S.bk)}, ${C(cid).name}. You can reschedule in “My appointments” if it does not suit you.`];
+    S.bk = { cid, di, ti: ev.ti, st: '已改约', kind: last.kind, mode: last.mode || '线下', topics: [], moved: true, moveSeen: true, oldWhen: `${fmtDay(new Date(last.at))} ${String(new Date(last.at).getHours()).padStart(2, '0')}:${String(new Date(last.at).getMinutes()).padStart(2, '0')}` };
+    const title = ['老师重新为你安排了时间', 'Your counsellor arranged a new time'], body = [`老师重新为你安排了时间：${when}，${whoZ(cid)}，点「接受新时间」就约好了；不方便可以改期。`, `Your counsellor arranged a new time: ${bkWhen(S.bk)}, ${C(cid).name}. Accept the new time to confirm, or reschedule if it does not suit you.`];
     addMsg('cal', title, body, 'mybook', true);
-    S.info = { ico: 'cal', title: L(...title), body: L(...body), btn: ['mybook', L('查看我的预约', 'My appointments')] }; S.modal = 'info';
+    S.info = { ico: 'cal', title: L(...title), body: L(...body), btn: ['movedOk', L('接受新时间', 'Accept new time')] }; S.modal = 'info';
   },
   zAdjNo() {
     const title = ['请重新选一个时间', 'Please choose another time'], body = ['老师这次没能重新安排，请重新选一个时间。', 'Your counsellor could not arrange a new time. Please choose another time.'];

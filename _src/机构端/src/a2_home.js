@@ -149,6 +149,7 @@ function bookTable(list) {
     if (b.st === 'audit') return isL1() ? `<button class="btn pri xs" data-act="bAudit" data-arg="${b.id}">审核并同步</button>` : S.role === 'L3' ? `<button class="btn sec xs" data-act="mo" data-arg="auditor:${b.id}">改派审核人</button> <button class="btn ghost xs" data-act="bAudit" data-arg="${b.id}">代审核</button>` : '';
     if (!mayBook(b) || isL1()) return '';
     if (b.st === 'confirm') return `<button class="btn pri xs" data-act="bOk" data-arg="${b.id}">确认</button> <button class="btn sec xs" data-act="mo" data-arg="bMove:${b.id}">改约</button> <button class="btn ghost xs" data-act="mo" data-arg="bNo:${b.id}">婉拒</button>`;
+    if (b.st === 'move') return `<button class="btn ghost xs" data-act="bOpen" data-arg="${b.id}">看学生信息</button>`;
     if (b.st === 'adjust') return `<button class="btn sec xs" data-act="mo" data-arg="bMove:${b.id}">改时间</button> <button class="btn ghost xs" data-act="mo" data-arg="bNo:${b.id}">婉拒</button>`;
     if (b.st === 'change') return `<button class="btn pri xs" data-act="bAgree" data-arg="${b.id}">同意</button> <button class="btn sec xs" data-act="mo" data-arg="bDeny:${b.id}">不同意</button> <button class="btn ghost xs" data-act="bTalk" data-arg="${b.id}">先和学生聊聊</button>`;
     if (b.st === 'record') return `<button class="btn pri xs" data-act="mo" data-arg="rec:${b.id}">写记录</button>`;

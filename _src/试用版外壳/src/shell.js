@@ -34,6 +34,7 @@ function fromStu(p, c) {
   if (b && b.pend && !(a && a.pend)) ev.push({ t: 'req', core, type: b.pend.type, date: b.pend.date, ti: b.pend.ti });
   if (a && !b && a.st === '待确认' && !a.pend) ev.push({ t: 'cancel', core });
   if (a && b && same(a, b) && a.st === '待确认' && b.st === '已确认') ev.push({ t: 'ok', core });
+  if (a && b && same(a, b) && a.st === '已改约' && b.st === '已确认') ev.push({ t: 'moveOk', core });
   if (c.cb && !p.cb) ev.push({ t: 'callback', core });
   if (c.crisis && !p.crisis) ev.push({ t: 'crisis', core });
   c.done.filter(x => !p.done.includes(x)).forEach(x => ev.push({ t: 'done', core, task: x }));
@@ -47,8 +48,9 @@ function fromAdm(p, c) {
   if (!p) return []; const ev = [];
   Object.keys(c).forEach(k => { if (k === '__cfg' || k === '__no' || k === '__inv' || k === '__slots') return; const a = p[k], b = c[k]; if (!a) return; if (b && b.id === a.id && !a.iv && b.iv) ev.push({ t: 'intakeViewed', core: k }); const moved = b && (a.day !== b.day || a.t !== b.t);
     if (['confirm', 'ok', 'change'].includes(a.st) && b && b.id === a.id && b.st === 'adjust') ev.push({ t: 'adjust', core: k });
-    else if (a.st === 'adjust' && b && b.id === a.id && b.st === 'ok') ev.push({ t: 'rearr', core: k, date: b.date, ti: b.t });
+    else if (a.st === 'adjust' && b && b.id === a.id && b.st === 'move') ev.push({ t: 'rearr', core: k, date: b.date, ti: b.t });
     else if (a.st === 'adjust' && !b) ev.push({ t: 'adjNo', core: k });
+    else if (a.st === 'confirm' && b && b.id === a.id && b.st === 'move') ev.push({ t: 'move', core: k, date: b.date, ti: b.t });
     else if (a.st === 'confirm' && b && b.id === a.id && b.st === 'ok') ev.push(moved ? { t: 'move', core: k, date: b.date, ti: b.t } : { t: 'confirm', core: k });
     else if (a.st === 'confirm' && !b) ev.push({ t: 'decline', core: k });
     else if (a.st === 'ok' && !b && c.__no && c.__no[k]) ev.push({ t: 'decline', core: k });

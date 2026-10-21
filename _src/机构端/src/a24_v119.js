@@ -345,7 +345,7 @@ Object.assign(ACT, {
     S.mo = 'ivIk:' + sid;
   },
   ivF(k) { S.f.ivst = S.f.ivst === k ? '' : k; },
-  bOpen(id) { const b = BOOK.find(x => x.id === id); if (!b) return; log('查看预约申请（预咨询摘要、普测结果、档案，按账号权限）', SU(b.sid), { cat: '查看', noTl: 1 }); markViewed(b); ACT.open(b.sid); },
+  bOpen(id) { const b = BOOK.find(x => x.id === id); if (!b) return; log('查看预约申请（预咨询摘要、普测结果、档案，按账号权限）', SU(b.sid), { cat: '查看', noTl: 1 }); ACT.open(b.sid); },
   poolR(v) { if (S.role !== 'L3') return; const P = RULES.pool, was = P.inv; if (+v === was) return; P.inv = +v; const N = poolN(); log(`号池配置 · 普通号 / 主动邀约号：${100 - was} / ${was} → ${100 - P.inv} / ${P.inv}（普通号 ${N.norm} 个、主动邀约号 ${N.inv} 个）`, null, { cat: '配置', obj: '号池' }); poolNoti(`号池比例调整为普通 ${100 - P.inv} / 主动邀约 ${P.inv}`); toast('已调整，已通知中心老师'); },
   poolH(d) { if (S.role !== 'L3') return; const P = RULES.pool, was = P.hold; P.hold = Math.max(0, P.hold + +d); log(`号池配置 · 暂留额度 ${was} → ${P.hold}`, null, { cat: '配置', obj: '号池' }); poolNoti(AUDIT[0].t); toast(+d < 0 ? '已放成可发' : '已留出'); },
   poolAppOk(id) { const P = RULES.pool, a = P.apps.find(x => x.id === id); if (!a || S.role !== 'L3') return; if (P.hold < a.n) return toast(`暂留额度只剩 ${P.hold} 个，可以先从别的学院挪`); P.hold -= a.n; P.col[a.col] = (P.col[a.col] || 0) + a.n; a.st = 'ok';

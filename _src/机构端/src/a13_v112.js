@@ -148,8 +148,12 @@ const _bL2 = briefL2; briefL2 = function () { const b = _bL2(), nw = BOOK.filter
   return b; };
 const _dw12 = drawer; drawer = function () { const s = SU(S.dw.sid), keep = s.tl; s.tl = s.tl.filter(e => e.k !== 'talk' || talkVis(TALKS.find(t => t.id === e.tid)));
   let h; try { h = _dw12(); } finally { s.tl = keep; }
-  const vis = TALKS.filter(t => t.sid === s.id && talkVis(t)), ab = BOOK.find(b => b.sid === s.id && ['confirm', 'ok', 'change', 'record', 'pool'].includes(b.st) && ikOf(b) && ikOf(b).sum);
-  let extra = ''; if (isCenter() && ab) { extra += intakeBox(ab); markViewed(ab); }
+  const vis = TALKS.filter(t => t.sid === s.id && talkVis(t)), ab = BOOK.find(b => b.sid === s.id && ['confirm', 'ok', 'change', 'record', 'pool'].includes(b.st) && ikOf(b) && ikOf(b).st === 'sent' && ikOf(b).sum && ikMayView(b));
+  const tab = S.dw.tab || (canRep() ? 'rep' : 'tl');
+  let extra = ''; if (isCenter() && ab) {
+    if (tab === 'bk') h = h.replace(/(<h3>预约与咨询[\s\S]*?<\/h3>)/, m => { markViewed(ab); return m + intakeBox(ab); });
+    else extra += `<div class="dbox"><button class="lnk" data-act="dtab" data-arg="bk">有 1 份预咨询摘要（${fmt(ikOf(ab).at)} 发送）· 查看</button></div>`;
+  }
   if (vis.length && S.role !== 'ADM') extra += `<div class="dbox" style="background:#fff"><b>${I('chat', 's')}辅导员谈心记录（${vis.length}）</b>${talkTable(vis, false)}</div>`;
   if (isL1() && S.role === 'L1' && inScope(s)) h = h.replace(/(<div class="acts"><small>[^<]*<\/small>)/, `$1<button class="btn sec xs" data-act="mo" data-arg="talk:${s.id}">写谈心记录</button>`);
   if (extra) h = h.replace(/(<div class="db"><div class="tabs">[\s\S]*?<\/div>)/, `$1${extra}`);

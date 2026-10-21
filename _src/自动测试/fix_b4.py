@@ -245,7 +245,26 @@ def demo_time(browser):
     return c.checks
 
 
-TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications, 'B4-5': audits, 'B4-6': duty_readonly, 'B4-7': high_preview, 'B4-8': application_copy, 'B4-9': assistant_overlap, 'B4-10': demo_time}
+def import_placeholder(browser):
+    c = Case(browser, 'B4-11-导入演示占位')
+    try:
+        c.login()
+        c.click(c.a, '[data-arg="ivAdd:"]')
+        button = c.a.get_by_role('button', name='导入表格（演示里不可用）')
+        c.check(button.is_disabled(), '导入表格清楚标注且禁用')
+        rect = button.bounding_box()
+        c.page.mouse.click(rect['x']+rect['width']/2, rect['y']+rect['height']/2)
+        c.steps.append({'操作':'实际尝试点击禁用导入按钮','看到':c.a.inner_text('#modal')})
+        c.check(c.a.locator('#modal table').count()==1 and c.a.locator('input[type=file]').count()==0, '点击禁用项没有切走或伪装上传')
+        c.click(c.a, '[data-act=fset][data-arg="ivt|paste"]')
+        c.check('真实使用时也可以上传 Excel / CSV（第一列学号）' in c.a.inner_text('#modal') and c.a.locator('[data-bind="form.ivIds"]').count()==1, '粘贴页显示真实使用上传说明并保留输入')
+        c.shot('导入禁用与粘贴说明')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications, 'B4-5': audits, 'B4-6': duty_readonly, 'B4-7': high_preview, 'B4-8': application_copy, 'B4-9': assistant_overlap, 'B4-10': demo_time, 'B4-11': import_placeholder}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

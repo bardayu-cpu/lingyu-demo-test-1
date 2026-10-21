@@ -100,3 +100,7 @@ const _declineB2 = ACT.zDecline; ACT.zDecline = function (ev) {
   if (S.ivc && S.ivc.st === 'sub') { S.ivc.st = 'entry'; S.info.btn = ['book', L('选时间', 'Choose a time')]; }
   return r;
 };
+
+const _ikCloseB2 = MODALS.ikClose; MODALS.ikClose = function () {
+  const h = _ikCloseB2(); return S.ik && S.ik.inv ? h.replace(/我的预约/g, '首页').replace(/My appointments/g, 'Home') : h;
+};

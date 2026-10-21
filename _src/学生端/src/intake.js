@@ -53,7 +53,7 @@ const ikNeedT2 = () => ikCfg().t2on && (!!S.walkin || !ikPrev());
 /* 变量替换；某一句里的变量为空时整句去掉 */
 function ikFill(text) { const prev = ikPrev(), v = { 接待老师: LANG === 'en' ? (S.hold ? C(S.hold.pick.cid) : S.bk ? C(S.bk.cid) : null)?.name || 'your counsellor' : ikTeacher(), 上次聊到的话题: prev ? prev.map(T).join(L('、', ', ')) : '' };
   return (text || '').split(/(?<=[。！？.!?])\s*/).filter(s => !/\{(\w+|[一-龥]+)\}/.test(s) || [...s.matchAll(/\{([^}]+)\}/g)].every(m => v[m[1]])).map(s => s.replace(/\{([^}]+)\}/g, (_, k) => v[k] ?? '')).join(LANG === 'en' ? ' ' : ''); }
-const ikHas = ik => Object.values(ik.ans).some(v => v != null && (Array.isArray(v) ? v.length : String(v).trim()));
+const ikHas = ik => Object.values(ik.ans).some(v => v != null && (Array.isArray(v) ? v.length : String(v).trim())) || ik.phase === 'q' && (!!(ik.txt || '').trim() || !!(ik.own || '').trim() || !!(ik.sel || []).length);
 const ikVal = (q, v) => v == null ? '' : Array.isArray(v) ? v.join('、') : String(v);
 
 /* ---------- 开始 / 继续 ---------- */
@@ -61,7 +61,7 @@ function ikStart(hold, resume) {
   const it = S.bk && S.bk.intake, keep = resume && it && it.qs ? it : null, tk = keep ? keep.tk : ikNeedT2() ? 't2' : 't1';
   const qs = keep ? keep.qs : JSON.parse(JSON.stringify(ikCfg()[tk]));
   S.ik = { tk, tv: keep ? keep.tv : ikCfg().ver, qs, i: 0, ans: keep ? { ...(keep.ans || {}) } : {}, probed: {}, probe: false, crisis: !!(it && it.crisis), crisisAt: -1, hold: !!hold, phase: 'q', sel: [], own: '' };
-  if (keep) { const n = qs.findIndex(q => S.ik.ans[q.k] == null); S.ik.i = n < 0 ? qs.length - 1 : n; }
+  if (keep) { const n = qs.findIndex(q => S.ik.ans[q.k] == null); S.ik.i = Number.isInteger(keep.pos) ? Math.max(0, Math.min(keep.pos, qs.length - 1)) : n < 0 ? qs.length - 1 : n; }
   ikLoad(); S.page = 'intake'; S.modal = null; S.pageTop = true;
 }
 /* 进入某一题时，把已有回答放进输入区 */
@@ -78,10 +78,19 @@ function ikAnswer(v) { const ik = S.ik, q = ik.qs[ik.i];
   if (ik.crisisAt === ik.i && q.type === 'text') { ik.probe = false; return; }   // 先停在这一题，让学生看到求助卡，再点「继续」
   ikNext(); }
 
+/* B2-4：保存当前输入，包含尚未点下一题的简答、多选和追问。 */
+function ikKeepCur() {
+  const ik = S.ik; if (!ik || ik.phase !== 'q') return; const q = ik.qs[ik.i]; if (!q) return;
+  if (q.type === 'text') { const text = (ik.txt || '').trim(); if (!text) return;
+    ikCrisisCheck(text); ik.ans[q.k] = ik.probe && ik.ans[q.k] ? `${ik.ans[q.k]}；${text}` : text;
+  } else if (q.type === 'multi') { const own = (ik.own || '').split(/[、,，]\s*/).map(x => x.trim()).filter(Boolean);
+    if ((ik.sel || []).length || own.length) { ikCrisisCheck(own.join(' ')); ik.ans[q.k] = [...(ik.sel || []), ...own]; }
+  }
+}
 /* ---------- 完成 / 保存 / 不填 ---------- */
 function ikFinish(st) {
   const ik = S.ik, sum = st === 'sent' || st === 'draft' ? ik.qs.map(q => ({ k: q.k, name: q.name, v: ik.phase === 'review' ? (S.ikS[q.k] || '').trim() : ikVal(q, ik.ans[q.k]) })) : null;
-  const prev = (S.bk && S.bk.intake) || {}, it = { st, at: new Date(NOW), sum: sum || prev.sum || null, crisis: ik.crisis || !!prev.crisis, ver: (prev.ver || 0) + 1, viewed: st === 'sent' ? false : !!prev.viewed, mode: IK_MODE, tk: ik.tk, tv: ik.tv, qs: ik.qs, ans: ik.ans, adds: prev.adds || [] };
+  const prev = (S.bk && S.bk.intake) || {}, it = { st, at: new Date(NOW), sum: sum || prev.sum || null, crisis: ik.crisis || !!prev.crisis, ver: (prev.ver || 0) + 1, viewed: st === 'sent' ? false : !!prev.viewed, mode: IK_MODE, tk: ik.tk, tv: ik.tv, qs: ik.qs, ans: ik.ans, pos: ik.i, adds: prev.adds || [] };
   const topicsOf = () => { const t = ik.qs.find(q => q.useTopics); return t ? (Array.isArray(ik.ans[t.k]) ? ik.ans[t.k] : []).filter(x => DATA.topics.includes(x)) : []; };
   if (ik.hold) { const h = S.hold; S.pick = h.pick; S.form = h.form; S.bkNote = h.note; S.form.topics = [...new Set([...S.form.topics, ...topicsOf()])]; S._ikPass = true; ACT.bookSubmit(); S._ikPass = false; S.hold = null; }
   else if (S.bk) S.bk.topics = [...new Set([...S.bk.topics, ...topicsOf()])];
@@ -92,7 +101,7 @@ function ikFinish(st) {
   if (!ik.hold) { S.page = 'mybook'; S.pageTop = true; }
 }
 /* 时段暂留到时（入口 B）：先提交预约，已答内容存为「已保存未发送」 */
-function ikTimeout() { if (!S.hold) return; const ik = S.ik;
+function ikTimeout() { ikKeepCur(); if (!S.hold) return; const ik = S.ik;
   if (ik) ikFinish(ikHas(ik) ? 'draft' : 'none'); else { S.ik = { tk: 't1', qs: ikCfg().t1, ans: {}, hold: true, phase: 'q' }; ikFinish('none'); }
   S.modal = 'booked'; S.ikTimedOut = true; toast(L('时段保留时间到了，已先为你提交预约', 'Your held time ran out, so we sent your booking')); }
 const ikStatusTxt = it => !it || it.st === 'none' ? L('还没聊', 'Not started') : it.st === 'skipped' ? L('这次不填', 'Skipped this time') : it.st === 'draft' ? L('已保存，未发送', 'Saved, not sent') : it.viewed ? L('老师已查看', 'Seen by your counsellor') : L('已发给老师', 'Sent to your counsellor');
@@ -183,7 +192,7 @@ Object.assign(ACT, {
   ikGoOn() { const ik = S.ik; ik.crisisAt = -1; ikNext(); },
   ikX() { const ik = S.ik; if (ik.phase === 'review' || ikHas(ik)) { S.modal = 'ikClose'; return; }
     if (ik.hold) { ikFinish('none'); S.modal = 'booked'; return; } S.ik = null; S.page = 'mybook'; S.pageTop = true; },
-  ikSave() { S.modal = null; const hold = S.ik.hold; if (S.ik.phase === 'review') ACT.ikBackQ(); ikFinish('draft'); if (hold) S.modal = 'booked'; },
+  ikSave() { ikKeepCur(); S.modal = null; const hold = S.ik.hold; if (S.ik.phase === 'review') ACT.ikBackQ(); ikFinish('draft'); if (hold) S.modal = 'booked'; },
   ikQuit() { S.modal = null; const hold = S.ik.hold; ikFinish('skipped'); if (hold) S.modal = 'booked'; },
   ikOkT() { S.ikOk = !S.ikOk; },
   ikSendSum() { if (!S.ikOk) return; const hold = S.ik.hold; ikFinish('sent'); if (hold) S.modal = 'booked'; },

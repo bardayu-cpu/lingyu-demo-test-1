@@ -123,7 +123,51 @@ def drafts(browser):
     return c.checks
 
 
-TESTS = {'B2-1': moves, 'B2-2': declines, 'B2-3': drafts}
+def resume_current(browser):
+    total = 0
+    for kind in ['text', 'multi', 'invite', 'probe']:
+        c = Case(browser, 'B2-4-续填-' + kind)
+        try:
+            c.login('c1|L2')
+            if kind == 'invite':
+                c.student('A', 'home')
+                c.s.locator('#zapT').check()
+                c.click(c.s, '[data-act=zIvc]')
+                c.click(c.s, '[data-act=ivAcc]')
+            else:
+                c.book()
+                c.click(c.s, '[data-act=ikYes]')
+            text = '还没点下一题时写下的学习和休息安排'
+            if kind in ['text', 'probe']:
+                c.click(c.s, '[data-act=ikTog]')
+                c.click(c.s, '[data-act=ikNextQ]')
+                if kind == 'probe':
+                    c.s.locator('#ikTxt').fill('累')
+                    c.click(c.s, '[data-act=ikNextQ]')
+                    c.check(c.s.evaluate('S.ik.probe'), '短答进入追问')
+                c.s.locator('#ikTxt').fill(text)
+            else:
+                c.click(c.s, '[data-act=ikTog]')
+                c.s.locator('#ikOwn').fill(text)
+            pos = c.s.evaluate('S.ik.i')
+            c.click(c.s, '[data-act=ikX]')
+            if kind == 'invite':
+                c.check('首页' in c.s.inner_text('#modal') and '我的预约' not in c.s.inner_text('#modal'), '邀约保存提示指向首页')
+            c.click(c.s, '[data-act=ikSave]')
+            c.shot('保存后')
+            c.click(c.s, '[data-act=ivIkGo]' if kind == 'invite' else '[data-act=ikGo]')
+            c.check(c.s.evaluate('S.ik.i') == pos, '恢复到保存时的题目')
+            c.check(c.s.locator('#ikTxt' if kind in ['text', 'probe'] else '#ikOwn').input_value() == ('累；' + text if kind == 'probe' else text), '未点下一题的输入完整保留')
+            if kind in ['multi', 'invite']:
+                c.check(c.s.evaluate('S.ik.sel.length') > 0, '多选题选择也保留')
+            c.shot('恢复当前输入')
+        finally:
+            c.close()
+            total += c.checks
+    return total
+
+
+TESTS = {'B2-1': moves, 'B2-2': declines, 'B2-3': drafts, 'B2-4': resume_current}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

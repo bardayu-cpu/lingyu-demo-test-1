@@ -45,6 +45,7 @@ const cwFind = x => { const t = cwNorm(x), hit = [], neg = [];
   CRISIS_WORDS.forEach(w => { const k = cwNorm(w); if (!k) return; let i = t.indexOf(k), any = false, ok = false; while (i >= 0) { any = true; if (!cwNeg(t, i)) { ok = true; break; } i = t.indexOf(k, i + 1); } if (ok) hit.push(w); else if (any) neg.push(w); });
   return { hit, neg }; };
 /* 一级、二级命中才算「有安全相关的表达」；三级只记为辅助信号 */
+const cwLv12 = x => cwFind(x).hit.filter(w => cwL(w) <= 2);
 TALK_RE.test = x => { const { hit } = cwFind(x); if (hit.length) cwHits.push(...hit); return hit.some(w => cwL(w) <= 2); };
 const _nc19 = newCrisis; newCrisis = function (s, src, type, urgent) {
   if (/谈话记录|追加/.test(src || '') && cwHits.length) urgent = cwHits.some(w => cwL(w) === 1);

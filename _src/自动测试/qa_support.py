@@ -43,7 +43,7 @@ class Case:
 
     def select(self, frame, selector, value):
         self.side('学生端' if frame == self.s else '机构端')
-        frame.locator(selector).select_option(value)
+        frame.locator(selector).select_option(value, timeout=60000)
         self.steps.append({'操作': f'{selector} 选择 {value}', '看到': frame.locator('body').inner_text()[-5000:]})
 
     def login(self, value='c5|L3'):

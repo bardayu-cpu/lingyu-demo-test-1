@@ -32,7 +32,9 @@ with sync_playwright() as p:
     t = T(); chk('容量缺口' in t and '核对结果' in t and '已发卡' in t and '申请额度' in t, 'invite tab parts')
     n0 = E("ivb().list.filter(x=>x.st==='new').length"); E("ACT.mo('ivSend:all');render()"); chk('确认后才发' in T('.mo'), 'send needs confirm')
     E("ACT.ivSendGo('all');render()"); chk(E("ivb().list.filter(x=>x.st==='new').length") == 0 and '发邀约卡' in E("AUDIT[0].t"), f'sent {n0} cards, audited')
-    E("ACT.mo('ivAdd:');S.form.ivt='paste';S.form.ivIds='xxx,'+SURV().find(s=>curLv(s)<3&&!activeBook(s)).sid;ACT.ivAddGo();render()"); chk(E("S.ivRes.in.length") == 1 and E("S.ivRes.bad.length") == 1, 'add students, four piles')
+    # B4-2: a new entrant must reach ivLv. Remove one eligible seeded row to model a not-yet-added student.
+    E("(()=>{const B=ivb(), s=SURV().find(s=>curLv(s)>=RULES.pool.ivLv&&!inCrisis(s.id)&&!activeBook(s));B.list=B.list.filter(x=>x.sid!==s.id);ACT.mo('ivAdd:');S.form.ivt='paste';S.form.ivIds='xxx,'+s.sid+','+SURV().find(s=>curLv(s)<RULES.pool.ivLv&&!activeBook(s)).sid;ACT.ivAddGo();render()})()"); chk(E("S.ivRes.in.length") == 1 and E("S.ivRes.bad.length") == 2, 'add eligible student and reject invalid/below-threshold students')
+    chk(E("S.ivRes.bad.some(x=>x.includes('未达主动邀约等级'))"), 'below-threshold rejection explains configured level')
     E("ACT.moClose&&ACT.moClose();S.mo=null;ACT.mo('ivApp:');S.form.apc='工程学院';S.form.apn='3';S.form.apw='等的人多';ACT.ivAppGo();render()"); chk(E("RULES.pool.apps.length") == 1, 'apply quota')
     E("ACT.btab('ai');render()"); t = T(); chk('预咨询摘要' in t and '题库配置' in t and '主动邀约' in t, 'AI tab summaries')
     n = E("AUDIT.length"); E("ACT.ivIkOpen(ivb().list.find(x=>x.ik&&x.ik.sum&&!x.bid).sid);render()"); chk('高危咨询题库' in T('.mo') and E("AUDIT.length") == n + 1, 'view invite summary audited')

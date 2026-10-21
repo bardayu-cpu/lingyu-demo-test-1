@@ -106,7 +106,7 @@ def conflicts(browser):
         admin.evaluate('(id)=>{ACT.bOk(id);render()}', bid)
         admin.evaluate('(id)=>{ACT.bOk(id);render()}', other['id'])
         check(admin.evaluate('(id)=>BOOK.find(b=>b.id===id).st', bid) == 'ok' and admin.evaluate('(id)=>BOOK.find(b=>b.id===id).st', other['id']) == 'confirm', 'B1-1 second conflicting application cannot be confirmed')
-        check('这个时段已经确认给 林晓 了，请改时间或婉拒' in admin.inner_text('#toast'), 'B1-1 duplicate confirmation names the existing student')
+        check('这个时间已由 林晓 先申请，请改时间或婉拒' in admin.inner_text('#toast'), 'B1-1 duplicate confirmation names the first applicant')
         # The exception for the current student's own held appointment remains usable.
         student.evaluate("reset('A');prepare('home');S.bk={cid:'c1',di:6,ti:2,kind:'预咨询',st:'待确认'};render();ACT.pickSlot('c1:6:2');render()")
         check(student.evaluate('S.modal') == 'submit', 'B1-1 current student can reopen their own held time')
@@ -399,11 +399,51 @@ def crisis_copy_review(browser):
         finally:
             context.close()
 
+def conflict_priority_review(browser):
+    context, page, admin, student = trial(browser)
+    try:
+        first = book_lin(admin, student)
+        second = clash_chen(admin)
+        page.click('[data-side="机构端"]')
+        admin.evaluate("enter('c1','L2','review');go('booking');ACT.btab('man');ACT.bsub('ok');render()")
+        check(admin.locator(f'[data-act=bOk][data-arg="{second}"]').count() == 0, '打回-4 conflicting request has no confirm button')
+        check(admin.locator(f'.bkpin [data-act=bOpen][data-arg="{second}"]').count() == 1 and admin.locator(f'.bkpin [data-arg="bMove:{second}"]').count() == 1 and admin.locator(f'.bkpin [data-arg="bNo:{second}"]').count() == 1, '打回-4 conflicting row retains student information, move, and decline')
+        pill = admin.locator('.bkpin tr').filter(has=admin.locator(f'[data-act=bOpen][data-arg="{second}"]')).locator('.pill.r')
+        check(pill.get_attribute('title') == '这个时间已由 林晓 先申请', '打回-4 conflict title identifies the first applicant')
+        admin.evaluate('(id)=>{ACT.bOk(id);render()}', second)
+        check(admin.evaluate('([a,b])=>[a,b].every(id=>BOOK.find(x=>x.id===id).st==="confirm")', [first, second]), '打回-4 forced confirmation cannot give the later applicant the first hold')
+        check('这个时间已由 林晓 先申请，请改时间或婉拒' in admin.inner_text('#toast'), '打回-4 forced confirmation explains the first applicant priority')
+        shot(page, '打回-4-冲突行无确认')
+        admin.evaluate("ACT.bsub('all');render()")
+        check(admin.locator(f'[data-act=bOk][data-arg="{second}"]').count() == 0, '打回-4 the All table cannot offer a second confirmation entry')
+        admin.evaluate("ACT.bsub('ok');render()")
+        admin.locator(f'[data-arg="bNo:{first}"]').click()
+        admin.locator('[data-act=fset][data-arg^="why|"]').first.click()
+        admin.locator('[data-act=bNoOk]').click()
+        check(admin.evaluate('(id)=>!BOOK.find(b=>b.id===id).clash', second), '打回-4 declining the first request clears the remaining conflict')
+        check(admin.locator(f'[data-act=bOk][data-arg="{second}"]').count() == 1, '打回-4 the remaining request regains its confirm button')
+        shot(page, '打回-4-首申请释放后恢复确认')
+        admin.locator(f'[data-act=bOk][data-arg="{second}"]').click()
+        check(admin.evaluate('(id)=>BOOK.find(b=>b.id===id).st', second) == 'ok' and admin.evaluate("SCHM.c1['10/21'][2]") == 'bk', '打回-4 remaining request confirms successfully and keeps its hold')
+    finally:
+        context.close()
+    for state in ['ok', 'change']:
+        context, page, admin, student = trial(browser)
+        try:
+            first = book_lin(admin, student)
+            admin.evaluate('(id)=>{ACT.bOk(id);render()}', first)
+            second = clash_chen(admin)
+            admin.evaluate('([a,b,state])=>{const first=BOOK.find(x=>x.id===a);first.st=state;if(state==="change")first.req={type:"取消"};delete BOOK.find(x=>x.id===b).clash;ACT.bOk(b);render()}', [first, second, state])
+            check(admin.evaluate('(id)=>BOOK.find(b=>b.id===id).st', second) == 'confirm', f'打回-4 legacy record without clash cannot double-confirm over {state}')
+            check('这个时段已经确认给 林晓 了，请改时间或婉拒' in admin.inner_text('#toast'), f'打回-4 original {state} occupancy guard is retained')
+        finally:
+            context.close()
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--only', choices=['B1-2', 'B1-1', 'B1-3', 'B1-4', '打回-1', '打回-2', '打回-3'])
+    parser.add_argument('--only', choices=['B1-2', 'B1-1', 'B1-3', 'B1-4', '打回-1', '打回-2', '打回-3', '打回-4'])
     args = parser.parse_args()
-    tests = {'B1-2': slots, 'B1-1': conflicts, 'B1-3': illness, 'B1-4': risk_limits, '打回-1': resync_review, '打回-2': adjustment_review, '打回-3': crisis_copy_review}
+    tests = {'B1-2': slots, 'B1-1': conflicts, 'B1-3': illness, 'B1-4': risk_limits, '打回-1': resync_review, '打回-2': adjustment_review, '打回-3': crisis_copy_review, '打回-4': conflict_priority_review}
     with sync_playwright() as p:
         choices = [os.environ.get('CHROMIUM_PATH'), '/opt/pw-browsers/chromium', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome']
         executable = next((c for c in choices if c and Path(c).is_file()), None)

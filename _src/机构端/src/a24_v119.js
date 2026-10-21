@@ -154,8 +154,10 @@ const schedDaysB1 = () => {
   const end = new Date(today); end.setDate(end.getDate() + 30);
   return DXL.map((d, day) => ({ d, day })).filter(x => x.d >= today && x.d <= end && x.d.getDay() % 6);
 };
+const slotClashName = b => { const first = BOOK.find(x => x.id === b.clash), s = first && SU(first.sid); return s ? nm(s) : '其他学生'; };
 const _bOkB1 = ACT.bOk; ACT.bOk = function (id) {
   const b = BOOK.find(x => x.id === id); if (!b) return;
+  if (b.clash) return toast(`这个时间已由 ${slotClashName(b)} 先申请，请改时间或婉拒`);
   const other = BOOK.find(x => x.id !== b.id && x.cid === b.cid && x.day === b.day && x.t === b.t && ['ok', 'change'].includes(x.st));
   if (other) return toast(`这个时段已经确认给 ${nm(SU(other.sid))} 了，请改时间或婉拒`);
   return _bOkB1.apply(this, arguments);
@@ -223,7 +225,7 @@ const _booking18 = booking; booking = function () { if (isL1()) return _booking1
   const top = `<div class="tabs">${BKT.map(([k, n]) => { const c = k === 'man' ? BOOK.filter(b => b.st === 'confirm' && (S.role === 'L3' || b.cid === me())).length : 0; return `<button class="${tab === k ? 'on' : ''}" data-act="btab" data-arg="${k}">${n}${c ? `<i class="r">${c}</i>` : ''}</button>`; }).join('')}</div>`;
   return top + ({ inv: bkInv, ai: bkAi, man: bkMan, sched: bkSched, pool: bkPool })[tab](); };
 PAGES.booking = booking;
-const bkBtnFix = h => h.replace(/>改约<\/button>/g, '>改时间</button>').replace(/(<button class="btn pri xs" data-act="bOk" data-arg="([^"]+)">确认<\/button>)/g, (m, a, id) => { const b = BOOK.find(x => x.id === id); return `<button class="btn ghost xs" data-act="bOpen" data-arg="${id}">看学生信息</button> ${b && b.clash ? '<span class="pill r">时段冲突</span> ' : ''}${a}`; });
+const bkBtnFix = h => h.replace(/>改约<\/button>/g, '>改时间</button>').replace(/(<button class="btn pri xs" data-act="bOk" data-arg="([^"]+)">确认<\/button>)/g, (m, a, id) => { const b = BOOK.find(x => x.id === id); return `<button class="btn ghost xs" data-act="bOpen" data-arg="${id}">看学生信息</button> ${b && b.clash ? `<span class="pill r" title="这个时间已由 ${esc(slotClashName(b))} 先申请">时段冲突</span>` : a}`; });
 
 /* 人工咨询：最上面是待确认的申请，下面是已约、改期取消、待写记录、待办池 */
 const bkMan = () => { const r = S.role; let list = BOOK.slice(); if (r === 'L2') list = list.filter(b => b.cid === me());
@@ -234,7 +236,7 @@ const bkMan = () => { const r = S.role; let list = BOOK.slice(); if (r === 'L2')
   return (unpub ? `<div class="head n" style="padding:10px 16px">${I('cal')}<div class="grow"><b style="font-size:13.5px">请提前 2 天提交排班：${unpub} 还没有开放任何时段</b></div><button class="btn sec xs" data-act="btab" data-arg="sched">去排班</button></div>` : '') +
     `<div class="card bkpin"><h3>${I('inbox')}待确认申请（${pend.length}）<span class="sp"></span><small>学生提交的是申请，老师确认后才算约好</small></h3>${pend.length ? bkBtnFix(bookTable(pend)) : `<div class="empty"><img src="${MASCOT}" alt="">没有等你确认的申请</div>`}
       <p class="note">打开申请能看到这个学生的预咨询摘要、普测结果和档案，能看到哪些按你的账号权限；每次查看记入操作记录。<b>确认</b>后变成正式预约；<b>改时间</b>要学生再确认一次；<b>婉拒</b>写一句原因，学生回到选时间那一步。</p></div>
-    <div class="card"><div class="tabs">${subs.map(([k, n]) => `<button class="${sub === k ? 'on' : ''}" data-act="bsub" data-arg="${k}">${n}<i class="${['pool', 'adjust'].includes(k) && list.filter(F[k]).length ? 'r' : ''}">${list.filter(F[k]).length}</i></button>`).join('')}</div>${bookTable(list.filter(F[sub]))}
+    <div class="card"><div class="tabs">${subs.map(([k, n]) => `<button class="${sub === k ? 'on' : ''}" data-act="bsub" data-arg="${k}">${n}<i class="${['pool', 'adjust'].includes(k) && list.filter(F[k]).length ? 'r' : ''}">${list.filter(F[k]).length}</i></button>`).join('')}</div>${bkBtnFix(bookTable(list.filter(F[sub])))}
     <p class="note" style="margin-top:10px">规则：所有预约都要老师确认，学生自己约普通号和主动邀约来的学生都一样。提前 24 小时预约；学生每 14 天可改期、取消各 1 次（老师改约不计）。确认时限：危机 ${RULES.lim.book5} 小时，其余 ${RULES.lim.book} 小时；超时自动进入待办池，由中心负责人指派。</p></div>`; };
 
 /* 主动邀约：批次、核对四堆、发邀约卡、进度、容量缺口、申请额度 */

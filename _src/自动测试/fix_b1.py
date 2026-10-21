@@ -408,7 +408,7 @@ def conflict_priority_review(browser):
         page.click('[data-side="机构端"]')
         admin.evaluate("enter('c1','L2','review');go('booking');ACT.btab('man');ACT.bsub('ok');render()")
         check(admin.locator(f'[data-act=bOk][data-arg="{second}"]').count() == 0, '打回-4 conflicting request has no confirm button')
-        check(admin.locator(f'.bkpin [data-act=bOpen][data-arg="{second}"]').count() == 1 and admin.locator(f'.bkpin [data-arg="bMove:{second}"]').count() == 1 and admin.locator(f'.bkpin [data-arg="bNo:{second}"]').count() == 1, '打回-4 conflicting row retains student information, move, and decline')
+        check(admin.locator(f'.bkpin button[data-act=bOpen][data-arg="{second}"]').count() == 1 and admin.locator(f'.bkpin [data-arg="bMove:{second}"]').count() == 1 and admin.locator(f'.bkpin [data-arg="bNo:{second}"]').count() == 1, '打回-4 conflicting row retains student information, move, and decline')
         pill = admin.locator('.bkpin tr').filter(has=admin.locator(f'[data-act=bOpen][data-arg="{second}"]')).locator('.pill.r')
         check(pill.get_attribute('title') == '这个时间已由 林晓 先申请', '打回-4 conflict title identifies the first applicant')
         admin.evaluate('(id)=>{ACT.bOk(id);render()}', second)

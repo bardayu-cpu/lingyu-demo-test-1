@@ -43,7 +43,8 @@ def drawers(browser):
         c = B6Case(browser, 'B6-1-' + role[:2] + '-逐学生切档案页签')
         try:
             c.login(role)
-            people = c.a.evaluate("""(()=>{const ids=[LY_CORE().chen.id,'s8',STU.find(s=>s.name==='Wong Jun').id,STU.find(s=>s.queue==='down').id,LY_CORE().lin.id];
+            people = c.a.evaluate("""(()=>{const wong=STU.find(s=>s.name==='Wong Jun' && BOOK.some(b=>b.sid===s.id && ikOf(b) && ikOf(b).sum)) || STU.find(s=>s.name==='Wong Jun');
+              const ids=[LY_CORE().chen.id,'s8',wong.id,STU.find(s=>s.queue==='down').id,LY_CORE().lin.id];
               return [...new Set(ids)].map(id=>SU(id)).map(s=>({id:s.id,name:s.name,down:s.queue==='down'}));})()""")
             c.check(len(people) >= 5, '每位老师至少打开五位学生档案')
             first_views = {}
@@ -75,12 +76,20 @@ def drawers(browser):
                     c.check(c.a.locator('.db .dbox > b').filter(has_text='申请把').count() == 0, '预约页不再完整显示降级申请')
                 c.click(c.a, '.db .tabs [data-act=dtab][data-arg=rep]')
                 c.check(c.a.locator('.db .ikbox').count() == 0, '返回筛查页完整摘要已收起')
+                if student['down']:
+                    c.shot(student['name'] + '-筛查页完整降级申请')
+                others = c.a.locator('.db .tabs [data-act=dtab]').evaluate_all('(els)=>els.map(e=>e.dataset.arg).filter(k=>!["rep","tl","bk"].includes(k))')
+                for tab in others:
+                    c.click(c.a, f'.db .tabs [data-act=dtab][data-arg="{tab}"]')
+                    c.check(c.a.evaluate('S.dw.tab') == tab and c.a.locator('.db .ikbox').count() == 0, tab + ' 页签正常切换，不重复展开摘要')
+                    if student['down']:
+                        c.check(c.a.locator('.db .dbox > b').filter(has_text='申请把').count() == 0, tab + ' 页签只保留降级提示')
                 c.click(c.a, '.dh [data-act=dwClose]')
             c.check(first_views['Wong Jun'] != first_views['Lim Jun'], 'Wong Jun 与 Lim Jun 首屏档案内容不同')
             # The booking shortcut retains its audit, but cannot mark a hidden summary read.
             c.select(c.a, '#jump', 'booking')
             c.click(c.a, '[data-act=btab][data-arg=man]')
-            c.click(c.a, '.bkpin [data-act=bOpen]')
+            c.click(c.a, '.bkpin button[data-act=bOpen]')
             c.check(c.a.locator('.db .ikbox').count() == 0, '待确认看学生信息不会在默认页自动展开摘要')
         finally:
             c.close()
@@ -88,7 +97,71 @@ def drawers(browser):
     return count
 
 
-TESTS = {'drawers': drawers}
+def appointment_rows(browser):
+    count = 0
+    for role in ['c1|L2', 'c5|L3']:
+        c = B6Case(browser, 'B6-2-' + role[:2] + '-人工咨询逐行打开档案')
+        try:
+            c.login(role)
+            c.click(c.a, '[data-act=btab][data-arg=man]')
+            c.click(c.a, '[data-act=bsub][data-arg=all]')
+            table = '#pg .card:not(.bkpin) table.t'
+            ids = c.a.locator(table + ' tr[data-act=bOpen]').evaluate_all('(rows)=>rows.map(r=>r.dataset.arg)')
+            c.check(len(ids) >= 5, '先逐行检查原始数据的全部列表，至少五条')
+            for bid in ids:
+                name = c.a.evaluate('id=>nm(SU(BOOK.find(b=>b.id===id).sid))', bid)
+                before = c.a.evaluate('AUDIT.filter(a=>a.t.startsWith("查看预约申请")).length')
+                c.click(c.a, table + f' tr[data-arg="{bid}"] td:first-child b', '点原始预约学生姓名 ' + name)
+                c.check(name in c.a.locator('.dh h2').inner_text(), '抽屉标题对应 ' + name)
+                c.check(c.a.evaluate('AUDIT.filter(a=>a.t.startsWith("查看预约申请")).length') == before + 1, '行点击走 bOpen，仅记一次预约查看')
+                c.click(c.a, '.dh [data-act=dwClose]')
+            # The seeded demo has fewer than two change/record/adjust/pool rows.
+            # Add distinct students as explicit display fixtures, then exercise every
+            # row and action through clicks. No click is simulated with ACT calls.
+            c.a.evaluate("""()=>{let n=0;for(const st of ['ok','change','adjust','record','pool','confirm'])for(let i=0;i<2;i++){
+              const base=BOOK.find(b=>b.st===st)||BOOK[0], sid=STU[120+n++].id;
+              const b={...base,id:'qa-b6-'+st+'-'+i,sid,cid:'c1',st,intake:null,fresh:false,rec:null};
+              delete b.clash; if(st==='change')b.req={type:'改期',day:4,t:2}; BOOK.push(b);
+            }render();}""")
+            c.steps.append({'测试准备':'为种子数据少于两行的状态补充独立学生夹具；每种状态两行，只检查列表、档案和按钮行为，不改变业务规则'})
+            tabs = ['ok', 'change', 'adjust', 'record'] + (['pool'] if role == 'c5|L3' else []) + ['all']
+            for tab in tabs:
+                c.click(c.a, f'[data-act=bsub][data-arg="{tab}"]')
+                rows = c.a.locator(table + ' tr[data-act=bOpen]')
+                c.check(rows.count() >= 2, tab + ' 子列表至少点击两行')
+                for i in range(2):
+                    row = rows.nth(i)
+                    bid = row.get_attribute('data-arg')
+                    name = c.a.evaluate('id=>nm(SU(BOOK.find(b=>b.id===id).sid))', bid)
+                    row.hover()
+                    c.check(row.evaluate('e=>getComputedStyle(e).cursor') == 'pointer' and row.locator('td').first.evaluate('e=>getComputedStyle(e).backgroundColor') != 'rgba(0, 0, 0, 0)', '可点击行使用统一手形与悬停底色')
+                    selector = table + f' tr[data-arg="{bid}"]'
+                    # Cover name, grade and a padded blank area of the date cell.
+                    mode = (tabs.index(tab) + i) % 3
+                    if mode == 0:
+                        c.click(c.a, selector + ' td:first-child b', '点姓名 ' + name)
+                    elif mode == 1:
+                        c.click(c.a, selector + ' td:nth-child(2)', '点等级 ' + name)
+                    else:
+                        c.click(c.a, selector + ' td:nth-child(4)', '点行内空白 ' + name, position={'x': 3, 'y': 3})
+                    c.check(name in c.a.locator('.dh h2').inner_text(), tab + ' 子列表打开正确学生 ' + name)
+                    c.click(c.a, '.dh [data-act=dwClose]')
+            for arg in ['bMove:b1', 'bNo:qa-b6-adjust-0', 'rec:qa-b6-record-0', 'intake:b1']:
+                c.click(c.a, '[data-act=bsub][data-arg=all]')
+                c.click(c.a, '#pg button[data-act=mo][data-arg="' + arg + '"]')
+                c.check(c.a.evaluate('S.mo') == arg and c.a.evaluate('S.dw===null'), arg + ' 只打开自己的弹窗，不同时开档案')
+                c.click(c.a, '[data-act=moClose]')
+            c.check(c.a.locator('.bkpin button[data-act=bOpen]').count() >= 2, '待确认仍保留原来的看学生信息按钮')
+            c.shot('人工咨询可点行')
+            c.select(c.a, '#roleSel', 'u1|L1')
+            c.check(c.a.locator('#jump option[value=booking]').count() == 0, '辅导员仍没有人工咨询页面')
+        finally:
+            c.close()
+        count += c.checks
+    return count
+
+
+TESTS = {'drawers': drawers, 'rows': appointment_rows}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

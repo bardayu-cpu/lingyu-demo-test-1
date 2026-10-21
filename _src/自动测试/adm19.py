@@ -35,7 +35,7 @@ with sync_playwright() as p:
     E("ACT.mo('ivAdd:');S.form.ivt='paste';S.form.ivIds='xxx,'+SURV().find(s=>curLv(s)<3&&!activeBook(s)).sid;ACT.ivAddGo();render()"); chk(E("S.ivRes.in.length") == 1 and E("S.ivRes.bad.length") == 1, 'add students, four piles')
     E("ACT.moClose&&ACT.moClose();S.mo=null;ACT.mo('ivApp:');S.form.apc='工程学院';S.form.apn='3';S.form.apw='等的人多';ACT.ivAppGo();render()"); chk(E("RULES.pool.apps.length") == 1, 'apply quota')
     E("ACT.btab('ai');render()"); t = T(); chk('预咨询摘要' in t and '题库配置' in t and '主动邀约' in t, 'AI tab summaries')
-    n = E("AUDIT.length"); E("ACT.mo('ivIk:'+ivb().list.find(x=>x.ik&&x.ik.sum&&!x.bid).sid);render()"); chk('高危咨询题库' in T('.mo') and E("AUDIT.length") == n + 1, 'view invite summary audited')
+    n = E("AUDIT.length"); E("ACT.ivIkOpen(ivb().list.find(x=>x.ik&&x.ik.sum&&!x.bid).sid);render()"); chk('高危咨询题库' in T('.mo') and E("AUDIT.length") == n + 1, 'view invite summary audited')
     E("S.mo=null;ACT.aisub('bank');render()"); chk('普通咨询' in T() and '高危咨询' in T(), 'two banks')
     E("ACT.ikBank('h');render()"); chk(E("RULES.ikt===RULES.ikh") and '主动邀约来的学生' in T(), 'high-risk bank editor')
     E("ACT.iktDel('t1|7');ACT.iktSave();render()"); chk(E("RULES.ikh.ver") == 2 and E("RULES.iktN.ver") == 1 and '高危咨询' in E("AUDIT[0].t"), 'save high-risk bank only')

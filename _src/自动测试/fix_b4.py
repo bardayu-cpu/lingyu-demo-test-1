@@ -114,7 +114,32 @@ def pool_notifications(browser):
     return c.checks
 
 
-TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications}
+def audits(browser):
+    c = Case(browser, 'B4-5-每次查看摘要记审计')
+    try:
+        c.login()
+        x = c.a.evaluate('ivb().list.find(x=>x.ik && x.ik.st==="sent" && x.ik.sum && !x.bid && ["c1","c4"].includes(x.resp))')
+        sid = x['sid']
+        audit = lambda: c.a.evaluate('(sid)=>AUDIT.filter(a=>a.sid===sid && a.t==="查看预咨询摘要（主动邀约）").length', sid)
+        before = audit()
+        for _ in range(2):
+            c.click(c.a, f'[data-act=ivIkOpen][data-arg="{sid}"]')
+            c.check('高危咨询题库' in c.a.inner_text('#modal'), '从批次打开的是已发送的邀约摘要')
+            c.click(c.a, '[data-act=moClose]')
+        c.login(x['resp'] + ('|L2' if x['resp']=='c1' else '|L3'))
+        c.click(c.a, '[data-act=btab][data-arg=ai]')
+        c.click(c.a, f'[data-act=ivIkOpen][data-arg="{sid}"]')
+        c.check(audit() == before + 3, '同一摘要两次打开，再换老师从AI列表打开，共三条审计')
+        c.check(c.a.evaluate('(sid)=>ivb().list.find(x=>x.sid===sid).ik.viewed', sid), '摘要已读标记保留')
+        c.shot('换老师第三次查看摘要')
+        c.click(c.a, '[data-act=moClose]')
+        c.check(audit() == before + 3, '弹窗关闭和页面重绘不产生额外查看日志')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications, 'B4-5': audits}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

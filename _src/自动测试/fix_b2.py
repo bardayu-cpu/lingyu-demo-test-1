@@ -167,7 +167,32 @@ def resume_current(browser):
     return total
 
 
-TESTS = {'B2-1': moves, 'B2-2': declines, 'B2-3': drafts, 'B2-4': resume_current}
+def workload(browser):
+    c = Case(browser, 'B2-5-工作量日期')
+    try:
+        c.login()
+        c.click(c.a, '[data-act=btab][data-arg=sched]')
+        table = c.a.locator('.card').filter(has=c.a.locator('h3').filter(has_text='工作量')).locator('table')
+        c.check('本周（10/12–10/16）' in c.a.inner_text('#pg') and '10/12–11/8' in table.inner_text(), '本周及四周区间明确显示')
+        row = table.locator('tr').filter(has_text='李文')
+        before = row.locator('td').all_inner_texts()
+        old = c.a.evaluate('LY_snap().lin')
+        old_week = int(bool(old and old['cid'] == 'c1' and 0 <= old['day'] < 5))
+        old_four = int(bool(old and old['cid'] == 'c1' and 0 <= old['day'] < 20))
+        c.book()
+        row = table.locator('tr').filter(has_text='李文')
+        after = row.locator('td').all_inner_texts()
+        c.check(int(after[1]) == int(before[1]) - old_week, '10/21 不进入本周，原有本周预约被替换后扣除')
+        c.check(int(after[3]) == int(before[3]) + 1 - old_four, '四周计入新申请，并扣除原来被替换的预约')
+        c.check(int(after[2]) == int(before[2]) + old_week and int(after[4]) == int(before[4]) - 1 + old_four, '开放数使用相同区间并反映申请占位')
+        c.side('机构端')
+        c.shot('本周与未来四周工作量')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'B2-1': moves, 'B2-2': declines, 'B2-3': drafts, 'B2-4': resume_current, 'B2-5': workload}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

@@ -59,7 +59,7 @@ with sync_playwright() as p:
     E("ACT.go('mybook');render()"); ok('老师确认后才算预约成功' in txt(),'我的预约：等老师确认'); E("ACT.zConfirm();ACT.close();ACT.go('mybook');render()")
     C('[data-act=resch]'); C('[data-act=reschOk]'); ok(E('S.page')=='book' and E('!!S.bk'),'改期：先选时间，原预约仍在'); ok('放弃改期' in txt(),'有放弃改期'); shot('a07_resch')
     C('[data-act=reschQuit]'); ok(E('S.page')=='mybook' and E("left('resch')"),'放弃改期：不扣次数')
-    C('[data-act=resch]'); C('[data-act=reschOk]'); C('.tm[data-act=pickSlot]'); ok('确认新的预约时间' in txt(),'改期提交弹窗标题'); C('[data-act=bookSubmit]'); E("ACT.close();render()")
+    C('[data-act=resch]'); C('[data-act=reschOk]'); C('[data-act=day]'); C('.tm[data-act=pickSlot]'); ok('确认新的预约时间' in txt(),'改期提交弹窗标题'); C('[data-act=bookSubmit]'); E("ACT.close();render()")
     ok(E("S.bk.pend && S.bk.pend.type")=='resch' and not E("left('resch')"),'已成功的预约改期需老师同意、扣次数')
     E("ACT.go('mybook');render()"); C('[data-act=zPend]'); E("ACT.close();render()"); ok(E('S.bk.st')=='已确认' and not E('S.bk.pend'),'老师同意改期，新时间生效')
     E("ACT.go('mybook');render()"); C('[data-act=zMove]'); ok(E('S.modal')=='moved','老师改约弹窗'); C('[data-act=movedResch]'); ok('不占用' in txt(),'老师改约引起的改期不计次')

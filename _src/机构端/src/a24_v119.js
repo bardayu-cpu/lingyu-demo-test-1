@@ -276,12 +276,19 @@ const bankPage = () => { const k = S.ikBank || 'n'; let h; S._ikBankView = 1; tr
 const _rB19 = render; render = function () { ikBankSet(S.page === 'booking' && S.tabs.booking === 'ai' && S.tabs.aisub === 'bank' && S.ikBank === 'h' ? 'h' : 'n'); return _rB19.apply(this, arguments); };
 
 /* 排班表：咨询排班 + 值班表（从「设置 · 成员管理」挪过来）+ 工作量 + 改班和停诊登记 */
-const bkSched = () => { const ed = S.role === 'L3', wk = ['c1', 'c2', 'c3', 'c4', 'c5'].map(c => [c, BOOK.filter(b => b.cid === c && ['ok', 'confirm', 'change'].includes(b.st)).length, SCHED[c].flat().filter(v => v === 'open').length]);
+const bkSched = () => {
+  const ed = S.role === 'L3', end4 = new Date(DAYS[0]); end4.setDate(end4.getDate() + 28);
+  const days4 = DXL.map((d, day) => ({ d, day })).filter(x => x.d >= DAYS[0] && x.d < end4).map(x => x.day);
+  const last4 = new Date(end4); last4.setDate(last4.getDate() - 1);
+  const range4 = `${dkey(DAYS[0])}–${dkey(last4)}`;
+  const wk = SC.map(c => { const count = days => BOOK.filter(b => b.cid === c && ['ok', 'confirm', 'change', 'move'].includes(b.st) && days.includes(b.day)).length;
+    const open = days => days.reduce((n, day) => n + TIMES.filter((_, t) => slotAt(c, day, t) === 'open').length, 0);
+    return [c, count([0, 1, 2, 3, 4]), open([0, 1, 2, 3, 4]), count(days4), open(days4)]; });
   const reg = (RULES.schedLog || []).slice().reverse();
   return (S.role === 'L3' ? schedGroup() : sched()) +
     `<div class="grid g2" style="margin-top:16px"><div class="card"><h3>${I('alert', 's')}值班表<span class="sp"></span><small>${ed ? '中心负责人可改，改动记入操作记录' : '只读'}</small></h3>
       <table class="t"><tr><th>周</th><th>值班咨询师（第一通知对象）</th><th>升级对象</th></tr>${DUTY.map((d, i) => `<tr><td>${d.wk}</td><td><select data-bind="duty.${i}" data-rerender ${ed ? '' : 'disabled'}>${['c4', 'c5'].map(x => `<option value="${x}" ${d.who === x ? 'selected' : ''}>${ST(x).name}</option>`).join('')}</select></td><td>${RULES.esc} 小时 → 中心负责人 · 12 小时 → 分管领导</td></tr>`).join('')}</table></div>
-    <div class="card"><h3>工作量 · 本周<span class="sp"></span><small>已约 / 待确认 · 还开着的时段</small></h3><table class="t"><tr><th>咨询师</th><th>预约</th><th>开放时段</th></tr>${wk.map(([c, n, o]) => `<tr><td>${ST(c).name}</td><td>${n}</td><td>${o}</td></tr>`).join('')}</table></div></div>
+    <div class="card"><h3>工作量 · 本周（10/12–10/16）<span class="sp"></span><small>已约 / 待确认 · 还开着的时段</small></h3><table class="t"><tr><th>咨询师</th><th>预约</th><th>开放时段</th><th>未来 4 周预约<br>（${range4}）</th><th>未来 4 周开放<br>（${range4}）</th></tr>${wk.map(([c, n, o, n4, o4]) => `<tr><td>${ST(c).name}</td><td>${n}</td><td>${o}</td><td>${n4}</td><td>${o4}</td></tr>`).join('')}</table></div></div>
     <div class="card" style="margin-top:16px"><h3>改班和停诊登记<span class="sp"></span><button class="btn sec xs" data-act="mo" data-arg="schedReg:">登记一次</button></h3>
       ${reg.length ? `<table class="t"><tr><th>登记时间</th><th>老师</th><th>类型</th><th>日期</th><th>说明</th></tr>${reg.map(x => `<tr><td>${fmt(new Date(x.at))}</td><td>${ST(x.cid).name}</td><td>${x.type}</td><td>${esc(x.day)}</td><td>${esc(x.why)}</td></tr>`).join('')}</table>` : '<p class="note" style="margin:0">还没有登记。</p>'}
       <p class="note">临时改班、病假停诊要登记，中心负责人会收到通知。受影响的预约记为「中心调整 · 待重新安排」，不算学生的「时间都不合适」。</p></div>`; };

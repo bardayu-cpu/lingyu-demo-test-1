@@ -43,7 +43,9 @@ with sync_playwright() as p:
     ADM.evaluate(f"ACT.bAgree('{bid}');render()"); pg.wait_for_timeout(400)
     chk(STU.evaluate("S.bk&&S.bk.di") == 2 and not STU.evaluate("S.bk.pend"), 'admin agree -> student new time')
     # 老师改约 → 学生端「老师调整」
-    ADM.evaluate(f"S.form={{slot:'4-3'}};ACT.bMoveOk('{bid}');render()"); pg.wait_for_timeout(400)
+    # B2-1: pick an actually open time; 4-3 belongs to baseline booking b8.
+    move_slot = ADM.evaluate("(()=>{for(let d=1;d<20;d++)for(let t=0;t<4;t++)if(slotAt('c1',d,t)==='open')return d+'-'+t;throw Error('No open move fixture')})()")
+    ADM.evaluate('([id,slot])=>{S.form={slot};ACT.bMoveOk(id);render()}', [bid, move_slot]); pg.wait_for_timeout(400)
     chk(STU.evaluate("S.bk.st") == '已改约' and STU.evaluate("S.modal") == 'moved', 'admin move -> student moved')
     # 婉拒：新预约后婉拒
     STU.evaluate("S.bk=null;S.modal=null;render()"); pg.wait_for_timeout(200)

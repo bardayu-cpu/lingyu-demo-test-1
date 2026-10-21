@@ -94,7 +94,8 @@ class Case:
             elif q['type'] == 'single':
                 self.click(self.s, '[data-act=ikPick]')
             elif q['type'] == 'multi':
-                self.click(self.s, '[data-act=ikTog]')
+                if not self.s.evaluate('S.ik.sel.length'):
+                    self.click(self.s, '[data-act=ikTog]')
                 self.click(self.s, '[data-act=ikNextQ]')
             else:
                 self.s.locator('#ikTxt').fill(text)

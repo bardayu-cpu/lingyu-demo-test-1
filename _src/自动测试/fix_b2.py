@@ -91,7 +91,39 @@ def declines(browser):
     return c.checks
 
 
-TESTS = {'B2-1': moves, 'B2-2': declines}
+def drafts(browser):
+    c = Case(browser, 'B2-3-草稿隐私')
+    try:
+        c.login('c1|L2')
+        bid = c.book()
+        c.click(c.s, '[data-act=ikYes]')
+        c.click(c.s, '[data-act=ikTog]')
+        c.click(c.s, '[data-act=ikNextQ]')
+        c.s.locator('#ikTxt').fill('这段正在填写的内容暂时不想发给老师。')
+        c.click(c.s, '[data-act=ikX]')
+        c.click(c.s, '[data-act=ikSave]')
+        c.wait(c.a, f'BOOK.find(b=>b.id==={bid!r}).intake.st==="draft"')
+        c.check(c.s.evaluate('S.bk.intake.sum.length') > 0, '学生本地仍保存有内容的草稿')
+        c.check(c.a.evaluate('(id)=>!BOOK.find(b=>b.id===id).intake.sum', bid), '老师端预约不含草稿摘要')
+        c.click(c.a, '[data-act=btab][data-arg=ai]')
+        row = c.a.locator('tr').filter(has_text='林晓')
+        c.check('已保存，未发送' in row.inner_text() and row.locator('button').count() == 0, '草稿行显示状态且无摘要按钮')
+        c.shot('老师端草稿不可打开')
+        c.a.evaluate('LY_in({t:"intake",core:"lin",intake:{st:"draft",ver:1,sum:[{k:"secret",v:"PRIVATE_DRAFT"}],ans:{secret:"PRIVATE_DRAFT"}}})')
+        c.check(c.a.evaluate('(id)=>{const it=BOOK.find(b=>b.id===id).intake;return !it.sum&&!it.ans}', bid), '接收端也丢弃直接传入的草稿内容')
+        c.click(c.s, '[data-act=ikGo]')
+        c.intake()
+        c.wait(c.a, f'BOOK.find(b=>b.id==={bid!r}).intake.st==="sent"')
+        row = c.a.locator('tr').filter(has_text='林晓')
+        c.click(c.a, f'[data-arg="intake:{bid}"]')
+        c.check('最近学习压力有些大' in c.a.inner_text('#modal'), '学生确认发送后老师能打开完整摘要')
+        c.shot('确认发送后的摘要')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'B2-1': moves, 'B2-2': declines, 'B2-3': drafts}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

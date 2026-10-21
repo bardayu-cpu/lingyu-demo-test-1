@@ -266,7 +266,7 @@ const bkAi = () => { const sub = S.tabs.aisub || 'sum';
   return `<div class="card">${head}<p class="intro">${I('info', 's')}<span>主动邀约来的、自己约普通号来的学生做完的预咨询都在这里。只收集，不评分，不改变等级；辅导员看不到。打开摘要记入操作记录。</span></p>
     <div class="filters"><select data-bind="f.aisrc" data-rerender><option value="">全部来源</option>${['主动邀约', '自己约普通号'].map(x => `<option ${f.aisrc === x ? 'selected' : ''}>${x}</option>`).join('')}</select><select data-bind="f.aicol" data-rerender><option value="">全部学院</option>${COLLEGES.map(c => `<option ${f.aicol === c ? 'selected' : ''}>${c}</option>`).join('')}</select><select data-bind="f.aibk" data-rerender><option value="">约没约都看</option><option value="y" ${f.aibk === 'y' ? 'selected' : ''}>已提交预约</option><option value="n" ${f.aibk === 'n' ? 'selected' : ''}>还没约</option></select><span class="note">${R.length} 人</span></div>
     <table class="t"><tr><th>学生</th><th>来源</th><th>时间</th><th>标记</th><th>预约</th><th></th></tr>${R.map(r => { const s = SU(r.sid);
-      return `<tr><td><b>${nm(s)}</b><small>${s.college}</small></td><td>${r.src}</td><td>${r.it.at ? fmt(new Date(r.it.at)) : '—'}</td><td>${tag(r)}</td><td>${r.b ? `${slotTxt(r.b)} · ${ST(r.b.cid).name}${BST[r.b.st] ? ' ' + BST[r.b.st] : ''}` : '<span class="note">还没约</span>'}</td><td>${r.it.sum ? `<button class="btn ghost xs" data-act="mo" data-arg="${r.b ? `intake:${r.b.id}` : `ivIk:${r.sid}`}">看摘要</button>` : ''}</td></tr>`; }).join('') || '<tr><td colspan="6" class="note">没有符合的记录</td></tr>'}</table></div>`; };
+      return `<tr><td><b>${nm(s)}</b><small>${s.college}</small></td><td>${r.src}</td><td>${r.it.at ? fmt(new Date(r.it.at)) : '—'}</td><td>${tag(r)}</td><td>${r.b ? `${slotTxt(r.b)} · ${ST(r.b.cid).name}${BST[r.b.st] ? ' ' + BST[r.b.st] : ''}` : '<span class="note">还没约</span>'}</td><td>${r.it.st !== 'draft' && r.it.sum ? `<button class="btn ghost xs" data-act="mo" data-arg="${r.b ? `intake:${r.b.id}` : `ivIk:${r.sid}`}">看摘要</button>` : ''}</td></tr>`; }).join('') || '<tr><td colspan="6" class="note">没有符合的记录</td></tr>'}</table></div>`; };
 const _ikS19 = intakeSettings; intakeSettings = function () { const h = _ikS19(), P = h.split('<div class="card">');
   if (!S._ikBankView) return P[0] + '<div class="card">' + P[1] + (iktDirty() ? `<div class="iktbar"><span class="note" style="color:var(--warn)">有未保存的修改</span><span class="sp"></span><button class="btn ghost" data-act="iktUndo">放弃修改</button><button class="btn pri" data-act="iktSave">保存</button></div>` : '') + `<div class="card"><h3>题目和开场白</h3><p class="note" style="margin:0">题目、开场白和版本记录挪到了「预约咨询 · AI 预咨询 · 题库配置」，分普通咨询、高危咨询两套，由中心负责人维护。</p></div>`;
   let body = P.slice(2).map(x => '<div class="card">' + x).join(''); if (ikBankCur === 'h') body = body.replace(/<div class="tabs">[\s\S]*?<\/div>/, '').replace('一次只问一道题；', '主动邀约的学生接受邀约后马上做；一次只问一道题；').replace('开场白（学生提交预约后看到的大窗口）', '开场白（学生接受邀约后，显示在第一题上面）').replace('可以用的变量：{接待老师}、{上次聊到的话题}。', '这时还没有接待老师，开场白里不要用 {接待老师}。');
@@ -408,4 +408,10 @@ const _noSnapB2 = LY_snap; LY_snap = function () {
   const o = _noSnapB2(); Object.entries(LY_CORE()).forEach(([key, s]) => {
     if (o.__no && o.__no[key]) { const b = BOOK.filter(x => x.sid === s.id).slice(-1)[0]; o.__no[key] = { why: b.noWhy || '', note: b.noNote || '' }; }
   }); return o;
+};
+
+/* B2-3：机构端接收草稿状态，拒收尚未发送的回答和摘要。 */
+const _intakeDraftB2 = LY_in; LY_in = function (ev) {
+  if (ev.t === 'intake' && ev.intake && ev.intake.st === 'draft') ev = Object.assign({}, ev, { intake: { st: 'draft', ver: ev.intake.ver } });
+  return _intakeDraftB2(ev);
 };

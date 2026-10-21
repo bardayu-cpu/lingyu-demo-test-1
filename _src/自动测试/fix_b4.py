@@ -74,7 +74,47 @@ def piles(browser):
     return c.checks
 
 
-TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles}
+def pool_notifications(browser):
+    c = Case(browser, 'B4-4-号池变更通知')
+    try:
+        c.login()
+        c.click(c.a, '[data-act=btab][data-arg=pool]')
+        def changes(label, action):
+            n = c.a.evaluate('NOTI.length')
+            action()
+            notices = c.a.evaluate('(n)=>NOTI.slice(0,NOTI.length-n)', n)
+            text = c.a.evaluate('AUDIT[0].t')
+            c.check(all(sum(x['to']==uid and x['t']==text for x in notices)==1 for uid in ['c1','c2','c3','c4']), label + '中心其他四位老师各收到一条与日志相同的站内通知')
+        def quota():
+            field = c.a.locator('[data-pool^="col|"]').first
+            field.fill('8')
+            field.press('Tab')
+            c.steps.append({'操作':'修改学院额度为8并移开焦点'})
+        changes('学院额度：', quota)
+        changes('主动邀约等级：', lambda: c.select(c.a, '[data-pool=ivLv]', '4'))
+        changes('暂留额度：', lambda: c.click(c.a, '[data-act=poolH][data-arg="-2"]'))
+        c.login('c1|L2')
+        c.click(c.a, '[data-act=btab][data-arg=inv]')
+        for why in ['需要本周接待一位学生', '申请下一个窗口接待']:
+            c.click(c.a, '[data-arg="ivApp:"]')
+            c.click(c.a, '[data-act=fset][data-arg^="apc|"]')
+            c.a.locator('[data-bind="form.apn"]').fill('1')
+            c.a.locator('[data-bind="form.apw"]').fill(why)
+            c.steps.append({'操作':'填写额度申请','数量':1,'原因':why})
+            c.click(c.a, '[data-act=ivAppGo]')
+        ids = c.a.evaluate('RULES.pool.apps.slice(-2).map(x=>x.id)')
+        c.login()
+        c.click(c.a, '[data-act=btab][data-arg=pool]')
+        changes('批准申请：', lambda: c.click(c.a, f'[data-act=poolAppOk][data-arg="{ids[0]}"]'))
+        changes('不批申请：', lambda: c.click(c.a, f'[data-act=poolAppNo][data-arg="{ids[1]}"]'))
+        c.check(c.a.evaluate('NOTI.some(n=>n.to==="c1" && n.t.includes("你申请的 1 个额度已批准")) && NOTI.some(n=>n.to==="c1" && n.t==="你的额度申请没有批准")'), '批准与不批仍分别通知申请人')
+        c.shot('额度申请处理结果')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

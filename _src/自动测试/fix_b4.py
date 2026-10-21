@@ -184,7 +184,22 @@ def high_preview(browser):
     return c.checks
 
 
-TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications, 'B4-5': audits, 'B4-6': duty_readonly, 'B4-7': high_preview}
+def application_copy(browser):
+    c = Case(browser, 'B4-8-预咨询位置文案')
+    try:
+        c.select(c.a, '#roleSel', 'a1|ADM')
+        c.select(c.a, '#jump', 'settings')
+        c.click(c.a, '[data-act=settab][data-arg=intake]')
+        c.check('预约申请提交后（推荐）' in c.a.locator('[data-bind=intakeMode]').inner_text(), '位置下拉明确申请提交后')
+        text = c.a.inner_text('#pg')
+        c.check('预约成功' not in text and '时段先替学生留着，不会被抢' in text, '位置表格与锁位说明统一')
+        c.shot('申请提交后位置设置')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications, 'B4-5': audits, 'B4-6': duty_readonly, 'B4-7': high_preview, 'B4-8': application_copy}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

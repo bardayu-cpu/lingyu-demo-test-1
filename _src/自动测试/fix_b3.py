@@ -126,7 +126,48 @@ def upgrade(browser):
     return total
 
 
-TESTS = {'B3-1': new_words, 'B3-2': upgrade}
+def auxiliary(browser):
+    c = Case(browser, 'B3-3-三级辅助信号权限')
+    try:
+        c.select(c.a, '#roleSel', 'c5|L3')
+        n0 = c.a.evaluate('NOTI.length')
+        k0 = c.a.evaluate('CRISES.length')
+        tid = talk(c, '最近失眠、焦虑，希望调整作息。', 'c5|L3')
+        c.check(c.a.evaluate('CRISES.length') == k0 and c.a.evaluate('NOTI.length') == n0, '只有三级词保存不建危机、不发通知')
+        c.check(c.a.evaluate('(id)=>{const a=TALKS.find(t=>t.id===id).aux;return a.includes("失眠") && a.includes("焦虑") && a.length===new Set(a).size}', tid), '记录保存去重后的三级词')
+        c.click(c.a, f'[data-act=tkView][data-arg="{tid}"]')
+        c.check('辅助信号：' in c.a.inner_text('#pg') and '不单独报告' in c.a.inner_text('#pg'), '中心负责人看到辅助信号及说明')
+        c.shot('中心看到辅助信号')
+        c.click(c.a, f'[data-act=tkEdit][data-arg="{tid}"]')
+        c.click(c.a, '[data-act=rcSPick]')
+        fill(c, '[data-rb=spick]', '周老师')
+        c.click(c.a, '[data-act=rcSAdd][data-arg=u1]')
+        c.click(c.a, '[data-act=recSave][data-arg=""]')
+        c.select(c.a, '#roleSel', 'u1|L1')
+        c.select(c.a, '#jump', 'talk')
+        c.click(c.a, '[data-act=tktab][data-arg=recs]')
+        c.click(c.a, f'[data-act=tkView][data-arg="{tid}"]')
+        c.check('最近失眠、焦虑' in c.a.inner_text('#pg') and '辅助信号：' not in c.a.inner_text('#pg'), '辅导员可读已分享正文，但看不到辅助信号行')
+        c.shot('辅导员同一记录不见辅助信号')
+        c.select(c.a, '#roleSel', 'c5|L3')
+        c.a.locator('#zapT').check()
+        for _ in range(6):
+            c.click(c.a, '[data-act=zTime]')
+        c.select(c.a, '#jump', 'talk')
+        c.click(c.a, '[data-act=tktab][data-arg=recs]')
+        c.click(c.a, f'[data-act=tkView][data-arg="{tid}"]')
+        c.click(c.a, f'[data-arg="tkAdd:{tid}"]')
+        n0, k0 = c.a.evaluate('NOTI.length'), c.a.evaluate('CRISES.length')
+        fill(c, '[data-bind="form.add"]', '追加：最近很累，仍有失眠。')
+        c.click(c.a, '[data-act=tkAddGo]')
+        c.check(c.a.evaluate('(id)=>{const a=TALKS.find(t=>t.id===id).aux;return a.includes("累") && a.filter(w=>w==="失眠").length===1}', tid), '追加内容补记三级词并去重')
+        c.check(c.a.evaluate('CRISES.length') == k0 and c.a.evaluate('NOTI.length') == n0, '只有三级词的追加不报告、不通知')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'B3-1': new_words, 'B3-2': upgrade, 'B3-3': auxiliary}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

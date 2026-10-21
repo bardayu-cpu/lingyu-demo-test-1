@@ -68,6 +68,7 @@ function recView() { const t = TALKS.find(x => x.id === S.rv), v = recVis(t), mi
     ${see('situ') ? (t.adds || []).map(a => `<p class="tkadd">补充 · ${fmt(a.at)}${a.who ? ` · ${SU(a.who).name}` : ''}：${esc(a.t)}</p>`).join('') : ''}
     <div class="kv" style="margin-top:12px"><span>情况类型</span><b>${see('types') ? (t.types || []).join('、') || '—' : none}</b><span>学生表达的需要</span><b>${see('need') ? esc(t.need) || '—' : none}</b><span>下次谈心</span><b>${see('next') ? t.next || '不需要' : none}</b>${mine || v === 'full' ? `<span>希望中心介入</span><b>${t.center ? `是${t.cwhy ? '：' + esc(t.cwhy) : ''}` : '否'}</b>` : ''}</div>
     ${t.risk ? `<p class="tkrisk">${I('alert', 's')}含安全相关内容 · ${recCrisisTxt(t)}</p>` : ''}
+    ${['L2', 'L3'].includes(S.role) && see('situ') && (t.aux || []).length ? `<p class="note">辅助信号：${t.aux.map(esc).join('、')}（不单独报告）</p>` : ''}
     ${mine ? `<h4>谁能看</h4>${(t.shares || []).length ? `<table class="t"><tr><th>分享给</th><th>能看</th><th>有效期</th><th></th></tr>${t.shares.map((x, i) => `<tr><td>${ST(x.to).name}<small>${tagOf(x.to)}</small></td><td>基本信息、${x.parts.map(p => PARTS.find(q => q[0] === p)[1]).join('、') || '—'}</td><td>${x.off ? '已收回' : shareOn(x) ? fmt(x.exp).split(' ')[0] + ' 前' : '已过期'}</td><td>${x.off ? '' : `<button class="btn ghost xs" data-act="shExt" data-arg="${t.id}|${i}">延长 30 天</button><button class="btn ghost xs" data-act="mo" data-arg="shEdit:${t.id}|${i}">改范围</button><button class="btn ghost xs" data-act="shOff" data-arg="${t.id}|${i}">收回</button>`}</td></tr>`).join('')}</table>` : '<p class="note">只有你能看。</p>'}
       ${t.forced ? '<p class="note">这条记录回传心理中心，不能移除；被分享的人看不到「心理中心」这一项。</p>' : ''}<p class="note">同步 SIS：${t.sis ? '已勾选（这一版只对齐字段）' : '不同步'}${(t.hist || []).length ? ` · 已修改 ${t.hist.length} 次，修改前的内容保留` : ''}</p>` : ''}</div>`; }
 
@@ -106,6 +107,7 @@ function recSave(draft) { const R = S.rec, edit = R.id && TALKS.find(t => t.id =
   o.points = o.situ;
   let t; if (edit) { if (formal) edit.hist.push({ at: new Date(NOW), situ: edit.situ, need: edit.need }); Object.assign(edit, o); t = edit; if (formal) { if (edit.corrOk) edit.corrOk = 0; if (!edit.savedAt0) edit.savedAt0 = edit.savedAt; } }
   else { t = addTalk(Object.assign(o, { by: me(), from: '自发' })); t.at = at; t.adds = []; t.hist = []; }
+  t.aux = [...new Set(cwFind([R.situ, R.need, R.topic, R.cwhy, ...Object.values(R.pp || {}).map(p => p.txt), ...(t.adds || []).map(a => a.t)].join(' ')).hit.filter(w => cwL(w) === 3))];
   const e = SU(t.sid).tl.find(x => x.tid === t.id); if (e) { e.k = 'talkr'; e.at = at; e.t = draft ? '谈话记录草稿' : `谈话记录（${o.mode} · ${o.result}）`; }
   if (first) t.savedAt = new Date(NOW); t.shares = shares;
   R.sids.forEach(id => { const p = t.pp[id]; if (p && p.txt && !p.savedAt && !draft) p.savedAt = new Date(NOW); });

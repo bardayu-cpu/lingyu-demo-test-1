@@ -116,6 +116,7 @@ Object.assign(ACT, {
   tkAddGo(tid) { const t = TALKS.find(x => x.id === tid), v = (S.form.add || '').trim(), ids = t.sids || [t.sid]; if (!recOwner(t)) return toast('只有写这条记录的人可以追加'); if (!v) return toast('请写下补充的内容');
     if (ids.length > 1 && TALK_RE.test(v) && !S.form.cw) { S.form.askCw = 1; return toast('补充里有安全相关的表达，请先选涉及哪个学生'); }
     const who = ids.length > 1 ? S.form.cw : t.sid; t.adds.push({ at: new Date(NOW), t: v, by: me(), who: who === 'all' ? null : who });
+    t.aux = [...new Set([...(t.aux || []), ...cwFind(v).hit.filter(w => cwL(w) === 3)])];
     log('追加谈话记录补充', SU(t.sid), { k: 'talkLog', noTl: 1, obj: '谈话记录' }); if (t.forced) notify(SU(t.sid).owner || SU(t.sid).assignee || 'c5', '站内', `${ST(me()).name} 追加了谈话记录补充：${nm(SU(t.sid))}`, t.sid);
     const hit = TALK_RE.test(v) ? (who === 'all' ? ids : [who || t.sid]) : [], ks = hit.map(id => riskAdd(t, v, id)).filter(Boolean); S.mo = ks[0] ? `tkCrisis:${ks[0].id}` : null; if (!ks.length) toast('已追加'); },
   tkCorrGo(tid) { const t = TALKS.find(x => x.id === tid), n = (S.form.note || '').trim(); if (!n) return toast('请写原因'); addXf('corr', SU(t.sid), { note: n, rec: tid }); t.corrAsk = 1; S.mo = null; toast('已提交，中心负责人批准后可以再改一次'); },

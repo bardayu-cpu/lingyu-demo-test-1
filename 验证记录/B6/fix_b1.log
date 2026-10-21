@@ -1,0 +1,146 @@
+PASS B1-2 baseline 10/21 09:00 is closed
+PASS B1-2 saving a next-week slot reaches student
+PASS B1-2 shared slot reader and absent-slot fallback
+PASS B1-2 snapshot has five teachers, copied rows, future dates
+PASS B1-2 next-week application reserves the monthly slot
+PASS B1-2 weekly detail shows 已预约
+PASS B1-2 other student sees 已约满
+PASS B1-2 decline releases the same monthly slot
+PASS B1-2 standalone student retains original formula
+PASS B1-2 synced opening still enforces 24 hours
+PASS B1-1 occupied time is disabled for another student
+PASS B1-1 forced pick/submit leaves booking unchanged and closes modal
+PASS B1-1 forced submission explains the conflict
+PASS B1-1 open time can be selected before it is occupied
+PASS B1-1 submit rechecks a time occupied after picking
+PASS B1-1 admin retains a conflicting application with owner id and message
+PASS B1-1 conflict does not change the reserved slot
+PASS B1-1 pending row shows a red conflict pill
+PASS B1-1 second conflicting application cannot be confirmed
+PASS B1-1 duplicate confirmation names the first applicant
+PASS B1-1 current student can reopen their own held time
+PASS B1-3 planned closure is blocked by active bookings
+PASS B1-3 blocked registration leaves schedule and log unchanged
+PASS B1-3 date buttons replace free text and include today
+PASS B1-3 confirmed booking becomes adjust with reason and timestamp
+PASS B1-3 pending and change-request bookings are also adjusted
+PASS B1-3 sick leave closes every selected daily slot
+PASS B1-3 history records center adjustment without using cancellation allowance
+PASS B1-3 inbox and popup use the exact agreed text
+PASS B1-3 center lead and responsible teacher are notified
+PASS B1-3 snapshot tracks the actual adjust state without __adj flags
+PASS B1-3 center lead sees adjustment row and its two actions
+PASS B1-3 appointment teacher sees the adjustment
+PASS B1-3 another teacher does not see this adjustment row
+PASS B1-3 selected-slot closure changes only the checked time
+PASS B1-3 shift-change registration keeps the existing schedule
+PASS B1-4 formal record 我感到绝望 opens the report receipt
+PASS B1-4 我感到绝望 has the correct urgency
+PASS B1-4 我感到绝望 countdown starts near 4 hours
+PASS B1-4 general popup separates 4-hour confirmation and 12-hour escalation
+PASS B1-4 general popup omits emergency-only guidance
+PASS B1-4 notification agrees with 4 小时 limit
+PASS B1-4 我感到绝望 record marker follows its associated crisis
+PASS B1-4 counsellor progress uses 4 小时
+PASS B1-4 center displays the matching countdown for 我感到绝望
+PASS B1-4 general limit follows configured RULES.esc
+PASS B1-4 formal record 我想死 opens the report receipt
+PASS B1-4 我想死 has the correct urgency
+PASS B1-4 我想死 countdown starts near 0.5 hours
+PASS B1-4 urgent popup retains the original 30-minute guidance
+PASS B1-4 notification agrees with 30 分钟 limit
+PASS B1-4 我想死 record marker follows its associated crisis
+PASS B1-4 counsellor progress uses 30 分钟
+PASS B1-4 center displays the matching countdown for 我想死
+PASS 打回-1 declining the later conflict keeps the first reservation
+PASS 打回-1 first pending request is preserved without a conflict marker
+PASS 打回-1 Wang sees the time as full after declining Chen
+PASS 打回-1 declining the last application releases the slot
+PASS 打回-1 declining a confirmed booking releases its last held slot
+PASS 打回-1 move preserves the remaining reservation
+PASS 打回-1 move clears the sole remaining request conflict
+PASS 打回-1 agree_cancel preserves the remaining reservation
+PASS 打回-1 agree_cancel clears the sole remaining request conflict
+PASS 打回-1 agree_reschedule preserves the remaining reservation
+PASS 打回-1 agree_reschedule clears the sole remaining request conflict
+PASS 打回-1 incoming_cancel preserves the remaining reservation
+PASS 打回-1 incoming_cancel clears the sole remaining request conflict
+PASS 打回-1 incoming_book preserves the remaining reservation
+PASS 打回-1 incoming_book clears the sole remaining request conflict
+PASS 打回-1 registered closure takes precedence over release
+PASS 打回-2 move: sick leave records every closed time
+PASS 打回-2 move: snapshot exposes adjust directly
+PASS 打回-2 move: teacher has a red adjustment count
+PASS B2-1 rearrangement starts with date choices only
+PASS 打回-2 next-week rearrangement is selectable after choosing its date
+PASS 打回-2 registered sick-leave day is absent from rearrangement choices
+PASS B2-1 rearrangement explicitly waits for the student
+PASS B2-1 center adjustment is not confirmed before student acceptance
+PASS 打回-2 rearrangement reaches inbox and popup with acceptance guidance
+PASS 打回-2 teacher rearrangement restores the actual confirmed appointment
+PASS 打回-2 rearrangement keeps the same admin booking and creates no echo request
+PASS 打回-2 the restored appointment can continue into rescheduling
+PASS 打回-2 move: all original sick-leave slots stay closed
+PASS 打回-2 move: center actions do not use student operation allowances
+PASS 打回-2 future_move: sick leave records every closed time
+PASS 打回-2 future_move: snapshot exposes adjust directly
+PASS 打回-2 future_move: teacher has a red adjustment count
+PASS B2-1 rearrangement starts with date choices only
+PASS 打回-2 next-week rearrangement is selectable after choosing its date
+PASS 打回-2 registered sick-leave day is absent from rearrangement choices
+PASS B2-1 rearrangement explicitly waits for the student
+PASS B2-1 center adjustment is not confirmed before student acceptance
+PASS 打回-2 rearrangement reaches inbox and popup with acceptance guidance
+PASS 打回-2 teacher rearrangement restores the actual confirmed appointment
+PASS 打回-2 rearrangement keeps the same admin booking and creates no echo request
+PASS 打回-2 the restored appointment can continue into rescheduling
+PASS 打回-2 future_move: all original sick-leave slots stay closed
+PASS 打回-2 future_move: center actions do not use student operation allowances
+PASS 打回-2 decline: sick leave records every closed time
+PASS 打回-2 decline: snapshot exposes adjust directly
+PASS 打回-2 decline: teacher has a red adjustment count
+PASS 打回-2 declining adjustment sends the exact new-time invitation
+PASS 打回-2 decline notification links to counselling booking
+PASS 打回-2 decline: all original sick-leave slots stay closed
+PASS 打回-2 decline: center actions do not use student operation allowances
+PASS 打回-2 student_book: sick leave records every closed time
+PASS 打回-2 student_book: snapshot exposes adjust directly
+PICK open shared slot c1:7:0
+PASS 打回-2 student rebooking cancels adjust and creates a new pending request
+PASS 打回-2 the new pending request uses the student-selected date
+PASS 打回-2 student_book: all original sick-leave slots stay closed
+PASS 打回-2 student_book: center actions do not use student operation allowances
+PASS 打回-2 reopen: sick leave records every closed time
+PASS 打回-2 reopen: snapshot exposes adjust directly
+PASS 打回-2 reopening one saved slot clears only its closure marker
+PASS 打回-2 explicit reopening survives later resync
+PASS 打回-2 reopen: center actions do not use student operation allowances
+PASS 打回-2 planned closure also persists through resync
+PASS 打回-2 blocked planned closure does not record a false closure
+PASS 打回-3 我感到绝望: actual talk list uses the associated urgency
+PASS 打回-3 我感到绝望: detail uses the same urgency wording
+PASS 打回-3 我感到绝望: the real demo clock triggers escalation
+PASS 打回-3 general escalation names the lead without claiming a repeat call
+PASS 打回-3 general escalation makes no repeat duty call
+PASS 打回-3 general notification receipt also omits the false repeat-call claim
+PASS 打回-3 我想死: actual talk list uses the associated urgency
+PASS 打回-3 我想死: detail uses the same urgency wording
+PASS 打回-3 我想死: the real demo clock triggers escalation
+PASS 打回-3 urgent escalation retains 30-minute repeat-call wording
+PASS 打回-3 urgent escalation still makes a repeat call
+PASS 打回-3 urgent notification receipt agrees with the actual repeat call
+PASS 打回-4 conflicting request has no confirm button
+PASS 打回-4 conflicting row retains student information, move, and decline
+PASS 打回-4 conflict title identifies the first applicant
+PASS 打回-4 forced confirmation cannot give the later applicant the first hold
+PASS 打回-4 forced confirmation explains the first applicant priority
+PASS 打回-4 the All table cannot offer a second confirmation entry
+PASS 打回-4 declining the first request clears the remaining conflict
+PASS 打回-4 the remaining request regains its confirm button
+PASS 打回-4 remaining request confirms successfully and keeps its hold
+PASS 打回-4 legacy record without clash cannot double-confirm over ok
+PASS 打回-4 original ok occupancy guard is retained
+PASS 打回-4 legacy record without clash cannot double-confirm over change
+PASS 打回-4 original change occupancy guard is retained
+PASS No browser errors: []
+fix_b1: 144 passed, 0 failed

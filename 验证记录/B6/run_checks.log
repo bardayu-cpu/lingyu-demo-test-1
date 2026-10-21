@@ -1,0 +1,153 @@
+RUN adm19.py
+adm19: 37 passed, 0 failed, errors 0
+[]
+RESULT adm19.py: 37 passed, 0 failed, 0 browser errors
+RUN stu19.py
+stu19: 20 passed, 0 failed, errors 0
+[]
+RESULT stu19.py: 20 passed, 0 failed, 0 browser errors
+RUN trial_v119.py
+PICK open shared slot c1:1:1
+trial_v119: 6 passed, 0 failed, errors 0
+[]
+RESULT trial_v119.py: 6 passed, 0 failed, 0 browser errors
+RUN trial_ik.py
+PICK open shared slot c1:1:1
+PICK open shared slot c1:2:1
+PICK open shared slot c2:1:2
+PICK open shared slot c1:1:2
+PICK open shared slot c4:2:2
+PICK open shared slot c1:3:1
+PICK open shared slot c1:2:1
+PICK open shared slot c2:2:2
+ok 40 fail 0
+errs []
+RESULT trial_ik.py: 40 passed, 0 failed, 0 browser errors
+RUN trial.py
+PICK open shared slot c1:1:1
+PICK open shared slot c2:1:2
+PICK open shared slot c1:8:0
+ok 29  fail 0
+RESULT trial.py: 29 passed, 0 failed, 0 browser errors
+RUN stu_reg.py
+HARNESS: recovered a Chrome driver shutdown stall after test completion
+== 场景 A
+  OK   A 开始体验→知情同意
+  OK   未读完不能勾选
+  OK   同意页可打开隐私政策
+  OK   进入手机验证
+  OK   改号后旧验证码失效
+  OK   进入基本信息
+  OK   名单外：给出 UCC 联系方式
+  OK   基本信息可返回改手机号
+  OK   登录后弹出待办提醒
+  OK   提醒标题区分必做
+  OK   提醒→选做任务说明页
+  OK   选做问卷提交弹窗
+  OK   Esc 关闭与按钮一致
+  OK   完成后对应消息自动已读
+  OK   消息→普测说明页
+  OK   14 天内 GAD-7 可勾选沿用
+  OK   沿用后只剩 PHQ-9 两页
+  OK   进入过渡页
+  OK   小屿回复时输入框禁用
+  OK   回复期间连发被拦截
+  OK   小屿承接语按回答分支（v1.13：从轻量组里选）
+  OK   访谈完成弹窗
+  OK   完成弹窗按实际问卷数（沿用后 1 份）
+  OK   先看卡片
+  OK   分享图统一文案
+  OK   关闭分享图回到卡片
+  OK   A 无邀请，关闭卡片结束
+  OK   AI 访谈固定落在访谈页
+  OK   重新对话不改变完成状态
+  OK   首页待办不再出现
+  OK   访谈页显示新一轮进行中
+  OK   新一轮完成，上一轮进历史
+  OK   历史对话可查看
+  OK   反馈入口与已反馈状态
+  OK   预咨询小屿提醒
+  OK   选方式后备注不丢失
+  OK   v1.19 第一次预约是申请，弹出预咨询小屿大窗口
+  OK   顶部角标显示预约
+  OK   预约中心顶部显示我的预约
+  OK   我的预约：等老师确认
+  OK   改期：先选时间，原预约仍在
+  OK   有放弃改期
+  OK   放弃改期：不扣次数
+  OK   改期提交弹窗标题
+  OK   已成功的预约改期需老师同意、扣次数
+  OK   老师同意改期，新时间生效
+  OK   老师改约弹窗
+  OK   老师改约引起的改期不计次
+  OK   离开预约中心自动退出改期
+  OK   老师改约后取消不计次
+  OK   取消成功且不扣次数
+  OK   已确认的取消需老师同意
+  OK   老师同意取消弹窗
+  OK   取消次数用完：锁定+可拨号求助
+  OK   老师婉拒弹窗+历史
+  OK   婉拒后可直接重新预约
+  OK   预咨询后分配负责咨询师
+  OK   老师主页显示我和 TA 的咨询记录
+  OK   更换通过后排除原咨询师
+  OK   预约中心不再出现原咨询师
+  OK   重绘后 FAQ 展开状态保留
+  OK   热线可点拨
+  OK   文章显示全文
+  OK   活动可报名
+  OK   播放按钮有反应
+  OK   自我了解共 9 项
+  OK   自我了解中途离开答案保留
+  OK   BRS 结果页
+  OK   ucla3 结果页
+  OK   scs 结果页
+  OK   gse 结果页
+  OK   我的问卷含做过的自我了解
+  OK   紧急联系人不能与本人号码相同
+  OK   改名后立即显示
+  OK   足迹无系统日志
+  OK   足迹 1 可点开
+  OK   足迹 2 可点开
+  OK   足迹 3 可点开
+  OK   足迹 4 可点开
+  OK   足迹 5 可点开
+== 场景 B
+  OK   B：v1.18 先出预约邀请，再出结束卡
+  OK   邀请弹窗入口名正确
+  OK   选个时间→预约中心
+== 场景 B
+  OK   B：暂不需要后出结束卡
+  OK   结束卡有关闭按钮
+== 场景 C
+  OK   问卷安全提示不出现小屿
+  OK   我点错了：说明
+  OK   请 UCC 今天联系我
+  OK   扩充词库触发危机
+  OK   危机后有即时通道
+  OK   已通知后按钮置灰
+  OK   继续聊：小屿承接并重提问题
+  OK   危机词：想轻生
+  OK   危机词：想自残
+  OK   危机词：活不下去了
+  OK   危机词：割腕
+== 场景 D
+  OK   D：已同意当前版本，跳过同意书
+  OK   D 登录
+  OK   D 仅选做：提醒语气放松
+  OK   D 推荐不含新生小组
+  OK   D 访谈页有历史记录
+  OK   D 轮数与对话一致
+  OK   D 老师主页有咨询记录
+  OK   D 只能约负责咨询师
+  OK   D 更换后排除王磊
+  OK   D 新负责咨询师不是原来的
+  OK   无老师的校区置灰
+FAILS: 0
+errs []
+RESULT stu_reg.py: 108 passed, 0 failed, 0 browser errors
+RUN adm13.py
+ok 35 fail 0
+errs []
+RESULT adm13.py: 35 passed, 0 failed, 0 browser errors
+SUITE: 7/7 passed

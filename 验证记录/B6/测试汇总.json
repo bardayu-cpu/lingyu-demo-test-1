@@ -1,0 +1,24 @@
+{
+  "counts": {
+    "fix_b1.py": 144,
+    "fix_b2.py": 56,
+    "fix_b3.py": 28,
+    "fix_b4.py": 77,
+    "fix_b5.py": 46,
+    "fix_b6.py": 304,
+    "adm19.py": 37,
+    "stu19.py": 20,
+    "trial_v119.py": 6,
+    "trial_ik.py": 40,
+    "trial.py": 29,
+    "stu_reg.py": 108,
+    "adm13.py": 35
+  },
+  "total": 930,
+  "failed": 0,
+  "b6_items": {
+    "B6-1": 159,
+    "B6-2": 111,
+    "B6-3": 34
+  }
+}

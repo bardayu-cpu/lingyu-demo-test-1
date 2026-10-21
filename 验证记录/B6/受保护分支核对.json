@@ -1,0 +1,13 @@
+{
+  "repository": "bardayu-cpu/lingyu-demo-test-1",
+  "unchanged": true,
+  "refs": {
+    "main": "b0e81e40fb8dde084261436d8da92dbda1e9f100",
+    "forayu": "1a1faced5509460310fbd9902703f34f5c4f0ea9",
+    "gpt-fix-b1": "21035d1716bd5fe519ccaf9c61e00236ddbdcb0a",
+    "gpt-fix-b2": "98846186998f6f060a9ae6def0f7c3e78730bcc4",
+    "gpt-fix-b3": "066350147f50ff5d02e1fdeda7e02df1feeaad1c",
+    "gpt-fix-b4": "9263dba446b597d4ab77a51c55f588c4e553691c",
+    "gpt-fix-b5": "28b0cc4d369d48decdd2258f1c7341854126c507"
+  }
+}

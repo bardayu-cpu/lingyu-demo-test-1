@@ -1,61 +1,38 @@
-灵屿 v1.19.2-gpt · 第一批四处打回补改交付说明
+v1.19.4-gpt · B6 交付说明
 
-版本与提交
+开发仓库 bardayu-cpu/lingyu-demo-test-1，分支 gpt-fix-b6。
+基线为 gpt-fix-b5 / 28b0cc4d369d48decdd2258f1c7341854126c507。
+三个功能提交：9a32ca3（B6-1）、24034a3（B6-2）、5cd115b（B6-3）。未改写历史。
 
-正式分支：gpt-fix-b1。
-起点：05e83bbad392831057bfffbcce6dd0ca48652fec；更早的原始基线为 1a1faced5509460310fbd9902703f34f5c4f0ea9。
-保留 05e83bb 及其全部历史，按打回-1、打回-2、打回-3、打回-4 依次追加四个提交。没有改写已有提交，没有推送远端。
-新的完整历史 bundle 使用 git bundle create gpt-fix-b1-第一批补改.bundle gpt-fix-b1 生成，不依赖本机已有提交。
-表内文件路径相对 _src/；四个提交均从源码构建并更新根目录 index.html。
+条目编号 | 状态 | 改动的文件 | 怎么验证的 | 测试结果
+B6-1 | 已修 | 机构端/src/a3_people.js、a13_v112.js、a24_v119.js；自动测试/fix_b6.py；index.html | 李文和朱静各打开陈嘉怡、Wong Jun、Lim Jun(s8)、周欣怡、林晓，逐个点所有可见档案页签；核对完整摘要、降级申请、提示跳转和查看审计 | 159 项通过
+B6-2 | 已修 | 机构端/src/a2_home.js；自动测试/fix_b1.py、fix_b6.py；index.html | 两位老师逐行点击原始全部预约；每个子页签至少点两行，覆盖姓名、等级和空白；核对抽屉学生标题、单次审计、悬停样式、按钮只开各自弹窗、L1 无入口 | 111 项通过
+B6-3 | 已修 | 机构端/src/adm.css；机构端/build.py；试用版外壳/build.py；自动测试/run_checks.py、fix_b4.py、fix_b6.py；index.html | 1280、1440、1615、1913 四种宽度，逐个点击数据看板四个页签与档案深度访谈评分，检查每个 .hb span:last-child 高度不超过 22px | 34 项通过，实际数字高度 20px
 
-交付表
+公共源码路径在 _src/ 内，均先改源码再重新打包。
+B6-1 为避免提前标记摘要已读，bOpen 保留预约/档案查看日志，摘要的 markViewed 延后到完整摘要显示时执行；摘要弹窗正常显示时仍会记录查看。未改变账号权限。
+B6-2 的种子数据在部分状态不足两行，测试运行时为这些状态补充独立学生夹具；只用于逐行点击覆盖，不写进产品初始数据。原始全部列表也已逐行点击。
 
-| 条目编号 | 状态 | 改动的文件 | 怎么验证的 | 测试结果 |
-|---|---|---|---|---|
-| 打回-1 | 已修 | 机构端/src/a24_v119.js；自动测试/fix_b1.py | 林晓先申请、陈嘉怡冲突申请被婉拒后，时段仍为 bk，王思远仍看到已约满；最后一条有效预约释放后才变 open。覆盖 bNoOk、bMoveOk、bAgree 取消和改期、LY_in cancel/book。关闭登记优先，只剩一条有效预约时清除 clash | 16 项专项业务检查通过 |
-| 打回-2 | 已修 | 机构端/src/a24_v119.js；学生端/src/v119.js；试用版外壳/src/shell.js、stu_bridge.js；自动测试/fix_b1.py | 病假和计划关闭记入 offSlots；adjust 进入快照，删除 __adj。老师在“中心调整→改时间”弹窗实际点击下周开放时段，学生收到新时间、已确认状态、站内信和弹窗；没有反向重复生成预约。老师婉拒后学生收到重新选时通知；学生自行重约会作废 adjust 并生成待确认申请；旧病假四格均保持 off。排班明确重新开放并保存后仅清除该格标记，中心调整计数有内容时为红色 | 41 项专项业务检查通过 |
-| 打回-3 | 已修 | 机构端/src/a24_v119.js、a17_talk_ui.js、a18_talk_rec.js、a10_l1.js、a1_core.js；自动测试/fix_b1.py | 谈心列表与详情共用 recCrisisTxt(t)。保存“我感到绝望”后两处均显示一般时限，实际推进演示时钟 5 小时后只显示已通知负责人；消息回执也不再声称再次呼叫。一级表达保留 30 分钟与再次呼叫，未改变升级判断或渠道 | 12 项专项业务检查通过 |
-| 打回-4 | 已修 | 机构端/src/a24_v119.js；自动测试/fix_b1.py | 冲突行在置顶区和“全部”列表均无确认按钮，只保留看学生信息、改时间、婉拒；title 显示林晓先申请。直接调用 bOk 不改变两条申请的状态。婉拒林晓后清除陈嘉怡 clash、恢复确认按钮，实际点击可以确认。旧数据没有 clash 时仍保留 ok/change 占用保护 | 13 项专项业务检查通过 |
+测试通过数（所有脚本均 0 失败、0 浏览器异常）：
+fix_b1.py 144；fix_b2.py 56；fix_b3.py 28；fix_b4.py 77；fix_b5.py 46；fix_b6.py 304。
+run_checks.py 原七个脚本 7/7：adm19.py 37；stu19.py 20；trial_v119.py 6；trial_ik.py 40；trial.py 29；stu_reg.py 108；adm13.py 35。
+本地合计 930 项。日志、逐次点击记录和截图在 验证记录/B6/。
 
-最终验证
+原有测试适配（没有放宽业务断言）：
+1. fix_b1.py 冲突行检查：将 .bkpin [data-act=bOpen] 收窄到 .bkpin button[data-act=bOpen]。新增可点行复用同一动作后，原定位同时匹配行和按钮；仍断言恰好保留一个看学生信息按钮以及改时间、婉拒按钮。
+2. fix_b4.py：独立版文件路径从 v1.19.3-gpt 改为 v1.19.4-gpt，确保测本次新构建；所有原有业务断言不变。
+3. run_checks.py 的 VER 按要求升级为 v1.19.4-gpt。
+运行时沿用本机的回归驱动，仅等待既有 toast 的渲染、清理断言结束后的 Chrome 退出卡顿；未改应用状态或业务断言。复跑可直接用 Python + Playwright 运行各测试脚本。
 
-自动测试/fix_b1.py：137 项通过，0 失败，0 浏览器异常。
-其中原第一批 54 项业务检查、本次 82 项专项业务检查，另有 1 项统一浏览器异常检查。
-原有七脚本：274 项断言通过，0 失败，0 浏览器异常。
+干净目录重新打包与交付 index.html 逐字节一致。
+index.html SHA256：c22f24d7d999f1bf80f25063edcdae392ed139346252943e457a0a4af6a2ec58。
 
-| 脚本 | 通过项数 |
-|---|---|
-| adm19.py | 36 |
-| stu19.py | 20 |
-| trial_v119.py | 6 |
-| trial_ik.py | 40 |
-| trial.py | 29 |
-| stu_reg.py | 108 |
-| adm13.py | 35 |
-
-七个旧脚本、run_checks.py、test_support.py 与 05e83bb 相比未修改。新增检查全部放在 fix_b1.py。
-原 fix_b1.py 的三处期望按这次要求更新：不再检查 __adj 标记，改为检查快照 adjust；一般时限进度检查“4 小时内没人确认接收”；冲突确认提示检查“先申请”。其余原有业务断言保留。
-
-下周选时验证
-
-独立复核发现，原补改目录中的跨周用例直接调用了 bMoveOk，真实弹窗只列本周，无法点击下周时间。
-本次在打回-2 中补齐“中心调整”的未来 30 天开放时段入口，并把验收改成打开弹窗、点击下周时段、点击“重新安排并通知学生”，再检查学生端预约、通知和旧停诊日四格。
-修前失败日志、修前截图、修后日志及截图均随包保存。第二批“学生再确认一次”的规则未提前实施；本批老师从中心调整重新安排后直接确认并通知学生。
-
-构建与恢复验证
-
-完整 _src/ 和 21 张图片随包交付，两个 build.py 保持相对路径。
-干净临时目录重新构建，index.html 与交付版逐字节一致。
-index.html SHA256：95223e0f7a1000613c937399768a2438d24e614bf83b400a77de2ed17920d284
-机构端拼接脚本、a24_v119.js、学生端 v119.js、学生桥接、外壳 shell.js 的 node --check 均通过；fix_b1.py 语法检查通过。
-完整 bundle 在空目录 clone 后核对 HEAD、四个新增提交、全部历史、源码与 index.html，并重新构建验证。
-
-构建：
-python3 _src/机构端/build.py
-python3 _src/试用版外壳/build.py
-
-测试：
-python3 -m pip install playwright
-python3 _src/自动测试/fix_b1.py
-python3 _src/自动测试/run_checks.py
-可通过 CHROMIUM_PATH 指定 Chrome/Chromium。
+发布状态：开发分支和内测仓库代码均已成功正常推送。
+开发功能 HEAD：5cd115bbc90148487aa3b347d581ecaa14278da9。
+内测 main 新提交：ef6e2635351ef1d654c35fe38aea41840bee7a28。
+内测 main 仍只有 index.html、README.md、.nojekyll；本次提交只修改 index.html 和 README 当前版本一行。
+待完成：内测仓库尚未启用 GitHub Pages（API has_pages=false），指定网址目前返回 404。当前协作者有 push 权限，无 admin/maintain 权限；已请仓库拥有者设置 Pages 来源为 main / (root)。
+线上三个修复的点击验收和截图将在 Pages 启用、线上构建 SHA256 与本地一致后继续。
+代码与本地验收资料已收在 gpt-fix-b6；最终分支 HEAD 以 git rev-parse gpt-fix-b6 和对话交付记录为准。
+内测链接：https://bardayu-cpu.github.io/lingyu-inside-4ayu-000/
+未生成或发送 ZIP。

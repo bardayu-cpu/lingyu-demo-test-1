@@ -3,7 +3,14 @@
   "functional_head": "5cd115bbc90148487aa3b347d581ecaa14278da9",
   "internal_push": "success",
   "internal_head": "ef6e2635351ef1d654c35fe38aea41840bee7a28",
-  "pages_enabled": false,
-  "online_verification": "pending_pages_activation",
-  "url": "https://bardayu-cpu.github.io/lingyu-inside-4ayu-000/"
+  "pages_enabled": true,
+  "pages_source": {
+    "branch": "main",
+    "path": "/"
+  },
+  "pages_deployment": "success",
+  "online_verification": "passed",
+  "online_passed": 309,
+  "url": "https://bardayu-cpu.github.io/lingyu-inside-4ayu-000/",
+  "same_as_tested_build": true
 }

@@ -1,0 +1,19 @@
+{
+  "script": "fix_b6.py",
+  "url": "https://bardayu-cpu.github.io/lingyu-inside-4ayu-000/",
+  "passed": 309,
+  "failed": 0,
+  "browser_errors": 0,
+  "items": {
+    "B6-1": 161,
+    "B6-2": 113,
+    "B6-3": 35
+  },
+  "viewports": [
+    1280,
+    1440,
+    1615,
+    1913
+  ],
+  "number_height_px": 20
+}

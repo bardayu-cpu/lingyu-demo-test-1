@@ -202,7 +202,8 @@ def risk_limits(browser):
             check(('已报告紧急情况' if urgent else '已报告（一般时限）') in marker, f'B1-4 {text} record marker follows its associated crisis')
             admin.evaluate('(id)=>{const k=CRISES.find(x=>x.id===id);k.esc=1;render()}', kid)
             progress = admin.evaluate('l1Extras()')
-            check(expected_time + '内未确认' in progress, f'B1-4 counsellor progress uses {expected_time}')
+            expected_progress = expected_time + ('内未确认' if urgent else '内没人确认接收')
+            check(expected_progress in progress, f'B1-4 counsellor progress uses {expected_time}')
             admin.evaluate('(id)=>{CRISES.find(x=>x.id===id).esc=0;enter("c5","L3","B1");go("crisis");S.crisis=id;render()}', kid)
             # Audit actions advance the demo clock by a minute, so urgent time is already below 30.
             expected_countdown = admin.evaluate('(id)=>"剩 "+Math.max(1,Math.round(cLeft(CRISES.find(x=>x.id===id))*60))+" 分钟"', kid) if urgent else '剩 4 小时'
@@ -361,11 +362,48 @@ def adjustment_review(browser):
     finally:
         context.close()
 
+def crisis_copy_review(browser):
+    for urgent, text in [(False, '我感到绝望'), (True, '我想死')]:
+        context, page, admin, student = trial(browser)
+        try:
+            page.click('[data-side="机构端"]')
+            admin.evaluate("enter('u1','L1','review');go('talk');render()")
+            sid = admin.evaluate("STU.find(s=>tkScope(s)&&!CRISES.some(k=>k.sid===s.id&&k.st!=='closed')).id")
+            admin.evaluate("([sid,text])=>{cwHits=[];ACT.tkNew(sid);Object.assign(S.rec,{mode:'面对面',place:'办公室',result:'已谈',situ:text,sis:false,types:['心理健康']});ACT.recSave('');render()}", [sid, text])
+            kid = admin.evaluate('S.mo.split(":")[1]')
+            tid = admin.evaluate('(id)=>CRISES.find(k=>k.id===id).fromRec', kid)
+            name = admin.evaluate('(id)=>SU(id).name', sid)
+            admin.evaluate("ACT.moClose();S.rv=null;S.rec=null;go('talk');S.tabs.talk='recs';render()")
+            expected = '已报告紧急情况' if urgent else '已报告（一般时限）'
+            row = admin.locator(f'tr:has([data-act=tkView][data-arg="{tid}"]) .tkrisk')
+            check(expected in row.inner_text(), f'打回-3 {text}: actual talk list uses the associated urgency')
+            shot(page, '打回-3-紧急列表' if urgent else '打回-3-一般时限列表')
+            admin.locator(f'[data-act=tkView][data-arg="{tid}"]').click()
+            check(expected in admin.inner_text('.tkrisk'), f'打回-3 {text}: detail uses the same urgency wording')
+            if urgent:
+                admin.evaluate('NOW.setTime(NOW.getTime()+H);tick();render()')
+            else:
+                admin.evaluate('ACT.zTime();NOW.setTime(NOW.getTime()+H);tick();render()')
+            check(admin.evaluate('(id)=>CRISES.find(k=>k.id===id).esc', kid) >= 1, f'打回-3 {text}: the real demo clock triggers escalation')
+            admin.evaluate("go('home');S.hv='work';S.full=true;render()")
+            progress = admin.locator('#pg .head').filter(has_text='你报告的紧急情况 · ' + name).inner_text()
+            if urgent:
+                check('30 分钟内未确认，已再次呼叫并通知中心负责人朱静' in progress, '打回-3 urgent escalation retains 30-minute repeat-call wording')
+                check(admin.evaluate('(id)=>NOTI.some(n=>n.ref===id&&n.ch.includes("追呼"))', kid), '打回-3 urgent escalation still makes a repeat call')
+                check(admin.evaluate('(id)=>NOTI.some(n=>n.ref===id&&n.to===me()&&n.t.includes("已再次呼叫并通知中心负责人"))', kid), '打回-3 urgent notification receipt agrees with the actual repeat call')
+            else:
+                check('4 小时内没人确认接收，已通知中心负责人朱静' in progress and '再次呼叫' not in progress, '打回-3 general escalation names the lead without claiming a repeat call')
+                check(admin.evaluate('(id)=>!NOTI.some(n=>n.ref===id&&n.ch.includes("追呼"))', kid), '打回-3 general escalation makes no repeat duty call')
+                check(admin.evaluate('(id)=>NOTI.some(n=>n.ref===id&&n.to===me()&&n.t.includes("已通知中心负责人")&&!n.t.includes("再次呼叫"))', kid), '打回-3 general notification receipt also omits the false repeat-call claim')
+            shot(page, '打回-3-紧急升级进度' if urgent else '打回-3-一般升级进度')
+        finally:
+            context.close()
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--only', choices=['B1-2', 'B1-1', 'B1-3', 'B1-4', '打回-1', '打回-2'])
+    parser.add_argument('--only', choices=['B1-2', 'B1-1', 'B1-3', 'B1-4', '打回-1', '打回-2', '打回-3'])
     args = parser.parse_args()
-    tests = {'B1-2': slots, 'B1-1': conflicts, 'B1-3': illness, 'B1-4': risk_limits, '打回-1': resync_review, '打回-2': adjustment_review}
+    tests = {'B1-2': slots, 'B1-1': conflicts, 'B1-3': illness, 'B1-4': risk_limits, '打回-1': resync_review, '打回-2': adjustment_review, '打回-3': crisis_copy_review}
     with sync_playwright() as p:
         choices = [os.environ.get('CHROMIUM_PATH'), '/opt/pw-browsers/chromium', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome']
         executable = next((c for c in choices if c and Path(c).is_file()), None)

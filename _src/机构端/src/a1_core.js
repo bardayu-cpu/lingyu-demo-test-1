@@ -113,7 +113,7 @@ function tick() {
     if (k.st !== 'new') return; const s = SU(k.sid);
     const [e1, e2] = kEsc(k), t1 = k.urgent ? `${RULES.urgentMin} 分钟` : `${e1} 小时`, t2 = `${e2} 小时`;
     if (hrs(k.at) >= e1 && k.esc < 1) { k.esc = 1; if (k.urgent) { notify(DUTY[0].who, '电话（追呼）', `紧急报告 ${t1} 未确认，再次呼叫`, k.id); k.notified.push(`${ST(DUTY[0].who).name}（追呼 · 电话）`); } notify('c5', '短信 + 电话', `危机已 ${t1} 无人接收，升级到中心负责人`, k.id); k.notified.push('朱静（升级 · 短信 + 电话）');
-      log(`危机 ${t1} 无人接收，${k.urgent ? '再次呼叫值班并' : '自动'}升级到中心负责人朱静`, s, { sys: 1, cat: '危机', r: 1, k: 'crisis' }); if (k.by) notify(k.by, '站内', `你报告的紧急情况 ${t1} 未确认，已再次呼叫并通知中心负责人`, k.id); }
+      log(`危机 ${t1} 无人接收，${k.urgent ? '再次呼叫值班并' : '自动'}升级到中心负责人朱静`, s, { sys: 1, cat: '危机', r: 1, k: 'crisis' }); if (k.by) notify(k.by, '站内', `你报告的${k.urgent ? '紧急情况' : '情况'} ${t1} 未确认，${k.urgent ? '已再次呼叫并通知中心负责人' : '已通知中心负责人'}`, k.id); }
     if (hrs(k.at) >= e2 && k.esc < 2) { k.esc = 2; notify('vp', '电话', `危机已 ${t2} 无人接收，二级升级到分管领导`, k.id); k.notified.push('何处长（二级升级 · 电话）');
       log(`危机 ${t2} 无人接收，二级升级到学生事务处分管领导`, s, { sys: 1, cat: '危机', r: 1, k: 'crisis' }); }
   });

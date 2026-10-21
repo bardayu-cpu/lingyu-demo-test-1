@@ -49,6 +49,9 @@ TALK_RE.test = x => { const { hit } = cwFind(x); if (hit.length) cwHits.push(...
 const _nc19 = newCrisis; newCrisis = function (s, src, type, urgent) {
   if (/谈话记录|追加/.test(src || '') && cwHits.length) urgent = cwHits.some(w => cwL(w) === 1);
   const keep = cwHits; cwHits = []; try { return _nc19.call(this, s, src, type, urgent); } finally { cwHits = keep; } };
+function recCrisisTxt(t) {
+  return CRISES.some(k => k.urgent && (k.fromRec === t.id || (k.recs || []).includes(t.id))) ? '已报告紧急情况' : '已报告（一般时限）';
+}
 
 const cwPage19 = () => { const ed = S.role === 'L3', F = S.form, q = cwNorm(S.f.cwq || ''), open = S.cwOpen || {};
   const words = CRISIS_WORDS.map((w, i) => [w, i]).filter(([w]) => !q || cwNorm(w).includes(q));

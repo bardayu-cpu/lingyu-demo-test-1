@@ -189,7 +189,12 @@ const IK_DEMO = [{ topics: ['情绪低落', '睡眠'], trouble: '最近总是提
   { topics: ['人际关系', '情绪低落'], trouble: '和室友闹得很僵，回宿舍就很压抑', dur: '几个月', impact: '有些影响', sleep: '有些变化', support: '没有', expect: '想解决一个具体问题', extra: '' }];
 const ikSum = (o, qs) => (qs || RULES.ikh.t1).map(q => ({ k: q.k, name: q.name, v: Array.isArray(o[q.k]) ? o[q.k].join('、') : o[q.k] || '' }));
 let IVB = null;
-const ivb = () => { if (IVB) return IVB; if (RULES.ivb) return IVB = RULES.ivb;
+const ivCoreRows = B => {
+  Object.values(LY_CORE()).filter(s => curLv(s) >= RULES.pool.ivLv && !inCrisis(s.id)).forEach(s => {
+    if (!B.list.some(x => x.sid === s.id)) B.list.push({ sid: s.id, lv: curLv(s), st: 'new', resp: ivResp(s), at: null });
+  }); return B;
+};
+const ivb = () => { if (IVB) return ivCoreRows(IVB); if (RULES.ivb) return ivCoreRows(IVB = RULES.ivb);
   const crisis = s => CRISES.some(k => k.sid === s.id && k.st !== 'closed');
   const C = SURV().filter(s => curLv(s) >= RULES.pool.ivLv).sort((a, b) => curLv(b) - curLv(a) || (a.done || 0) - (b.done || 0));
   const skip = C.filter(crisis), has = C.filter(s => !crisis(s) && activeBook(s)), inn = C.filter(s => !crisis(s) && !activeBook(s));
@@ -203,7 +208,7 @@ const ivb = () => { if (IVB) return IVB; if (RULES.ivb) return IVB = RULES.ivb;
       BOOK.push(b); setSlot(cid, d, t, 'bk'); x.bid = b.id; } else x.st = 'entry'; }
     return x; });
   IVB = RULES.ivb = { name: '2026 秋季普测 · 第 1 批', at: ago(30), by: 'c5', list, piles: { bad: [], skip: skip.map(s => ({ sid: s.id, why: '危机中，由危机流程接手' })), has: has.map(s => ({ sid: s.id, why: '已有在途预约，由负责老师确认是否用这次预约承接' })) } };
-  return IVB; };
+  return ivCoreRows(IVB); };
 const ivDue = n => { const d = new Date(NOW); d.setDate(d.getDate() + n); return `${d.getMonth() + 1}/${d.getDate()} 18:00`; };
 const ivMine = () => ivb().list.filter(x => S.role === 'L3' || x.resp === me());
 const IV_F = Object.fromEntries(IV_KPI.map(([k]) => [k, k === 'sent' ? x => x.st !== 'new' : k === 'acc' ? x => ['ik', 'queue', 'entry', 'sub', 'ok', 'nofit'].includes(x.st) : x => x.st === k]));
@@ -266,7 +271,7 @@ const bkInv = () => { const B = ivb(), L = ivMine(), c = ivCnt(L), P = poolN(), 
         <div style="margin-top:8px;display:flex;gap:8px">${S.role === 'L3' && gap ? `<button class="btn sec xs" data-act="btab" data-arg="pool">去号池配置调额度</button>` : ''}<button class="btn sec xs" data-act="mo" data-arg="ivApp:">申请额度</button></div></div></div>
     <div class="card"><h3>名单<small>当前筛选：${(IV_KPI.find(x => x[0] === f) || [0, '全部'])[1]} · ${rows.length} 人</small><span class="sp"></span>${f ? `<button class="btn ghost xs" data-act="ivF" data-arg="">看全部</button>` : ''}${nNew ? `${tiers.map(t => `<button class="btn sec xs" data-act="mo" data-arg="ivSend:${t}">只发 ${t >= 4 ? '4 级及以上' : `${t} 级`}（${L.filter(x => x.st === 'new' && (t >= 4 ? x.lv >= 4 : x.lv === t)).length}）</button>`).join('')}<button class="btn pri xs" data-act="mo" data-arg="ivSend:all">发邀约卡（${nNew} 人）</button>` : ''}</h3>
       <table class="t"><tr><th>学生</th><th>等级</th><th>负责老师</th><th>状态</th><th>截止</th><th>预咨询</th></tr>${rows.map(x => { const s = SU(x.sid), it = x.ik, [t, cl] = IV_ST[x.st];
-        return `<tr><td><b>${nm(s)}</b><small>${s.college}</small></td><td>${lvV(s)}</td><td>${ST(x.resp).name}</td><td><span class="pill ${cl}">${t}</span></td><td>${x.st === 'entry' ? `入口 ${x.edue}` : x.st === 'sent' ? `回复 ${x.due}` : '—'}</td><td>${it && it.sum ? `<button class="lnk" data-act="ivIkOpen" data-arg="${x.sid}">${I('chat', 's')}看摘要</button>` : it ? `<span class="note">${{ skipped: '跳过了', draft: '已保存，未发送' }[it.st] || '—'}</span>` : '—'}</td></tr>`; }).join('') || '<tr><td colspan="6" class="note">没有符合的学生</td></tr>'}</table>
+        return `<tr><td><b>${nm(s)}</b><small>${s.college}</small></td><td>${lvV(s)}</td><td>${ST(x.resp).name}</td><td><span class="pill ${cl}">${t}</span></td><td>${x.st === 'nofit' ? `<small>学生方便的时间</small>${(x.fit || []).map(esc).join('<br>') || '—'}` : x.st === 'entry' ? `入口 ${x.edue}` : x.st === 'sent' ? `回复 ${x.due}` : '—'}</td><td>${it && it.sum ? `<button class="lnk" data-act="ivIkOpen" data-arg="${x.sid}">${I('chat', 's')}看摘要</button>` : it ? `<span class="note">${{ skipped: '跳过了', draft: '已保存，未发送' }[it.st] || '—'}</span>` : '—'}${['queue', 'nofit'].includes(x.st) && Object.values(LY_CORE()).some(s => s.id === x.sid) ? ` <button class="btn sec xs" data-act="ivEntryGo" data-arg="${x.sid}">给入口</button>` : ''}</td></tr>`; }).join('') || '<tr><td colspan="6" class="note">没有符合的学生</td></tr>'}</table>
       <p class="note">顺序：先按等级分档（4 级及以上一档、3 级一档），同档按普测完成时间。邀约卡 48 小时有效，人工入口 48 小时内要提交申请；到期没处理的回到负责老师那里，由老师决定是否再发。</p></div>`; };
 
 /* AI 预咨询：摘要 + 题库配置 */
@@ -473,3 +478,58 @@ const _modalHighPreview = modal; modal = function () {
 
 /* B4-8：此时只提交了申请，老师尚未确认。 */
 IKM.A = 'A · 预约申请提交后（推荐）';
+
+/* B5-1：仅核心且符合条件的学生与批次互通；其余演示名单保持原数据。 */
+const _ivSnapB5 = LY_snap; LY_snap = function () {
+  const o = _ivSnapB5(), B = ivb(); o.__ivc = {};
+  Object.entries(LY_CORE()).forEach(([core, student]) => {
+    const x = B.list.find(v => v.sid === student.id);
+    if (x && !inCrisis(student.id)) o.__ivc[core] = { st: x.st, due: x.due || null, edue: x.edue || null, fit: (x.fit || []).slice() };
+  }); return o;
+};
+Object.assign(ACT, {
+  ivEntryGo(sid) { const x = ivMine().find(v => v.sid === sid);
+    if (!x || !['queue', 'nofit'].includes(x.st) || !Object.values(LY_CORE()).some(s => s.id === sid) || inCrisis(sid)) return;
+    S.mo = 'ivEntry:' + sid;
+  },
+  ivEntryOk(sid) { const x = ivMine().find(v => v.sid === sid);
+    if (!x || !['queue', 'nofit'].includes(x.st) || !Object.values(LY_CORE()).some(s => s.id === sid) || inCrisis(sid)) return;
+    x.st = 'entry'; x.edue = ivDue(2);
+    log(`主动邀约 · 给 ${nm(SU(sid))} 预约入口（截止 ${x.edue}）`, SU(sid), { cat: '预约', obj: '主动邀约' });
+    S.mo = null; toast('已给预约入口，学生已收到选时间通知');
+  }
+});
+const _ivEntryModalB5 = modal; modal = function () {
+  const [key, sid] = (S.mo || '').split(':'), x = key === 'ivEntry' && ivMine().find(v => v.sid === sid);
+  if (x) return mbox(`给 ${nm(SU(sid))} 预约入口`, '请先核对可安排的时间。确认后学生会收到选时间通知；入口 48 小时有效，学生提交申请后仍要老师确认。',
+    x.st === 'nofit' ? `<div class="dbox"><b>学生提供的方便时间</b><p>${(x.fit || []).map(esc).join('<br>')}</p></div>` : '<p>学生正在排队等入口。</p>', '确认给入口', 'ivEntryOk', sid);
+  return _ivEntryModalB5.apply(this, arguments);
+};
+const _ivInB5 = LY_in; LY_in = function (ev) {
+  if (ev.t !== 'ivcSt') {
+    const result = _ivInB5.apply(this, arguments);
+    if (ev.t === 'book' && ev.inv) {
+      const student = LY_CORE()[ev.core], x = student && ivb().list.find(v => v.sid === student.id), b = student && lyBook(student);
+      if (x && b) { x.bid = b.id; x.st = 'sub'; if (x.ik) b.intake = Object.assign({}, x.ik); render(); }
+    }
+    return result;
+  }
+  const student = LY_CORE()[ev.core], x = student && ivb().list.find(v => v.sid === student.id);
+  const st = ({ wait: 'sent', acc: 'ik' })[ev.st] || ev.st;
+  if (!x || inCrisis(student.id) || !['sent', 'ik', 'no', 'queue', 'entry', 'sub', 'nofit', 'ok'].includes(st)) return '';
+  const fit = Array.isArray(ev.fit) ? ev.fit.slice(0, 3).map(String) : [], old = x.st;
+  const ik = ev.ik && (ev.ik.st === 'sent' && Array.isArray(ev.ik.sum) ? { st: 'sent', ver: ev.ik.ver || 1, tk: 'h', sum: JSON.parse(JSON.stringify(ev.ik.sum)) } : { st: ev.ik.st });
+  const ikChanged = ik && (x.ik && x.ik.st) !== ik.st || ik && ik.st === 'sent' && JSON.stringify(x.ik && x.ik.sum) !== JSON.stringify(ik.sum);
+  if (old === st && JSON.stringify(x.fit || []) === JSON.stringify(fit) && !ikChanged) return '';
+  x.st = st; x.fit = fit;
+  if (ikChanged) x.ik = Object.assign({}, ik, { at: new Date(NOW) });
+  const b = lyBook(student); if (st === 'sub' && b) { x.bid = b.id; if (x.ik) b.intake = Object.assign({}, x.ik); }
+  if (!['sub', 'ok'].includes(st) && x.bid && !BOOK.some(b => b.id === x.bid && LY_ACTIVE.includes(b.st))) delete x.bid;
+  log(`主动邀约 · 学生进度：${student.name} · ${IV_ST[st][0]}`, student, { cat: '预约', obj: '主动邀约', sys: 1 });
+  if (old !== st && ['queue', 'nofit', 'no'].includes(st)) notify(x.resp, '站内', `主动邀约 · ${student.name}：${IV_ST[st][0]}${st === 'nofit' ? '（' + fit.join('、') + '）' : ''}`, student.id);
+  render(); return `${student.name} 的邀约进度已更新：${IV_ST[st][0]}`;
+};
+const _ivConfirmB5 = ACT.bOk; ACT.bOk = function (id) {
+  const result = _ivConfirmB5.apply(this, arguments), b = BOOK.find(v => v.id === id), x = ivb().list.find(v => v.bid === id);
+  if (b && b.st === 'ok' && x) x.st = 'ok'; return result;
+};

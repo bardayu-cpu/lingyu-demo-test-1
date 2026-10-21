@@ -37,10 +37,10 @@ Object.assign(ACT, {
     addMsg('cal', title, body, 'book', true);
     S.info = { ico: 'cal', title: L(...title), body: L(...body), btn: ['book', L('预约咨询', 'Counselling')] }; S.modal = 'info';
   },
-  zIvc() { S.ivc = { st: 'wait', due: IVC_DUE_(), at: new Date(NOW) };
-    addMsg('chat', ['心理中心邀请你聊一聊', 'UCC invites you to talk'], [`接受后，小屿会先花 3 分钟了解一下你最近的情况，然后你可以自己选和老师见面的时间。请在 ${IVC_DUE_()} 前回复。`, `If you accept, Xiaoyu will spend about 3 minutes getting to know how you’ve been, then you can choose a time to meet a counsellor. Please reply by ${IVC_DUE_()}.`], 'ivc'); S.modal = 'ivc'; },
+  zIvc(due) { S.ivc = { st: 'wait', due: due || IVC_DUE_(), at: new Date(NOW) };
+    addMsg('chat', ['心理中心邀请你聊一聊', 'UCC invites you to talk'], [`接受后，小屿会先花 3 分钟了解一下你最近的情况，然后你可以自己选和老师见面的时间。请在 ${ivcDue()} 前回复。`, `If you accept, Xiaoyu will spend about 3 minutes getting to know how you’ve been, then you can choose a time to meet a counsellor. Please reply by ${ivcDue()}.`], 'ivc'); S.modal = 'ivc'; },
   zIvQ() { S.ivQ = !S.ivQ; toast(S.ivQ ? L('演示：号不够，做完预咨询先排队', 'Demo: no slots, queue after intake') : L('演示：有号，做完预咨询直接选时间', 'Demo: slots available')); },
-  zIvTurn() { if (!S.ivc || S.ivc.st !== 'queue') return; S.ivc.st = 'entry'; S.ivc.edue = ivDay(4);
+  zIvTurn(due) { if (!S.ivc || !['queue', 'nofit'].includes(S.ivc.st)) return; S.ivc.st = 'entry'; S.ivc.edue = due || ivDay(4);
     addMsg('cal', ['可以选和老师见面的时间了', 'You can now pick a time to meet'], [`请在 ${S.ivc.edue} 前提交。`, `Please send your choice by ${S.ivc.edue}.`], 'book'); toast(L('收到通知：可以选时间了', 'Notified: you can pick a time now')); },
   ivcOpen() { S.modal = 'ivc'; },
   ivAcc() { S.modal = null; S.ivc.acc = new Date(NOW); addFoot('chat', ['接受了心理中心的邀约', 'Accepted UCC’s invitation'], 'home');
@@ -91,8 +91,9 @@ Object.assign(MODALS, {
 const _ikPage19 = PAGES.intake; PAGES.intake = () => { const h = _ikPage19(), ik = S.ik; if (!ik || !ik.inv || ik.i !== 0 || ik.phase !== 'q' || ikHas(ik)) return h;
   return h.replace('<div class="iksay', `<div class="iksay ikopen">${ikFill(ikTx(ikCfg(), 'open'))}</div><div class="iksay`); };
 /* 演示按钮放在首页最下面（不算待办） */
-const _home19 = PAGES.home; PAGES.home = () => { const h = _home19(); if (S.ivc) return h;
-  return h.replace(/<\/div><\/div>\s*$/, `<div class="zaps"><span class="zap" data-act="zIvc">⚡ ${L('演示 · 收到心理中心的邀约卡', 'Demo: receive UCC’s invitation')}</span><span class="zap" data-act="zIvQ">⚡ ${S.ivQ ? L('演示 · 现在：没号要排队', 'Demo: now queueing') : L('演示 · 现在：有号', 'Demo: slots available')}</span></div></div></div>`); };
+const _home19 = PAGES.home; PAGES.home = () => { const h = _home19(); if (S.ivc && !S._ivcManaged) return h;
+  const receive = !S._ivcManaged ? `<span class="zap" data-act="zIvc">⚡ ${L('演示 · 收到心理中心的邀约卡', 'Demo: receive UCC’s invitation')}</span>` : '';
+  return h.replace(/<\/div><\/div>\s*$/, `<div class="zaps">${receive}<span class="zap" data-act="zIvQ">⚡ ${S.ivQ ? L('演示 · 现在：没号要排队', 'Demo: now queueing') : L('演示 · 现在：有号', 'Demo: slots available')}</span></div></div></div>`); };
 
 /* B2-2：主动邀约申请被婉拒，保留原入口期限并返回选时间。 */
 const _declineB2 = ACT.zDecline; ACT.zDecline = function (ev) {
@@ -103,4 +104,9 @@ const _declineB2 = ACT.zDecline; ACT.zDecline = function (ev) {
 
 const _ikCloseB2 = MODALS.ikClose; MODALS.ikClose = function () {
   const h = _ikCloseB2(); return S.ik && S.ik.inv ? h.replace(/我的预约/g, '首页').replace(/My appointments/g, 'Home') : h;
+};
+
+const _ivStudentConfirmB5 = ACT.zConfirm; ACT.zConfirm = function () {
+  const result = _ivStudentConfirmB5.apply(this, arguments);
+  if (S.bk && S.bk.inv && S.ivc && S.ivc.st === 'sub') S.ivc.st = 'ok'; return result;
 };

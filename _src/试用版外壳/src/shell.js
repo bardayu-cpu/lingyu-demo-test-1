@@ -41,12 +41,13 @@ function fromStu(p, c) {
   const da = p.decl || [], db = c.decl || []; db.filter(x => !da.includes(x)).forEach(x => ev.push({ t: 'decl', core, task: x, on: true })); da.filter(x => !db.includes(x)).forEach(x => ev.push({ t: 'decl', core, task: x, on: false }));
   const ia = a && a.intake, ib = b && b.intake;
   if (ib && ib.st !== 'none' && (!ia || ia.st !== ib.st || ia.ver !== ib.ver)) ev.push({ t: 'intake', core, intake: ib.st === 'draft' ? { st: 'draft', ver: ib.ver } : ib });
+  if (c.ivc && JSON.stringify(p.ivc) !== JSON.stringify(c.ivc)) ev.push({ t: 'ivcSt', core, st: c.ivc.st, fit: c.ivc.fit, ik: c.ivc.ik });
   const ra = (p.inv || []), rb = (c.inv || []); rb.forEach(v => { const o = ra.find(x => x.id === v.id); if (v.rv > ((o && o.rv) || 0)) ev.push({ t: 'invReply', core, id: v.id, r: v.r, slots: v.slots, why: v.why, ver: v.ver }); });
   return ev;
 }
 function fromAdm(p, c) {
   if (!p) return []; const ev = [];
-  Object.keys(c).forEach(k => { if (k === '__cfg' || k === '__no' || k === '__inv' || k === '__slots') return; const a = p[k], b = c[k]; if (!a) return; if (b && b.id === a.id && !a.iv && b.iv) ev.push({ t: 'intakeViewed', core: k }); const moved = b && (a.day !== b.day || a.t !== b.t);
+  Object.keys(c).forEach(k => { if (k === '__cfg' || k === '__no' || k === '__inv' || k === '__slots' || k === '__ivc') return; const a = p[k], b = c[k]; if (!a) return; if (b && b.id === a.id && !a.iv && b.iv) ev.push({ t: 'intakeViewed', core: k }); const moved = b && (a.day !== b.day || a.t !== b.t);
     if (['confirm', 'ok', 'change'].includes(a.st) && b && b.id === a.id && b.st === 'adjust') ev.push({ t: 'adjust', core: k });
     else if (a.st === 'adjust' && b && b.id === a.id && b.st === 'move') ev.push({ t: 'rearr', core: k, date: b.date, ti: b.t });
     else if (a.st === 'adjust' && !b) ev.push({ t: 'adjNo', core: k });
@@ -70,6 +71,10 @@ window.addEventListener('message', e => {
     if (iv && sc && (d.side === '学生端' ? d.init || (p && (p.scen !== d.snap.scen || p.inst !== d.snap.inst)) : !p)) post('学生端', { t: 'ev', ev: { t: 'invSync', invs: iv[sc.core] || [] } });
     const cf = last['机构端'] && last['机构端'].__cfg, pc = d.side === '机构端' && p && p.__cfg;
     if (cf && (d.side === '学生端' ? d.init : !pc || JSON.stringify(pc) !== JSON.stringify(cf))) post('学生端', { t: 'ev', ev: Object.assign({ t: 'cfg' }, cf) });
+    const ivcRows = last['机构端'] && last['机构端'].__ivc, current = last['学生端'];
+    const ivcOld = d.side === '机构端' && p && p.__ivc;
+    if (ivcRows && current && (d.side === '学生端' ? d.init || p && (p.scen !== d.snap.scen || p.inst !== d.snap.inst) : !ivcOld || JSON.stringify(ivcOld[current.core]) !== JSON.stringify(ivcRows[current.core])))
+      post('学生端', { t: 'ev', ev: Object.assign({ t: 'ivc', managed: !!ivcRows[current.core] }, ivcRows[current.core] || {}) });
     const slots = last['机构端'] && last['机构端'].__slots, ps = d.side === '机构端' && p && p.__slots;
     if (slots && (d.side === '学生端' ? d.init : !ps || JSON.stringify(ps) !== JSON.stringify(slots))) post('学生端', { t: 'ev', ev: { t: 'slots', slots } }); }
   else if (d.t === 'applied') syncNote(d.msg ? `${d.side === '机构端' ? '学生端 → 机构端' : '机构端 → 学生端'}：${d.msg}` : '');

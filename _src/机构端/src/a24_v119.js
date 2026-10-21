@@ -406,7 +406,7 @@ const _st19 = settings; settings = function () { let h = _st19();
   if (S.tabs.settings === 'cwords') { const t = h.indexOf('<div class="tabs">'), e = h.indexOf('</div>', t) + 6; h = h.slice(0, e) + cwPage19() + '</div>'; }
   return h.replace('预咨询的设置暂时放在这里，预约咨询那一版会挪到「预约咨询 · AI 预咨询」。', '这里只设置预咨询放在预约的哪一步、是否启用模板二。题目和开场白在「预约咨询 · AI 预咨询 · 题库配置」里。'); };
 PAGES.settings = settings;
-const _setTab19 = ACT.setTab; ACT.setTab = function (k) { if (k === 'duty') { if (S.role === 'ADM') return toast('值班表在「预约咨询 · 排班表」里，由心理中心维护'); go('booking'); S.tabs.booking = 'sched'; return; } return _setTab19.apply(this, arguments); };
+const _setTab19 = ACT.setTab; ACT.setTab = function (k) { if (k === 'duty') { if (S.role === 'ADM') { S.mo = 'dutyRO:'; return; } go('booking'); S.tabs.booking = 'sched'; return; } return _setTab19.apply(this, arguments); };
 const _data19 = data; data = function () { return _data19().replace('值班按「成员管理 · 值班表」统计，咨询排班等预约那一版加上。', '值班按「预约咨询 · 排班表」里的值班表统计。'); };
 PAGES.data = data;
 ivb();
@@ -450,4 +450,11 @@ const _noSnapB2 = LY_snap; LY_snap = function () {
 const _intakeDraftB2 = LY_in; LY_in = function (ev) {
   if (ev.t === 'intake' && ev.intake && ev.intake.st === 'draft') ev = Object.assign({}, ev, { intake: { st: 'draft', ver: ev.intake.ver } });
   return _intakeDraftB2(ev);
+};
+
+/* B4-6：管理员在工作台查看同一份值班数据，只读。 */
+const _modalDutyRO = modal; modal = function () {
+  if (S.mo === 'dutyRO:' && S.role === 'ADM') return mbox('值班表 · 只读', '',
+    `<table class="t"><tr><th>周</th><th>值班咨询师（第一通知对象）</th><th>升级对象</th></tr>${DUTY.map(d => `<tr><td>${d.wk}</td><td>${ST(d.who).name}</td><td>${RULES.esc} 小时 → 中心负责人 · ${RULES.esc2} 小时 → 分管领导</td></tr>`).join('')}</table><p class="note">由心理中心在『预约咨询 · 排班表』里维护</p>`, '', '', '');
+  return _modalDutyRO.apply(this, arguments);
 };

@@ -139,7 +139,24 @@ def audits(browser):
     return c.checks
 
 
-TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications, 'B4-5': audits}
+def duty_readonly(browser):
+    c = Case(browser, 'B4-6-管理员只读值班表')
+    try:
+        c.select(c.a, '#roleSel', 'a1|ADM')
+        c.select(c.a, '#jump', 'home')
+        c.click(c.a, '[data-act=setTab][data-arg=duty]')
+        text = c.a.inner_text('#modal')
+        c.check('值班表 · 只读' in text and '预约咨询 · 排班表' in text, '工作台按钮打开只读值班表并说明维护位置')
+        c.check(c.a.locator('#modal table tr').count() == c.a.evaluate('DUTY.length') + 1, '表格列出同一份全部值班周')
+        c.check(c.a.locator('#modal input, #modal select, #modal [data-act=save]').count() == 0, '没有可修改控件')
+        c.check(c.a.locator('#jump option[value=booking]').count() == 0 and c.a.locator('.side [data-arg=booking]').count() == 0, '管理员仍没有预约咨询入口')
+        c.shot('管理员只读值班表')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications, 'B4-5': audits, 'B4-6': duty_readonly}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

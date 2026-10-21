@@ -1,5 +1,5 @@
 import base64,pathlib
-VER = 'v1.19.3-gpt'
+VER = 'v1.19.4-gpt'
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PIC = ROOT / '公共图片'
 r=pathlib.Path(__file__).parent/'src'

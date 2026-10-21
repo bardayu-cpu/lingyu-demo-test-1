@@ -161,7 +161,34 @@ def appointment_rows(browser):
     return count
 
 
-TESTS = {'drawers': drawers, 'rows': appointment_rows}
+def single_line_bars(browser):
+    c = B6Case(browser, 'B6-3-四种宽度的全部比例数字')
+    try:
+        c.login()
+        for width in [1280, 1440, 1615, 1913]:
+            c.page.set_viewport_size({'width': width, 'height': 1000})
+            c.select(c.a, '#jump', 'data')
+            for tab in ['dash', 'stu', 'staff', 'report']:
+                c.click(c.a, f'[data-act=dtabD][data-arg="{tab}"]')
+                cells = c.a.locator('#pg .hb span:last-child').evaluate_all('(els)=>els.map(e=>({text:e.textContent,height:e.getBoundingClientRect().height,whiteSpace:getComputedStyle(e).whiteSpace}))')
+                if tab in ['dash', 'stu']:
+                    c.check(bool(cells), f'{width}px {tab} 实际覆盖比例数字')
+                c.check(all(x['height'] <= 22 and x['whiteSpace'] == 'nowrap' for x in cells), f'{width}px {tab} 的 {len(cells)} 个数字均为单行：{cells}')
+                if width == 1440 and tab == 'stu':
+                    c.shot('1440学生情况比例单行')
+            student = c.a.evaluate('({id:LY_CORE().chen.id,name:LY_CORE().chen.name})')
+            c.open_student(student)
+            c.click(c.a, '.db .tabs [data-act=dtab][data-arg=score]')
+            cells = c.a.locator('.db .hb span:last-child').evaluate_all('(els)=>els.map(e=>({text:e.textContent,height:e.getBoundingClientRect().height}))')
+            c.check(len(cells) == 5 and all(x['height'] <= 22 for x in cells), f'{width}px 档案深度访谈评分五项均为单行：{cells}')
+            c.click(c.a, '.dh [data-act=dwClose]')
+        c.check(c.a.evaluate('LY_VER') == 'v1.19.4-gpt' and 'v1.19.4-gpt' in c.page.locator('#tb').inner_text(), '两端构建与合并版版本号为 v1.19.4-gpt')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'drawers': drawers, 'rows': appointment_rows, 'bars': single_line_bars}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

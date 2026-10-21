@@ -71,7 +71,7 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}.t th{text-align:left
 .head .grow{flex:1}.head b{display:block;font-size:15px}.head small{color:var(--ink2)}.head .cd{font-variant-numeric:tabular-nums;font-weight:600;color:var(--crit)}
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}.filters select,.filters input{height:32px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:0 8px;font-size:13px}
 .bar{height:8px;border-radius:4px;background:var(--line2);overflow:hidden}.bar i{display:block;height:100%;background:var(--pri2);border-radius:4px}
-.hb{display:grid;grid-template-columns:110px 1fr 54px;gap:10px;align-items:center;font-size:12.5px;margin:7px 0}.hb span:last-child{text-align:right;color:var(--mute2)}
+.hb{display:grid;grid-template-columns:110px 1fr auto;gap:10px;align-items:center;font-size:12.5px;margin:7px 0}.hb span:last-child{text-align:right;color:var(--mute2);white-space:nowrap}
 .note{font-size:12px;color:var(--mute2)}
 /* 抽屉：学生档案 */
 .dw-ov{position:fixed;inset:40px 0 0;background:rgba(30,51,55,.28);z-index:90;animation:fade .15s}

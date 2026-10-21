@@ -21,7 +21,7 @@ function bar() {
   let f = $('#fabs'); if (!f) { document.body.insertAdjacentHTML('beforeend', '<div id="fabs"></div>'); f = $('#fabs'); }
   f.innerHTML = ST.collect ? '' : '<button class="fab l" data-do="fbL" title="提意见（面板在左边）">提意见</button><button class="fab r" data-do="fbR" title="提意见（面板在右边）">提意见</button>';
 }
-function show(side) { ST.side = side; store.set('ly_side', side); Object.entries(FR).forEach(([k, f]) => f.classList.toggle('on', k === side)); bar(); if (ST.collect) { keepText(); pickOn(); panel('fb'); } }
+function show(side) { ST.side = side; store.set('ly_side', side); Object.entries(FR).forEach(([k, f]) => f.classList.toggle('on', k === side)); post('学生端', { t: 'ev', ev: { t: 'visible', visible: side === '学生端' } }); bar(); if (ST.collect) { keepText(); pickOn(); panel('fb'); } }
 function post(side, m) { const f = FR[side]; if (f && f.contentWindow) f.contentWindow.postMessage(Object.assign({ ly: 1, to: side }, m), '*'); }
 
 /* ---------- 两端联动：比较前后两次状态，推导出事件 ---------- */
@@ -65,6 +65,7 @@ function fromAdm(p, c) {
 window.addEventListener('message', e => {
   const d = e.data; if (!d || !d.ly || !d.side) return;
   if (d.t === 'snap') { const p = d.init ? null : last[d.side]; last[d.side] = d.snap;
+    if (d.side === '学生端' && d.init) post('学生端', { t: 'ev', ev: { t: 'visible', visible: ST.side === '学生端' } });
     if (d.side === '学生端') fromStu(p, d.snap).forEach(ev => post('机构端', { t: 'ev', ev }));
     else { const core = last['学生端'] && last['学生端'].core; fromAdm(p, d.snap).filter(ev => ev.core === core).forEach(ev => post('学生端', { t: 'ev', ev })); }
     const iv = last['机构端'] && last['机构端'].__inv, sc = last['学生端'];
@@ -87,7 +88,7 @@ const askCtx = side => new Promise(res => { const id = Math.random().toString(36
 /* ---------- 名字 ---------- */
 function askName(force) {
   if (ST.name && !force) return;
-  $('#ov').innerHTML = `<div class="ov"><div class="card"><h3>${force ? '修改名字' : '欢迎试用灵屿 2.0'}</h3><p>${force ? '' : '这是给咨询中心看的演示版，里面的学生和数据全部是虚构的。<br>试用中觉得哪里看不懂、不好用、出错了，随时点右上角「提意见」。<br><br>'}请先写下你的名字，方便我们区分每个人的意见。</p>
+  $('#ov').innerHTML = `<div class="ov"><div class="card"><h3>${force ? '修改名字' : '欢迎试用灵屿 2.0'}</h3><p>${force ? '' : '这是给咨询中心看的演示版，里面的学生和数据全部是虚构的。<br>请在同一个页面里用顶部按钮切换学生端和机构端，分开两个标签页不会同步。<br>试用中觉得哪里看不懂、不好用、出错了，随时点右上角「提意见」。<br><br>'}请先写下你的名字，方便我们区分每个人的意见。</p>
     <input class="in" id="nm" placeholder="你的名字" value="${esc(ST.name)}" maxlength="30"><div class="err" id="nmErr"></div>
     <div class="row">${force ? '<button class="btn" data-do="ovClose">取消</button>' : ''}<button class="btn pri" data-do="nameOk">${force ? '保存' : '开始试用'}</button></div></div></div>`;
   setTimeout(() => $('#nm') && $('#nm').focus(), 30);

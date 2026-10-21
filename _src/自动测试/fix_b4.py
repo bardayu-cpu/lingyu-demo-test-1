@@ -230,7 +230,7 @@ def demo_time(browser):
             c.check(label in c.page.inner_text('#tb'), side + ' 合并版顶栏标明演示时间')
         standalone = c.context.new_page()
         standalone.on('pageerror', lambda e: c.errors.append(str(e)))
-        standalone.goto((ROOT / '机构端/灵屿2.0-机构端演示-v1.19.4-gpt.html').as_uri())
+        standalone.goto((ROOT / '机构端/灵屿2.0-机构端演示-demo-v2.0.html').as_uri())
         c.check(label in standalone.inner_text('.demo'), '单独机构端也标出演示时间')
         standalone.select_option('#roleSel', 'c5|L3')
         standalone.check('#zapT')

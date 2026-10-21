@@ -27,7 +27,7 @@ class B6Case(Case):
         self.out = Path(os.environ.get('QA_DIR', ROOT / '自动测试/shots')) / name
         self.out.mkdir(parents=True, exist_ok=True)
         if os.environ.get('QA_URL'):
-            self.check('v1.19.4-gpt' in self.page.locator('#tb').inner_text(), '线上顶栏版本为 v1.19.4-gpt')
+            self.check('demo-v2.0' in self.page.locator('#tb').inner_text(), '线上顶栏版本为 demo-v2.0')
 
     def open_student(self, student):
         self.select(self.a, '#jump', 'students')
@@ -182,7 +182,7 @@ def single_line_bars(browser):
             cells = c.a.locator('.db .hb span:last-child').evaluate_all('(els)=>els.map(e=>({text:e.textContent,height:e.getBoundingClientRect().height}))')
             c.check(len(cells) == 5 and all(x['height'] <= 22 for x in cells), f'{width}px 档案深度访谈评分五项均为单行：{cells}')
             c.click(c.a, '.dh [data-act=dwClose]')
-        c.check(c.a.evaluate('LY_VER') == 'v1.19.4-gpt' and 'v1.19.4-gpt' in c.page.locator('#tb').inner_text(), '两端构建与合并版版本号为 v1.19.4-gpt')
+        c.check(c.a.evaluate('LY_VER') == 'demo-v2.0' and 'demo-v2.0' in c.page.locator('#tb').inner_text(), '两端构建与合并版版本号为 demo-v2.0')
     finally:
         c.close()
     return c.checks

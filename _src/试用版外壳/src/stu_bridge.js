@@ -33,7 +33,8 @@ function LY_snap() { const b = S.bk, ts = S.tasks || []; S._ly = S._ly || Math.r
     cb: !!S.callback, crisis: ts.some(t => t.crisis) || !!(S.ik && S.ik.crisis), done: ts.filter(isDone).map(t => DATA_ZH.tasks.find(d => d.id === t.id).name), decl: ts.filter(t => t.declined).map(t => DATA_ZH.tasks.find(d => d.id === t.id).name), inv: (S.invs || []).map(v => ({ id: v.id, r: v.r, rv: v.rv, slots: v.slots, why: v.why })) }; }
 function LY_ctx() { return { 端: '学生端', 场景: SCENES[S.scen].name, 页面: ((typeof JUMPS !== 'undefined' && JUMPS.find(j => j[0] === S.page)) || [0, S.page])[1].replace(/^\d+b? /, ''), 弹窗: S.modal || '', 语言: LANG === 'en' ? 'English' : '中文' }; }
 function LY_in(ev) { const b = S.bk; let msg = '';
-  if (ev.t === 'confirm' && b && b.st === '待确认') { ACT.zConfirm(); msg = '学生端收到「老师已确认你的预约」'; }
+  if (ev.t === 'visible') { studentVisible = !!ev.visible; }
+  else if (ev.t === 'confirm' && b && b.st === '待确认') { ACT.zConfirm(); msg = '学生端收到「老师已确认你的预约」'; }
   else if (ev.t === 'adjust' && b) { ACT.zAdjust(); msg = '学生端收到「中心调整」通知'; }
   else if (ev.t === 'rearr') { ACT.zRearr(ev); msg = '学生端收到「老师重新为你安排了时间」'; }
   else if (ev.t === 'adjNo') { ACT.zAdjNo(); msg = '学生端收到「请重新选一个时间」'; }
@@ -57,3 +58,7 @@ function LY_in(ev) { const b = S.bk; let msg = '';
   }
   else if (ev.t === 'slots') { LY_SLOTS = ev.slots; msg = ''; }
   render(); return msg; }
+const _inB7 = LY_in; LY_in = function (ev) {
+  const important = ['confirm', 'adjust', 'rearr', 'adjNo', 'decline', 'agree', 'deny', 'move', 'invite', 'invUpd', 'ivc'].includes(ev.t);
+  return important ? withImportantNotice(() => _inB7(ev)) : _inB7(ev);
+};

@@ -129,3 +129,11 @@ ACT.todoOpen = function (group) {
   if (S.ivc && S.ivc.st === 'entry') return ACT.go('book');
   if (latest) ACT.msgOpen(latest.i);
 };
+
+['zConfirm', 'zMove', 'zDecline', 'zPend', 'zAdjust', 'zRearr', 'zAdjNo', 'zIvc', 'zIvTurn'].forEach(key => {
+  const old = ACT[key]; ACT[key] = function () { const args = arguments; return withImportantNotice(() => old.apply(this, args)); };
+});
+ACT.noticeDismiss = function (id) { S.noticeIds = (S.noticeIds || []).filter(x => x !== id); };
+ACT.noticeView = function (id) {
+  const i = S.inbox.findIndex(x => x.noticeId === id); ACT.noticeDismiss(id); if (i >= 0) ACT.msgOpen(i);
+};

@@ -104,6 +104,43 @@ const msgForTodo = (x, group) => group === 'ivc' ? x.link === 'ivc' || x.link ==
 const todoMessages = group => unreadMsgs().filter(({ x }) => msgForTodo(x, group));
 const todoNew = group => todoMessages(group).length ? `<span class="todo-new">${L('新', 'New')}</span>` : '';
 const readTodoMessages = group => S.inbox.forEach(x => { if (msgForTodo(x, group)) x.read = true; });
+
+/* B7-3：重要事件保留到学生真正看到并操作；短提示仍只服务学生自己的操作。 */
+let studentVisible = window.parent === window, importantDepth = 0;
+const noticeShown = new Set();
+function withImportantNotice(fn) {
+  if (importantDepth) return fn();
+  const state = S, before = new Set(S.inbox), modal = S.modal, info = S.info, appr = S.appr, inv = S.inv, ivc = S.ivc;
+  const invDetail = modal === 'inv' && JSON.stringify((S.invs || []).find(v => v.id === inv));
+  const when = S.bk && `${S.bk.di}|${S.bk.ti}|${S.bk.st}`;
+  importantDepth++;
+  try { return fn(); }
+  finally {
+    importantDepth--;
+    if (S === state) {
+      const added = S.inbox.filter(x => !before.has(x));
+      const full = S.modal && (S.modal !== modal || S.info !== info || S.appr !== appr || S.inv !== inv || S.ivc !== ivc
+        || S.modal === 'moved' && when !== (S.bk && `${S.bk.di}|${S.bk.ti}|${S.bk.st}`)
+        || S.modal === 'inv' && invDetail !== JSON.stringify((S.invs || []).find(v => v.id === S.inv)));
+      if (!full && added.length) {
+        added.forEach(x => { x.noticeId = x.noticeId || 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2); });
+        S.noticeIds = added.map(x => x.noticeId).concat(S.noticeIds || []);
+        render();
+      }
+    }
+  }
+}
+function renderNotices(loggedIn) {
+  let root = $('#notices'); if (!root) { root = document.createElement('aside'); root.id = 'notices'; root.setAttribute('aria-live', 'polite'); document.body.appendChild(root); }
+  const messages = (S.noticeIds || []).map(id => S.inbox.find(x => x.noticeId === id)).filter(x => x && !x.read);
+  S.noticeIds = messages.map(x => x.noticeId);
+  if (!studentVisible || !loggedIn) { root.innerHTML = ''; return; }
+  root.setAttribute('aria-label', L('重要提醒', 'Important updates'));
+  root.innerHTML = messages.slice(0, 3).map(x => {
+    const enter = !noticeShown.has(x.noticeId); noticeShown.add(x.noticeId);
+    return `<section class="notice-card${enter ? ' notice-enter' : ''}" data-notice="${x.noticeId}"><div class="notice-title">${I(x.ico)}<b>${esc(L(...x.t))}</b></div><p>${esc(L(...x.d))}</p><div class="notice-acts"><button class="btn soft sm" data-act="noticeDismiss" data-arg="${x.noticeId}">${L('知道了', 'Got it')}</button><button class="btn pri sm" data-act="noticeView" data-arg="${x.noticeId}">${L('查看', 'View')}</button></div></section>`;
+  }).join('') + (messages.length > 3 ? `<div class="notice-more">${L(`还有 ${messages.length - 3} 条`, `${messages.length - 3} more update${messages.length === 4 ? '' : 's'}`)}</div>` : '');
+}
 /* 危机后的反馈：不提等级，只告诉学生有人会联系、现在可以找谁 */
 function crisisFollow() { if (S.crisisMsg) return; S.crisisMsg = true;
   addMsg('heart', ['大学心理咨询中心会尽快联系你', 'UCC will be in touch soon'], ['谢谢你愿意说出来。UCC 的老师会尽快和你联系。如果你现在感到不安全，请拨打 1767（24 小时）或 995。', 'Thank you for telling us. A UCC counsellor will contact you soon. If you don’t feel safe right now, call 1767 (24 hours) or 995.'], 'help', true); }
@@ -126,6 +163,7 @@ function render() {
   $('#app').innerHTML = (S.page === 'launch' ? '' : loggedIn ? header() : tpl('hd-out')) + pg;
   $('#modal').innerHTML = S.modal ? `<div class="ov" data-act="ovClose">${MODALS[S.modal]()}</div>` : '';
   $('#toast').innerHTML = S.toast ? `<div class="toast" role="status">${I('check')}${esc(S.toast)}</div>` : '';
+  renderNotices(loggedIn);
   renderMemo(); renderShell();
   document.querySelectorAll('[data-keep]').forEach(e => { if (keep[e.id] != null && !S.resetScroll && !S.pageTop) e.scrollTop = keep[e.id]; });
   if (S.scrollEnd) { const m = $('#msgs'); if (m) m.scrollTop = m.scrollHeight; S.scrollEnd = false; }
@@ -920,7 +958,7 @@ function finishSurvey(t) { readTaskMsgs(t.id); addFoot('list', [`提交了「${D
 const readTaskMsgs = id => S.inbox.forEach(x => { if (x.link === 'task:' + id) x.read = true; });
 function finish() { S.task.redo = false; readTaskMsgs(S.task.id); addFoot('chat', [`完成「${DATA_ZH.tasks.find(d => d.id === S.task.id).name}」的问卷和访谈`, `Finished the questionnaires and chat for “${deepMerge(DATA_ZH, DATA_EN).tasks.find(d => d.id === S.task.id).name}”`], 'go:talks'); const t = S.task; t.phase = 'done'; t.paused = false; t.doneAt = new Date(NOW); t.lv = RULE.finalLevel(t); if (RULE.invite(t.lv) && !S.invited && !S.bk) { S.modal = 'invite'; S.after = () => { S.modal = 'done'; }; } else S.modal = 'done'; }   // v1.18：需要邀请的学生先出邀请卡，再出结束卡
 function afterDone(next) { if (RULE.invite(S.task.lv) && !S.invited && !S.bk) { S.after = next; S.modal = 'invite'; } else { S.modal = null; next(); } }
-function toast(t) { S.toast = t; clearTimeout(S.toastT); S.toastT = setTimeout(() => { S.toast = ''; render(); }, 2400); }
+function toast(t) { if (importantDepth) return; S.toast = t; clearTimeout(S.toastT); S.toastT = setTimeout(() => { S.toast = ''; render(); }, 2400); }
 
 /* ---------- 事件 ---------- */
 document.addEventListener('click', e => {

@@ -458,3 +458,16 @@ const _modalDutyRO = modal; modal = function () {
     `<table class="t"><tr><th>周</th><th>值班咨询师（第一通知对象）</th><th>升级对象</th></tr>${DUTY.map(d => `<tr><td>${d.wk}</td><td>${ST(d.who).name}</td><td>${RULES.esc} 小时 → 中心负责人 · ${RULES.esc2} 小时 → 分管领导</td></tr>`).join('')}</table><p class="note">由心理中心在『预约咨询 · 排班表』里维护</p>`, '', '', '');
   return _modalDutyRO.apply(this, arguments);
 };
+
+/* B4-7：高危题库在接受邀约后进入第一题，预览使用相同时点。 */
+const _iktPreviewB4 = iktPreview; iktPreview = function (tk) {
+  if (ikBankCur !== 'h') return _iktPreviewB4.apply(this, arguments);
+  const d = iktD(), qs = d[tk];
+  return `<div class="ikpv"><div class="ikpv-w"><img src="${MASCOT_IK}" alt=""><div><small>学生接受邀约后马上看到 · 开场白显示在第一题上面</small><p>${esc(d.open)}</p></div></div>
+    <div class="ikpv-q">${qs.map((q, i) => `<div><small>第 ${i + 1} / ${qs.length} 题 · ${IKT_TYPES[q.type]}${q.skip ? ' · 可跳过' : ''}</small><b>${esc(q.say)}</b>${q.type === 'text' ? '<span class="ikpv-t">学生自己写</span>' : `<span class="ikpv-o">${(q.useTopics ? ['学业压力', '情绪低落', '睡眠', '人际关系', '…'] : q.opts || []).map(o => `<i>${esc(o)}</i>`).join('')}</span>`}</div>`).join('')}</div>
+    <p class="note">最后一步：${esc(d.close)}<br>学生可以修改摘要，勾选同意后发送；发完就可以选和老师见面的时间。</p></div>`;
+};
+const _modalHighPreview = modal; modal = function () {
+  const h = _modalHighPreview.apply(this, arguments);
+  return (S.mo || '').startsWith('iktPrev:') && ikBankCur === 'h' ? h.replace(/学生视角预览 · 模板[一二]/, '学生视角预览 · 高危咨询') : h;
+};

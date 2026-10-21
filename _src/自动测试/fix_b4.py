@@ -156,7 +156,35 @@ def duty_readonly(browser):
     return c.checks
 
 
-TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications, 'B4-5': audits, 'B4-6': duty_readonly}
+def high_preview(browser):
+    c = Case(browser, 'B4-7-高危预览时点')
+    try:
+        c.login()
+        c.click(c.a, '[data-act=btab][data-arg=ai]')
+        c.click(c.a, '[data-act=aisub][data-arg=bank]')
+        c.click(c.a, '[data-act=ikBank][data-arg=h]')
+        c.click(c.a, '[data-arg="iktPrev:t1"]')
+        text = c.a.inner_text('#modal')
+        c.check('学生视角预览 · 高危咨询' in text and '接受邀约后马上看到' in text, '预览标题及发生时点正确')
+        c.check('这次先不用' not in text and '好的，开始' not in text, '高危预览没有普通预约的欢迎按钮')
+        c.check('发完就可以选和老师见面的时间' in text, '最后一步明确发送后选时间')
+        c.shot('高危题库预览')
+        c.click(c.a, '[data-act=moClose]')
+        c.click(c.a, '[data-act=ikBank][data-arg=n]')
+        c.click(c.a, '[data-arg="iktPrev:t1"]')
+        c.check('这次先不用' in c.a.inner_text('#modal'), '普通题库预览保留原欢迎按钮')
+        c.student('A')
+        c.s.locator('#zapT').check()
+        c.click(c.s, '[data-act=zIvc]')
+        c.click(c.s, '[data-act=ivAcc]')
+        c.check(c.s.evaluate('S.ik.inv && S.ik.i===0') and '心理中心邀请你聊一聊' in c.s.inner_text('body'), '学生实际接受后直接进入带开场白的第一题')
+        c.shot('学生实际第一题')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications, 'B4-5': audits, 'B4-6': duty_readonly, 'B4-7': high_preview}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

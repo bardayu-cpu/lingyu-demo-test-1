@@ -1,0 +1,63 @@
+[
+  {
+    "打开": "file:///Users/kayra_ayu/Desktop/claude%20%E4%B8%8B%E8%BD%BD%E5%A4%87%E4%BB%BD/lingyu-gpt-fix-b1-%E6%AD%A3%E5%BC%8F%E8%A1%A5%E6%94%B9/index.html",
+    "视口": {
+      "width": 1440,
+      "height": 1000
+    },
+    "版本": "demo-v2.0"
+  },
+  {
+    "操作": "#scen 选择 A",
+    "看到": "演示工具\n场景\nA · 林晓 · 首次普测（日常关注）\nB · 陈嘉怡 · 首次普测 → 预约邀请（密切关注）\nC · 黄子轩 · 危机：作答中出现风险信号\nD · 王思远 · 再次预约：已有负责咨询师\n页面\n— 跳到页面 —\n01 启动页\n02 知情同意\n03 手机验证\n04 基本信息\n05 个人中心\n06 任务说明\n07 标准化问卷\n07b 进入访谈过渡\n08 小屿访谈\n09 危机回复\n11 完成 / 预约邀请\nAI 访谈 / 我的访谈记录\n我的问卷\n老师主页\n13 我的报告\n14 预约中心\n16 我的预约\n16b 预咨询小屿\n19 心理园区\n消息中心\n帮助中心\n个人信息\n访谈反馈\n演示按钮\n📝 备忘录\n重置\n我会陪你看见每一个真实的自己\n小屿\n灵屿系统访谈智能体\nNTU\n南洋理工大学\n大学心理咨询中心 UCC\n中\n/ EN\n认识自己，\n是一切成长的开始\n\n心理普测 · AI 访谈 · 咨询预约 · 心理园区\n\n开始体验\n由\n灵屿\n提供技术支持\n一站式群体心理健康智能筛查与服务协同系统 · 以 AI 补全情境线索，将群体评估、专业判断与后续支持连成一条完整链路。"
+  },
+  {
+    "操作": "#jump 选择 home",
+    "看到": "演示工具\n场景\nA · 林晓 · 首次普测（日常关注）\nB · 陈嘉怡 · 首次普测 → 预约邀请（密切关注）\nC · 黄子轩 · 危机：作答中出现风险信号\nD · 王思远 · 再次预约：已有负责咨询师\n页面\n— 跳到页面 —\n01 启动页\n02 知情同意\n03 手机验证\n04 基本信息\n05 个人中心\n06 任务说明\n07 标准化问卷\n07b 进入访谈过渡\n08 小屿访谈\n09 危机回复\n11 完成 / 预约邀请\nAI 访谈 / 我的访谈记录\n我的问卷\n老师主页\n13 我的报告\n14 预约中心\n16 我的预约\n16b 预咨询小屿\n19 心理园区\n消息中心\n帮助中心\n个人信息\n访谈反馈\n演示按钮\n📝 备忘录\n重置\n个人中心\n心理问卷\nAI 访谈\n预约咨询\n心理园区\n帮助中心\n2\n中\n/ EN\nN\n林晓\n早上好，林晓\n小屿提醒：“学校发布了新的心理健康普测。准备好了就开始，中途可以随时停下。”\n新消息\n查看全部\n新任务：2026 秋季学期心理健康普测\n1 小时前\n新任务：期中压力小调查\n1 小时前\n我的待办\n共 2 项\n2026 秋季学期心理健康普测 必做\n来自 大学心理咨询中心（UCC），10 月 19 日截止，剩余 6 天 23 时，约 25–35 分钟\n问卷 0/16\n›\n和小屿聊聊\n›\n拿到我的卡片\n开始\n期中压力小调查 选做\n来自 学院辅导员 周老师，10 月 30 日截止，剩余 17 天，约 3 分钟\n问卷 0/7\n›\n提交\n开始\n最近足迹\n你在灵屿里做过的事会记在这里。\n为你推荐\n去心理园区\n音频\n3:00\n4-7-8 呼吸练习\n平台内容\n视频\n5:40\n睡不着的时候，可以做什么\n睡眠小课 · 第 2 讲\n视频\nUCC\n4:26\n怎么开口向别人求助\nUCC 微课 · 第 2 讲\n活动\nUCC\n新生适应小组\n本校内容 · UCC"
+  },
+  {
+    "操作": "演示产生任务提醒",
+    "控件": "[data-act=zDue][data-arg=t1]",
+    "看到": "演示工具\n场景\nA · 林晓 · 首次普测（日常关注）\nB · 陈嘉怡 · 首次普测 → 预约邀请（密切关注）\nC · 黄子轩 · 危机：作答中出现风险信号\nD · 王思远 · 再次预约：已有负责咨询师\n页面\n— 跳到页面 —\n01 启动页\n02 知情同意\n03 手机验证\n04 基本信息\n05 个人中心\n06 任务说明\n07 标准化问卷\n07b 进入访谈过渡\n08 小屿访谈\n09 危机回复\n11 完成 / 预约邀请\nAI 访谈 / 我的访谈记录\n我的问卷\n老师主页\n13 我的报告\n14 预约中心\n16 我的预约\n16b 预咨询小屿\n19 心理园区\n消息中心\n帮助中心\n个人信息\n访谈反馈\n演示按钮\n📝 备忘录\n重置\n个人中心\n心理问卷\nAI 访谈\n预约咨询\n心理园区\n帮助中心\n3\n中\n/ EN\nN\n林晓\n早上好，林晓\n小屿提醒：“学校发布了新的心理健康普测。准备好了就开始，中途可以随时停下。”\n新消息\n查看全部\n「2026 秋季学期心理健康普测」还剩 2 天截止\n刚刚\n新任务：2026 秋季学期心理健康普测\n1 小时前\n新任务：期中压力小调查\n1 小时前\n我的待办\n共 2 项\n2026 秋季学期心理健康普测 必做\n来自 大学心理咨询中心（UCC），10 月 19 日截止，剩余 6 天 23 时，约 25–35 分钟\n问卷 0/16\n›\n和小屿聊聊\n›\n拿到我的卡片\n⚡ 模拟到期提醒\n开始\n期中压力小调查 选做\n来自 学院辅导员 周老师，10 月 30 日截止，剩余 17 天，约 3 分钟\n问卷 0/7\n›\n提交\n⚡ 模拟到期提醒\n开始\n最近足迹\n你在灵屿里做过的事会记在这里。\n为你推荐\n去心理园区\n音频\n3:00\n4-7-8 呼吸练习\n平台内容\n视频\n5:40\n睡不着的时候，可以做什么\n睡眠小课 · 第 2 讲\n视频\nUCC\n4:26\n怎么开口向别人求助\nUCC 微课 · 第 2 讲\n活动\nUCC\n新生适应小组\n本校内容 · UCC\n⚡ 演示 · 收到心理中心的邀约卡\n⚡ 演示 · 现在：有号\n已通过站内信和短信提醒"
+  },
+  {
+    "操作": "演示产生任务提醒",
+    "控件": "[data-act=zDue][data-arg=t1]",
+    "看到": "演示工具\n场景\nA · 林晓 · 首次普测（日常关注）\nB · 陈嘉怡 · 首次普测 → 预约邀请（密切关注）\nC · 黄子轩 · 危机：作答中出现风险信号\nD · 王思远 · 再次预约：已有负责咨询师\n页面\n— 跳到页面 —\n01 启动页\n02 知情同意\n03 手机验证\n04 基本信息\n05 个人中心\n06 任务说明\n07 标准化问卷\n07b 进入访谈过渡\n08 小屿访谈\n09 危机回复\n11 完成 / 预约邀请\nAI 访谈 / 我的访谈记录\n我的问卷\n老师主页\n13 我的报告\n14 预约中心\n16 我的预约\n16b 预咨询小屿\n19 心理园区\n消息中心\n帮助中心\n个人信息\n访谈反馈\n演示按钮\n📝 备忘录\n重置\n个人中心\n心理问卷\nAI 访谈\n预约咨询\n心理园区\n帮助中心\n4\n中\n/ EN\nN\n林晓\n早上好，林晓\n小屿提醒：“学校发布了新的心理健康普测。准备好了就开始，中途可以随时停下。”\n新消息\n查看全部\n「2026 秋季学期心理健康普测」还剩 2 天截止\n刚刚\n「2026 秋季学期心理健康普测」还剩 2 天截止\n刚刚\n新任务：2026 秋季学期心理健康普测\n1 小时前\n还有 1 条 · 查看全部\n我的待办\n共 2 项\n2026 秋季学期心理健康普测 必做\n来自 大学心理咨询中心（UCC），10 月 19 日截止，剩余 6 天 23 时，约 25–35 分钟\n问卷 0/16\n›\n和小屿聊聊\n›\n拿到我的卡片\n⚡ 模拟到期提醒\n开始\n期中压力小调查 选做\n来自 学院辅导员 周老师，10 月 30 日截止，剩余 17 天，约 3 分钟\n问卷 0/7\n›\n提交\n⚡ 模拟到期提醒\n开始\n最近足迹\n你在灵屿里做过的事会记在这里。\n为你推荐\n去心理园区\n音频\n3:00\n4-7-8 呼吸练习\n平台内容\n视频\n5:40\n睡不着的时候，可以做什么\n睡眠小课 · 第 2 讲\n视频\nUCC\n4:26\n怎么开口向别人求助\nUCC 微课 · 第 2 讲\n活动\nUCC\n新生适应小组\n本校内容 · UCC\n⚡ 演示 · 收到心理中心的邀约卡\n⚡ 演示 · 现在：有号\n已通过站内信和短信提醒"
+  },
+  {
+    "操作": "演示产生任务提醒",
+    "控件": "[data-act=zDue][data-arg=t1]",
+    "看到": "演示工具\n场景\nA · 林晓 · 首次普测（日常关注）\nB · 陈嘉怡 · 首次普测 → 预约邀请（密切关注）\nC · 黄子轩 · 危机：作答中出现风险信号\nD · 王思远 · 再次预约：已有负责咨询师\n页面\n— 跳到页面 —\n01 启动页\n02 知情同意\n03 手机验证\n04 基本信息\n05 个人中心\n06 任务说明\n07 标准化问卷\n07b 进入访谈过渡\n08 小屿访谈\n09 危机回复\n11 完成 / 预约邀请\nAI 访谈 / 我的访谈记录\n我的问卷\n老师主页\n13 我的报告\n14 预约中心\n16 我的预约\n16b 预咨询小屿\n19 心理园区\n消息中心\n帮助中心\n个人信息\n访谈反馈\n演示按钮\n📝 备忘录\n重置\n个人中心\n心理问卷\nAI 访谈\n预约咨询\n心理园区\n帮助中心\n5\n中\n/ EN\nN\n林晓\n早上好，林晓\n小屿提醒：“学校发布了新的心理健康普测。准备好了就开始，中途可以随时停下。”\n新消息\n查看全部\n「2026 秋季学期心理健康普测」还剩 2 天截止\n刚刚\n「2026 秋季学期心理健康普测」还剩 2 天截止\n刚刚\n「2026 秋季学期心理健康普测」还剩 2 天截止\n刚刚\n还有 2 条 · 查看全部\n我的待办\n共 2 项\n2026 秋季学期心理健康普测 必做\n来自 大学心理咨询中心（UCC），10 月 19 日截止，剩余 6 天 23 时，约 25–35 分钟\n问卷 0/16\n›\n和小屿聊聊\n›\n拿到我的卡片\n⚡ 模拟到期提醒\n开始\n期中压力小调查 选做\n来自 学院辅导员 周老师，10 月 30 日截止，剩余 17 天，约 3 分钟\n问卷 0/7\n›\n提交\n⚡ 模拟到期提醒\n开始\n最近足迹\n你在灵屿里做过的事会记在这里。\n为你推荐\n去心理园区\n音频\n3:00\n4-7-8 呼吸练习\n平台内容\n视频\n5:40\n睡不着的时候，可以做什么\n睡眠小课 · 第 2 讲\n视频\nUCC\n4:26\n怎么开口向别人求助\nUCC 微课 · 第 2 讲\n活动\nUCC\n新生适应小组\n本校内容 · UCC\n⚡ 演示 · 收到心理中心的邀约卡\n⚡ 演示 · 现在：有号\n已通过站内信和短信提醒"
+  },
+  {
+    "操作": "「2026 秋季学期心理健康普测」还剩 2 天截止\n刚刚",
+    "控件": ".home-msg",
+    "看到": "演示工具\n场景\nA · 林晓 · 首次普测（日常关注）\nB · 陈嘉怡 · 首次普测 → 预约邀请（密切关注）\nC · 黄子轩 · 危机：作答中出现风险信号\nD · 王思远 · 再次预约：已有负责咨询师\n页面\n— 跳到页面 —\n01 启动页\n02 知情同意\n03 手机验证\n04 基本信息\n05 个人中心\n06 任务说明\n07 标准化问卷\n07b 进入访谈过渡\n08 小屿访谈\n09 危机回复\n11 完成 / 预约邀请\nAI 访谈 / 我的访谈记录\n我的问卷\n老师主页\n13 我的报告\n14 预约中心\n16 我的预约\n16b 预咨询小屿\n19 心理园区\n消息中心\n帮助中心\n个人信息\n访谈反馈\n演示按钮\n📝 备忘录\n重置\n个人中心\n心理问卷\nAI 访谈\n预约咨询\n心理园区\n帮助中心\n4\n中\n/ EN\nN\n林晓\n2026 秋季学期心理健康普测\n\n来自 大学心理咨询中心（UCC）\n\n包含内容\n2 份标准化问卷，和小屿聊一聊\n预计用时\n约 25–35 分钟\n有效期至\n10 月 19 日（剩余 6 天 23 时）\n\n你好，我是小屿。我们会先完成几份标准化问卷，再随便聊聊。这不是考试，没有标准答案。中途有事随时可以停，有效期内回来就能接着做。完成之后，你会拿到一张属于自己的卡片。\n\n开始\n进度会自动保存\n这次不参加\n已通过站内信和短信提醒"
+  },
+  {
+    "操作": "个人中心",
+    "控件": ".hd [data-act=go][data-arg=home]",
+    "看到": "演示工具\n场景\nA · 林晓 · 首次普测（日常关注）\nB · 陈嘉怡 · 首次普测 → 预约邀请（密切关注）\nC · 黄子轩 · 危机：作答中出现风险信号\nD · 王思远 · 再次预约：已有负责咨询师\n页面\n— 跳到页面 —\n01 启动页\n02 知情同意\n03 手机验证\n04 基本信息\n05 个人中心\n06 任务说明\n07 标准化问卷\n07b 进入访谈过渡\n08 小屿访谈\n09 危机回复\n11 完成 / 预约邀请\nAI 访谈 / 我的访谈记录\n我的问卷\n老师主页\n13 我的报告\n14 预约中心\n16 我的预约\n16b 预咨询小屿\n19 心理园区\n消息中心\n帮助中心\n个人信息\n访谈反馈\n演示按钮\n📝 备忘录\n重置\n个人中心\n心理问卷\nAI 访谈\n预约咨询\n心理园区\n帮助中心\n4\n中\n/ EN\nN\n林晓\n早上好，林晓\n小屿提醒：“学校发布了新的心理健康普测。准备好了就开始，中途可以随时停下。”\n新消息\n查看全部\n「2026 秋季学期心理健康普测」还剩 2 天截止\n刚刚\n「2026 秋季学期心理健康普测」还剩 2 天截止\n刚刚\n新任务：2026 秋季学期心理健康普测\n1 小时前\n还有 1 条 · 查看全部\n我的待办\n共 2 项\n2026 秋季学期心理健康普测 必做\n来自 大学心理咨询中心（UCC），10 月 19 日截止，剩余 6 天 23 时，约 25–35 分钟\n问卷 0/16\n›\n和小屿聊聊\n›\n拿到我的卡片\n⚡ 模拟到期提醒\n开始\n期中压力小调查 选做\n来自 学院辅导员 周老师，10 月 30 日截止，剩余 17 天，约 3 分钟\n问卷 0/7\n›\n提交\n⚡ 模拟到期提醒\n开始\n最近足迹\n你在灵屿里做过的事会记在这里。\n为你推荐\n去心理园区\n音频\n3:00\n4-7-8 呼吸练习\n平台内容\n视频\n5:40\n睡不着的时候，可以做什么\n睡眠小课 · 第 2 讲\n视频\nUCC\n4:26\n怎么开口向别人求助\nUCC 微课 · 第 2 讲\n活动\nUCC\n新生适应小组\n本校内容 · UCC\n⚡ 演示 · 收到心理中心的邀约卡\n⚡ 演示 · 现在：有号\n已通过站内信和短信提醒"
+  },
+  {
+    "操作": "中\n/ EN",
+    "控件": "[data-act=lang]",
+    "看到": "演示工具\n场景\nA · 林晓 · 首次普测（日常关注）\nB · 陈嘉怡 · 首次普测 → 预约邀请（密切关注）\nC · 黄子轩 · 危机：作答中出现风险信号\nD · 王思远 · 再次预约：已有负责咨询师\n页面\n— 跳到页面 —\n01 启动页\n02 知情同意\n03 手机验证\n04 基本信息\n05 个人中心\n06 任务说明\n07 标准化问卷\n07b 进入访谈过渡\n08 小屿访谈\n09 危机回复\n11 完成 / 预约邀请\nAI 访谈 / 我的访谈记录\n我的问卷\n老师主页\n13 我的报告\n14 预约中心\n16 我的预约\n16b 预咨询小屿\n19 心理园区\n消息中心\n帮助中心\n个人信息\n访谈反馈\n演示按钮\n📝 备忘录\n重置\nMy space\nQuestionnaires\nTalk with Xiaoyu\nCounselling\nWellbeing hub\nHelp\n4\nEN\n/ 中\nN\nLin Xiao\nGood morning, Lin Xiao\nXiaoyu says:“NTU has a new wellbeing check for you. Start when you’re ready — you can stop anytime.”\nNew messages\nView all\n“Semester 1, 2026 Wellbeing Check” closes in 2 days\nJust now\n“Semester 1, 2026 Wellbeing Check” closes in 2 days\nJust now\nNew: Semester 1, 2026 Wellbeing Check\n1 h ago\n1 more · View all\nTo do\n2 items\nSemester 1, 2026 Wellbeing Check Required\nFrom University Counselling Centre (UCC), Due 19 Oct, 6d 23h left, About 25–35 min\nQuestionnaires 0/16\n›\nChat with Xiaoyu\n›\nGet your card\n⚡ Demo: due reminder\nStart\nMid-term Stress Check-in Optional\nFrom Mr Zhou, college student advisor, Due 30 Oct, 17 days left, About 3 min\nQuestionnaires 0/7\n›\nSubmit\n⚡ Demo: due reminder\nStart\nRecent activity\nThings you do here will show up here.\nFor you\nOpen the hub\nAudio\n3:00\n4-7-8 Breathing\nPlatform\nVideo\n5:40\nWhen You Can’t Fall Asleep\nSleep 101 · Ep 2\nVideo\nUCC\n4:26\nHow to Ask for Help\nUCC micro-lesson · Ep 2\nEvent\nUCC\nFreshmen Support Group\nNTU UCC\n⚡ Demo: receive UCC’s invitation\n⚡ Demo: slots available\n已通过站内信和短信提醒"
+  },
+  {
+    "操作": "1 more · View all",
+    "控件": ".home-msg-more",
+    "看到": "演示工具\n场景\nA · 林晓 · 首次普测（日常关注）\nB · 陈嘉怡 · 首次普测 → 预约邀请（密切关注）\nC · 黄子轩 · 危机：作答中出现风险信号\nD · 王思远 · 再次预约：已有负责咨询师\n页面\n— 跳到页面 —\n01 启动页\n02 知情同意\n03 手机验证\n04 基本信息\n05 个人中心\n06 任务说明\n07 标准化问卷\n07b 进入访谈过渡\n08 小屿访谈\n09 危机回复\n11 完成 / 预约邀请\nAI 访谈 / 我的访谈记录\n我的问卷\n老师主页\n13 我的报告\n14 预约中心\n16 我的预约\n16b 预咨询小屿\n19 心理园区\n消息中心\n帮助中心\n个人信息\n访谈反馈\n演示按钮\n📝 备忘录\n重置\nMy space\nQuestionnaires\nTalk with Xiaoyu\nCounselling\nWellbeing hub\nHelp\n4\nEN\n/ 中\nN\nLin Xiao\nBack\nNotifications\nMark all as read\nAll\nUnread 4\n“Semester 1, 2026 Wellbeing Check” closes in 2 days\nPlease finish by 19 Oct. About 25–35 min.\nAlso sent by SMS\nToday 10:00\n“Semester 1, 2026 Wellbeing Check” closes in 2 days\nPlease finish by 19 Oct. About 25–35 min.\nAlso sent by SMS\nToday 10:00\n“Semester 1, 2026 Wellbeing Check” closes in 2 days\nPlease finish by 19 Oct. About 25–35 min.\nAlso sent by SMS\nToday 10:00\nNew: Semester 1, 2026 Wellbeing Check\nFrom UCC · required · due 19 Oct\nToday 09:00\nNew: Mid-term Stress Check-in\nFrom Mr Zhou, college advisor · optional · due 30 Oct\nToday 09:00\n已通过站内信和短信提醒"
+  },
+  {
+    "操作": "Mark all as read",
+    "控件": "[data-act=readAll]",
+    "看到": "演示工具\n场景\nA · 林晓 · 首次普测（日常关注）\nB · 陈嘉怡 · 首次普测 → 预约邀请（密切关注）\nC · 黄子轩 · 危机：作答中出现风险信号\nD · 王思远 · 再次预约：已有负责咨询师\n页面\n— 跳到页面 —\n01 启动页\n02 知情同意\n03 手机验证\n04 基本信息\n05 个人中心\n06 任务说明\n07 标准化问卷\n07b 进入访谈过渡\n08 小屿访谈\n09 危机回复\n11 完成 / 预约邀请\nAI 访谈 / 我的访谈记录\n我的问卷\n老师主页\n13 我的报告\n14 预约中心\n16 我的预约\n16b 预咨询小屿\n19 心理园区\n消息中心\n帮助中心\n个人信息\n访谈反馈\n演示按钮\n📝 备忘录\n重置\nMy space\nQuestionnaires\nTalk with Xiaoyu\nCounselling\nWellbeing hub\nHelp\nEN\n/ 中\nN\nLin Xiao\nBack\nNotifications\nMark all as read\nAll\nUnread 0\n“Semester 1, 2026 Wellbeing Check” closes in 2 days\nPlease finish by 19 Oct. About 25–35 min.\nAlso sent by SMS\nToday 10:00\n“Semester 1, 2026 Wellbeing Check” closes in 2 days\nPlease finish by 19 Oct. About 25–35 min.\nAlso sent by SMS\nToday 10:00\n“Semester 1, 2026 Wellbeing Check” closes in 2 days\nPlease finish by 19 Oct. About 25–35 min.\nAlso sent by SMS\nToday 10:00\nNew: Semester 1, 2026 Wellbeing Check\nFrom UCC · required · due 19 Oct\nToday 09:00\nNew: Mid-term Stress Check-in\nFrom Mr Zhou, college advisor · optional · due 30 Oct\nToday 09:00\n已通过站内信和短信提醒"
+  },
+  {
+    "操作": "My space",
+    "控件": ".hd [data-act=go][data-arg=home]",
+    "看到": "演示工具\n场景\nA · 林晓 · 首次普测（日常关注）\nB · 陈嘉怡 · 首次普测 → 预约邀请（密切关注）\nC · 黄子轩 · 危机：作答中出现风险信号\nD · 王思远 · 再次预约：已有负责咨询师\n页面\n— 跳到页面 —\n01 启动页\n02 知情同意\n03 手机验证\n04 基本信息\n05 个人中心\n06 任务说明\n07 标准化问卷\n07b 进入访谈过渡\n08 小屿访谈\n09 危机回复\n11 完成 / 预约邀请\nAI 访谈 / 我的访谈记录\n我的问卷\n老师主页\n13 我的报告\n14 预约中心\n16 我的预约\n16b 预咨询小屿\n19 心理园区\n消息中心\n帮助中心\n个人信息\n访谈反馈\n演示按钮\n📝 备忘录\n重置\nMy space\nQuestionnaires\nTalk with Xiaoyu\nCounselling\nWellbeing hub\nHelp\nEN\n/ 中\nN\nLin Xiao\nGood morning, Lin Xiao\nXiaoyu says:“NTU has a new wellbeing check for you. Start when you’re ready — you can stop anytime.”\nTo do\n2 items\nSemester 1, 2026 Wellbeing Check Required\nFrom University Counselling Centre (UCC), Due 19 Oct, 6d 23h left, About 25–35 min\nQuestionnaires 0/16\n›\nChat with Xiaoyu\n›\nGet your card\n⚡ Demo: due reminder\nStart\nMid-term Stress Check-in Optional\nFrom Mr Zhou, college student advisor, Due 30 Oct, 17 days left, About 3 min\nQuestionnaires 0/7\n›\nSubmit\n⚡ Demo: due reminder\nStart\nRecent activity\nThings you do here will show up here.\nFor you\nOpen the hub\nAudio\n3:00\n4-7-8 Breathing\nPlatform\nVideo\n5:40\nWhen You Can’t Fall Asleep\nSleep 101 · Ep 2\nVideo\nUCC\n4:26\nHow to Ask for Help\nUCC micro-lesson · Ep 2\nEvent\nUCC\nFreshmen Support Group\nNTU UCC\n⚡ Demo: receive UCC’s invitation\n⚡ Demo: slots available\n已通过站内信和短信提醒"
+  }
+]

@@ -1,0 +1,65 @@
+PASS B7-3-后台确认-dismiss-中文 原使用说明标注同页切换要求
+PASS B7-3-后台确认-dismiss-中文 两端和外壳均为 demo-v2.0
+CLICK B7-3-后台确认-dismiss-中文 21
+CLICK B7-3-后台确认-dismiss-中文 14:00
+CLICK B7-3-后台确认-dismiss-中文 提交预约申请
+CLICK B7-3-后台确认-dismiss-中文 这次先不用
+CLICK B7-3-后台确认-dismiss-中文 个人中心
+CLICK B7-3-后台确认-dismiss-中文 确认
+PASS B7-3-后台确认-dismiss-中文 机构端显示时尚未渲染学生提醒卡
+PASS B7-3-后台确认-dismiss-中文 超过短提示时长后后台仍保留重要提醒
+PASS B7-3-后台确认-dismiss-中文 切回后恰好一张确认提醒，没有重复整页弹窗
+PASS B7-3-后台确认-dismiss-中文 老师确认不再使用 2.4 秒短提示
+PASS B7-3-后台确认-dismiss-中文 首页新消息和预约新标记同时出现
+PASS B7-3-后台确认-dismiss-中文 学生端等待三秒后提醒仍持续显示
+CLICK B7-3-后台确认-dismiss-中文 知道了
+PASS B7-3-后台确认-dismiss-中文 知道了仅关闭提醒卡，消息中心仍保留未读
+CLICK B7-3-后台确认-dismiss-中文 ⚡ 演示 · 现在：有号
+PASS B7-3-后台确认-dismiss-中文 学生自己的操作仍使用短提示
+PASS B7-3-后台确认-dismiss-中文 学生操作短提示照旧自动消失
+PASS B7-3-后台确认-dismiss-中文 无浏览器脚本异常 []
+PASS B7-3-后台确认-view-中文 原使用说明标注同页切换要求
+PASS B7-3-后台确认-view-中文 两端和外壳均为 demo-v2.0
+CLICK B7-3-后台确认-view-中文 21
+CLICK B7-3-后台确认-view-中文 14:00
+CLICK B7-3-后台确认-view-中文 提交预约申请
+CLICK B7-3-后台确认-view-中文 这次先不用
+CLICK B7-3-后台确认-view-中文 个人中心
+CLICK B7-3-后台确认-view-中文 确认
+PASS B7-3-后台确认-view-中文 机构端显示时尚未渲染学生提醒卡
+PASS B7-3-后台确认-view-中文 超过短提示时长后后台仍保留重要提醒
+PASS B7-3-后台确认-view-中文 切回后恰好一张确认提醒，没有重复整页弹窗
+PASS B7-3-后台确认-view-中文 老师确认不再使用 2.4 秒短提示
+PASS B7-3-后台确认-view-中文 首页新消息和预约新标记同时出现
+PASS B7-3-后台确认-view-中文 学生端等待三秒后提醒仍持续显示
+CLICK B7-3-后台确认-view-中文 查看
+PASS B7-3-后台确认-view-中文 提醒查看进入我的预约并标记对应消息已读
+PASS B7-3-后台确认-view-中文 查看后提醒卡关闭
+CLICK B7-3-后台确认-view-中文 个人中心
+PASS B7-3-后台确认-view-中文 提醒查看后首页预约新标记消失
+PASS B7-3-后台确认-view-中文 无浏览器脚本异常 []
+PASS B7-3-后台确认-view-英文 原使用说明标注同页切换要求
+PASS B7-3-后台确认-view-英文 两端和外壳均为 demo-v2.0
+CLICK B7-3-后台确认-view-英文 21
+CLICK B7-3-后台确认-view-英文 14:00
+CLICK B7-3-后台确认-view-英文 提交预约申请
+CLICK B7-3-后台确认-view-英文 这次先不用
+CLICK B7-3-后台确认-view-英文 个人中心
+CLICK B7-3-后台确认-view-英文 中
+/ EN
+CLICK B7-3-后台确认-view-英文 确认
+PASS B7-3-后台确认-view-英文 机构端显示时尚未渲染学生提醒卡
+PASS B7-3-后台确认-view-英文 超过短提示时长后后台仍保留重要提醒
+PASS B7-3-后台确认-view-英文 切回后恰好一张确认提醒，没有重复整页弹窗
+PASS B7-3-后台确认-view-英文 老师确认不再使用 2.4 秒短提示
+PASS B7-3-后台确认-view-英文 首页新消息和预约新标记同时出现
+PASS B7-3-后台确认-view-英文 学生端等待三秒后提醒仍持续显示
+PASS B7-3-后台确认-view-英文 英文提醒标题、详情和两个按钮均无中文
+CLICK B7-3-后台确认-view-英文 View
+PASS B7-3-后台确认-view-英文 提醒查看进入我的预约并标记对应消息已读
+PASS B7-3-后台确认-view-英文 查看后提醒卡关闭
+CLICK B7-3-后台确认-view-英文 My space
+PASS B7-3-后台确认-view-英文 提醒查看后首页预约新标记消失
+PASS B7-3-后台确认-view-英文 无浏览器脚本异常 []
+HARNESS: recovered a Chrome driver shutdown stall after test completion
+fix_b7: 37 passed, 0 failed

@@ -1,0 +1,20 @@
+[
+  {
+    "name": "主链接",
+    "url": "https://bardayu-cpu.github.io/lingyu-demo-test-1/",
+    "status": 200,
+    "bytes": 2655906,
+    "sha256": "94d83e1378dee55a6d9692ab356b5d9acf5f1cf5a28f4a0197fb7ca3b12e027d",
+    "version_present": true,
+    "checked_at": "2026-10-21T07:33:01.470147+00:00"
+  },
+  {
+    "name": "内测",
+    "url": "https://bardayu-cpu.github.io/lingyu-inside-4ayu-000/",
+    "status": 200,
+    "bytes": 2655906,
+    "sha256": "94d83e1378dee55a6d9692ab356b5d9acf5f1cf5a28f4a0197fb7ca3b12e027d",
+    "version_present": true,
+    "checked_at": "2026-10-21T07:32:57.076520+00:00"
+  }
+]

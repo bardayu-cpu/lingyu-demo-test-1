@@ -1,42 +1,48 @@
-v1.19.4-gpt · B6 交付说明
+demo-v2.0 · B7 交付说明
 
-开发仓库 bardayu-cpu/lingyu-demo-test-1，分支 gpt-fix-b6。
-基线为 gpt-fix-b5 / 28b0cc4d369d48decdd2258f1c7341854126c507。
-三个功能提交：9a32ca3（B6-1）、24034a3（B6-2）、5cd115b（B6-3）。未改写历史。
+开发仓库：bardayu-cpu/lingyu-demo-test-1；分支：gpt-fix-b7。
+基线：gpt-fix-b6 / aaad38df8b48b6a6de44bc80b55739fb06ba19c8。
+三个功能提交：44b2fa5（B7-1）、51eec31（B7-2）、cf2e850（B7-3）。每条一个提交，未改写已有历史。
+功能 HEAD：cf2e850811466201dd317f8c9426dc970c2392de；后续交付记录提交仅补说明、日志和截图，不改应用源码。
 
 条目编号 | 状态 | 改动的文件 | 怎么验证的 | 测试结果
-B6-1 | 已修 | 机构端/src/a3_people.js、a13_v112.js、a24_v119.js；自动测试/fix_b6.py；index.html | 李文和朱静各打开陈嘉怡、Wong Jun、Lim Jun(s8)、周欣怡、林晓，逐个点所有可见档案页签；核对完整摘要、降级申请、提示跳转和查看审计 | 本地 159 项；线上 161 项通过
-B6-2 | 已修 | 机构端/src/a2_home.js；自动测试/fix_b1.py、fix_b6.py；index.html | 两位老师逐行点击原始全部预约；每个子页签至少点两行，覆盖姓名、等级和空白；核对抽屉学生标题、单次审计、悬停样式、按钮只开各自弹窗、L1 无入口 | 本地 111 项；线上 113 项通过
-B6-3 | 已修 | 机构端/src/adm.css；机构端/build.py；试用版外壳/build.py；自动测试/run_checks.py、fix_b4.py、fix_b6.py；index.html | 1280、1440、1615、1913 四种宽度，逐个点击数据看板四个页签与档案深度访谈评分，检查每个 .hb span:last-child 高度不超过 22px | 本地 34 项；线上 35 项通过，实际数字高度 20px
+B7-1 | 已修 | 学生端/src/app.js、stu.html、stu.css；自动测试/fix_b7.py；index.html | 首页问候语下显示最新最多三条未读（图标、标题、相对时间）；五条未读显示其余两条；实际点击消息标已读并跳转；查看全部进消息中心；读完整块隐藏；中英文 | 13 项通过
+B7-2 | 已修 | 学生端/src/app.js、v119.js、stu.css；自动测试/fix_b7.py；index.html | 老师确认后的预约行、邀约卡和选时间入口标新；点击行或消息中心阅读后消失；取消后仍能从更新待办打开结果；无独立未读标记状态 | 本条 9 项通过；申请结果、选时间入口另在 B7-3 覆盖
+B7-3 | 已修 | 学生端/src/app.js、v119.js、stu.css；试用版外壳/src/stu_bridge.js、shell.js；机构端/build.py、试用版外壳/build.py；自动测试/run_checks.py、fix_b4.py、fix_b6.py、fix_b7.py；index.html | 提交申请、李文确认、在机构端等 5.5 秒再切回；再等 3 秒卡片仍在；知道了关闭、查看进入我的预约并已读；欢迎窗未关闭也能真实点击提醒；改时间、婉拒、中心调整/重新安排、改期与取消同意/不同意、发卡/排队/两次给入口、谈心多条堆叠均实际点击；英文、去重及学生自己的短提示 | 本条 129 项通过；B7 合计 151 项，15 组真实点击场景，0 失败、0 浏览器异常
 
-公共源码路径在 _src/ 内，均先改源码再重新打包。
-B6-1 为避免提前标记摘要已读，bOpen 保留预约/档案查看日志，摘要的 markViewed 延后到完整摘要显示时执行；摘要弹窗正常显示时仍会记录查看。未改变账号权限。
-B6-2 的种子数据在部分状态不足两行，测试运行时为这些状态补充独立学生夹具；只用于逐行点击覆盖，不写进产品初始数据。原始全部列表也已逐行点击。
+重要提醒按 B7-3 第 5 条执行：老师改时间、婉拒、中心调整/重新安排、同意申请、邀约卡已有完整弹窗时保留完整弹窗，同一事件不再叠卡。老师确认、不同意申请、可选时间入口、初次谈心邀约等没有完整弹窗的更新使用持久卡。其他未读事件的卡不因打开无关弹窗丢失。
+“知道了”关闭提醒卡；消息仍可在首页新消息或消息中心阅读。“查看”复用消息的 link 和原消息打开动作，并标已读。提醒标记依据 S.inbox 的 read，不另记一份未读状态。
+同一页切换两端的使用提示已加入外壳原欢迎说明，没有增加新弹窗。未实现跨浏览器标签页实时同步。
+版本：机构端/build.py、试用版外壳/build.py、自动测试/run_checks.py 的 VER 均为 demo-v2.0；两端版本及外壳左上角版本已核对。
 
-测试通过数（所有脚本均 0 失败、0 浏览器异常）：
-fix_b1.py 144；fix_b2.py 56；fix_b3.py 28；fix_b4.py 77；fix_b5.py 46；fix_b6.py 304。
+最终本地回归（全部 0 失败）：
+fix_b1.py 144；fix_b2.py 56；fix_b3.py 28；fix_b4.py 77；fix_b5.py 46；fix_b6.py 304；fix_b7.py 151。
 run_checks.py 原七个脚本 7/7：adm19.py 37；stu19.py 20；trial_v119.py 6；trial_ik.py 40；trial.py 29；stu_reg.py 108；adm13.py 35。
-本地合计 930 项。日志、逐次点击记录和截图在 验证记录/B6/。
+本地合计 1,081 项。最终统一回归结果在 验证记录/B7/最终回归/回归结果.json，完整日志同目录；逐次点击记录与关键截图在 验证记录/B7/本地点击/。
+测试视口为 1440×1000；B6-3 仍覆盖 1280、1440、1615、1913 四种宽度。
 
-原有测试适配（没有放宽业务断言）：
-1. fix_b1.py 冲突行检查：将 .bkpin [data-act=bOpen] 收窄到 .bkpin button[data-act=bOpen]。新增可点行复用同一动作后，原定位同时匹配行和按钮；仍断言恰好保留一个看学生信息按钮以及改时间、婉拒按钮。
-2. fix_b4.py：独立版文件路径从 v1.19.3-gpt 改为 v1.19.4-gpt，确保测本次新构建；所有原有业务断言不变。
-3. run_checks.py 的 VER 按要求升级为 v1.19.4-gpt。
-运行时沿用本机的回归驱动，仅等待既有 toast 的渲染、清理断言结束后的 Chrome 退出卡顿；未改应用状态或业务断言。复跑可直接用 Python + Playwright 运行各测试脚本。
+原有测试期望适配（未放宽业务断言）：
+1. fix_b4.py 独立机构端产物路径从 v1.19.4-gpt 更新为 demo-v2.0。
+2. fix_b6.py 两处版本断言及相应提示文字更新为 demo-v2.0，仍核对机构端及合并版实际版本。
+3. run_checks.py VER 更新为 demo-v2.0，原七个业务脚本不改。
+沿用 B6 的本机 Chrome 回归驱动：等待既有 toast 重绘后填输入，并只在断言结束后的 Browser.close 卡住时清理自己的驱动进程；不修改应用状态、业务断言或测试结果。
+复跑：python3 _src/机构端/build.py；python3 _src/试用版外壳/build.py；python3 验证记录/B7/运行回归.py（需 Python Playwright 与 Chrome/Chromium）。
 
-干净目录重新打包与交付 index.html 逐字节一致。
-index.html SHA256：c22f24d7d999f1bf80f25063edcdae392ed139346252943e457a0a4af6a2ec58。
+构建复现：最终源码重新打包与通过自测的 index.html 逐字节相同。
+index.html SHA256：94d83e1378dee55a6d9692ab356b5d9acf5f1cf5a28f4a0197fb7ca3b12e027d。
 
-发布状态：已发布，线上验收通过。
-开发功能 HEAD：5cd115bbc90148487aa3b347d581ecaa14278da9；功能后的交付提交只增加验收记录和截图，不改应用源码。
-内测 main 新提交：ef6e2635351ef1d654c35fe38aea41840bee7a28。
-内测 main 仍只有 index.html、README.md、.nojekyll；本次提交只修改 index.html 和 README 当前版本一行。
-Pages 来源为 main / (root)，部署任务 completed / success：
-https://github.com/bardayu-cpu/lingyu-inside-4ayu-000/actions/runs/39555905203
-实际网址返回 HTTP 200，版本 v1.19.4-gpt，线上 HTML SHA256 与通过本地自测的文件相同。
-在线重跑同一个 fix_b6.py：309 项通过、0 失败、0 浏览器脚本异常。其中 B6-1 为 161 项，B6-2 为 113 项，B6-3 为 35 项；比本地多 5 项是每个线上用例的版本号检查。
-线上截图、逐步点击记录、完整日志、Pages 配置与部署结果在 验证记录/B6/线上/，该目录 README.md 可直接查看关键截图。
-代码、源码、测试脚本和全部本轮验收资料均正常推送至 gpt-fix-b6；最终交付分支 HEAD 以 git rev-parse gpt-fix-b6 和对话交付记录为准。
-开发仓库 main、forayu、gpt-fix-b1 到 gpt-fix-b5 的提交号已核对保持原样；本次只推送 gpt-fix-b6。
+发布状态：已发布，两个 Pages 均 built，线上实际点击验收通过。
+旧版留底：demo-v1.11 标签已推送，指向 b0e81e40fb8dde084261436d8da92dbda1e9f100。
+主仓库 main：de4c2cc0dba34a62d6e7073c7bdf19f543a6c87a；仅 index.html、README.md。
+内测仓库 main：162b672f2f82aeee8eb296ffa4bc77a0103af985；仅 index.html、README.md、原有 .nojekyll；README 只改当前版本一行。
+主链接：https://bardayu-cpu.github.io/lingyu-demo-test-1/
 内测链接：https://bardayu-cpu.github.io/lingyu-inside-4ayu-000/
-未生成或发送 ZIP。
+没有生成或发送 ZIP。forayu、gpt-fix-b1 至 gpt-fix-b6、内测 gpt-fix 未作修改；未强推。
+
+线上验收：两个 URL 均 HTTP 200，HTML 的 SHA256 与通过本地自测的文件完全一致。
+主链接与内测链接各在线执行 fix_b7.py --only confirm：各 37 项通过、0 失败、0 浏览器脚本异常。包括后台等 5.5 秒切回、继续停留 3 秒不消失、知道了关闭、查看已读并清除新标记、英文提醒。线上共 74 项。
+另在本对话的内置浏览器主链接实际操作一遍：学生选择李文 10/21 14:00 提交、这次先不用预咨询、回首页、机构端用李文确认、停在机构端 6 秒、切回学生端；现场可见持续提醒、首页新消息和预约“新”。该标签页保留，提醒卡留给 Ayu 查看。
+线上逐步点击与截图：验证记录/B7/线上-主链接/、验证记录/B7/线上-内测/。
+关键线上截图：验证记录/B7/发布/主链接-延迟切回提醒.png、内测-延迟切回提醒.png；现场截图为 主链接-Codex现场截图.png。
+Pages 对应提交及部署结果、线上文件哈希、保留分支核对均在 验证记录/B7/发布/；构建与功能提交信息在 验证记录/B7/构建信息.json。
+最终交付分支 HEAD 请以 git rev-parse gpt-fix-b7 和对话交付的提交号为准（本说明后的记录提交不改源码）。

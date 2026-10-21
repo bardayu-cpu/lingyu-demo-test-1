@@ -1,0 +1,49 @@
+{
+  "version": "demo-v2.0",
+  "base": "aaad38df8b48b6a6de44bc80b55739fb06ba19c8",
+  "bytes": 2655906,
+  "sha256": "94d83e1378dee55a6d9692ab356b5d9acf5f1cf5a28f4a0197fb7ca3b12e027d",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "baseline_expectations_changed": [
+    "fix_b4.py 单独机构端产物路径更新为 demo-v2.0",
+    "fix_b6.py 两处版本断言及相应提示文字更新为 demo-v2.0",
+    "run_checks.py VER 更新为 demo-v2.0"
+  ],
+  "business_assertions_relaxed": false,
+  "rebuild_byte_identical": true,
+  "regression_results": "最终回归/回归结果.json",
+  "feature_head": "cf2e850811466201dd317f8c9426dc970c2392de",
+  "feature_commits": {
+    "B7-1": "44b2fa5",
+    "B7-2": "51eec31",
+    "B7-3": "cf2e850"
+  },
+  "b7_counts": {
+    "B7-1": 13,
+    "B7-2": 9,
+    "B7-3": 129,
+    "total": 151
+  },
+  "local_assertions_passed": 1081,
+  "local_failed": 0,
+  "original_suite_passed": "7/7",
+  "release": {
+    "development_branch": "gpt-fix-b7",
+    "backup_tag": "demo-v1.11",
+    "backup_commit": "b0e81e40fb8dde084261436d8da92dbda1e9f100",
+    "main_commit": "de4c2cc0dba34a62d6e7073c7bdf19f543a6c87a",
+    "inside_commit": "162b672f2f82aeee8eb296ffa4bc77a0103af985",
+    "main_url": "https://bardayu-cpu.github.io/lingyu-demo-test-1/",
+    "inside_url": "https://bardayu-cpu.github.io/lingyu-inside-4ayu-000/",
+    "pages_status": "built",
+    "online_checks_passed": {
+      "主链接": 37,
+      "内测": 37
+    },
+    "online_failed": 0,
+    "actual_codex_browser_roundtrip_verified": true
+  }
+}

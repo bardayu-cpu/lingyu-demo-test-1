@@ -1,0 +1,16 @@
+{
+  "version": "demo-v2.0",
+  "online": {
+    "主链接": 37,
+    "内测": 37
+  },
+  "failed": 0,
+  "browser_errors": 0,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "student_return_delay_ms": 5500,
+  "reminder_visible_after_additional_ms": 3000,
+  "actual_codex_browser_roundtrip": "主链接：申请→李文确认→保持机构端6秒→切回学生首页；卡片、新消息和新标记均可见，保持给Ayu查看。"
+}

@@ -1,0 +1,18 @@
+{
+  "development": {
+    "refs/heads/forayu": "1a1faced5509460310fbd9902703f34f5c4f0ea9",
+    "refs/heads/gpt-fix-b1": "21035d1716bd5fe519ccaf9c61e00236ddbdcb0a",
+    "refs/heads/gpt-fix-b2": "98846186998f6f060a9ae6def0f7c3e78730bcc4",
+    "refs/heads/gpt-fix-b3": "066350147f50ff5d02e1fdeda7e02df1feeaad1c",
+    "refs/heads/gpt-fix-b4": "9263dba446b597d4ab77a51c55f588c4e553691c",
+    "refs/heads/gpt-fix-b5": "28b0cc4d369d48decdd2258f1c7341854126c507",
+    "refs/heads/gpt-fix-b6": "aaad38df8b48b6a6de44bc80b55739fb06ba19c8",
+    "refs/heads/main": "de4c2cc0dba34a62d6e7073c7bdf19f543a6c87a",
+    "refs/tags/demo-v1.11": "b0e81e40fb8dde084261436d8da92dbda1e9f100"
+  },
+  "inside": {
+    "refs/heads/gpt-fix": "d6c74507bcada9553c80107d72a8d1e967e439bc",
+    "refs/heads/main": "162b672f2f82aeee8eb296ffa4bc77a0103af985"
+  },
+  "protected_development_branches_unchanged": true
+}

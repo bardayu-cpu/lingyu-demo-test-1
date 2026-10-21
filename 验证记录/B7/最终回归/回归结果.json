@@ -1,0 +1,68 @@
+[
+  {
+    "script": "fix_b1.py",
+    "exit": 0,
+    "summary": [
+      "fix_b1: 144 passed, 0 failed"
+    ]
+  },
+  {
+    "script": "fix_b2.py",
+    "exit": 0,
+    "summary": [
+      "fix_b2: 56 passed, 0 failed"
+    ]
+  },
+  {
+    "script": "fix_b3.py",
+    "exit": 0,
+    "summary": [
+      "fix_b3: 28 passed, 0 failed"
+    ]
+  },
+  {
+    "script": "fix_b4.py",
+    "exit": 0,
+    "summary": [
+      "fix_b4: 77 passed, 0 failed"
+    ]
+  },
+  {
+    "script": "fix_b5.py",
+    "exit": 0,
+    "summary": [
+      "fix_b5: 46 passed, 0 failed"
+    ]
+  },
+  {
+    "script": "fix_b6.py",
+    "exit": 0,
+    "summary": [
+      "fix_b6: 304 passed, 0 failed"
+    ]
+  },
+  {
+    "script": "fix_b7.py",
+    "exit": 0,
+    "summary": [
+      "fix_b7: 151 passed, 0 failed"
+    ]
+  },
+  {
+    "script": "run_checks.py",
+    "exit": 0,
+    "summary": [
+      "adm19: 37 passed, 0 failed, errors 0",
+      "RESULT adm19.py: 37 passed, 0 failed, 0 browser errors",
+      "stu19: 20 passed, 0 failed, errors 0",
+      "RESULT stu19.py: 20 passed, 0 failed, 0 browser errors",
+      "trial_v119: 6 passed, 0 failed, errors 0",
+      "RESULT trial_v119.py: 6 passed, 0 failed, 0 browser errors",
+      "RESULT trial_ik.py: 40 passed, 0 failed, 0 browser errors",
+      "RESULT trial.py: 29 passed, 0 failed, 0 browser errors",
+      "RESULT stu_reg.py: 108 passed, 0 failed, 0 browser errors",
+      "RESULT adm13.py: 35 passed, 0 failed, 0 browser errors",
+      "SUITE: 7/7 passed"
+    ]
+  }
+]

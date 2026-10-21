@@ -1,0 +1,415 @@
+PASS B7-1-首页新消息 原使用说明标注同页切换要求
+PASS B7-1-首页新消息 两端和外壳均为 demo-v2.0
+PASS B7-1-首页新消息 初始两条未读在首页显示
+PASS B7-1-首页新消息 新消息紧接问候语，排在我的待办前
+CLICK B7-1-首页新消息 演示产生任务提醒
+CLICK B7-1-首页新消息 演示产生任务提醒
+CLICK B7-1-首页新消息 演示产生任务提醒
+PASS B7-1-首页新消息 五条未读只列最新三条
+PASS B7-1-首页新消息 剩余条数准确
+PASS B7-1-首页新消息 每条有图标、标题、相对时间
+CLICK B7-1-首页新消息 「2026 秋季学期心理健康普测」还剩 2 天截止
+刚刚
+PASS B7-1-首页新消息 点击同一条消息标已读并跳到对应任务
+CLICK B7-1-首页新消息 个人中心
+PASS B7-1-首页新消息 回首页后按剩余未读更新
+CLICK B7-1-首页新消息 中
+/ EN
+PASS B7-1-首页新消息 英文标题、溢出条数和相对时间完整
+CLICK B7-1-首页新消息 1 more · View all
+PASS B7-1-首页新消息 查看全部进入消息中心
+CLICK B7-1-首页新消息 Mark all as read
+CLICK B7-1-首页新消息 My space
+PASS B7-1-首页新消息 全部读完后整块消失且不留占位
+PASS B7-1-首页新消息 无浏览器脚本异常 []
+PASS B7-2-预约邀约新标记 原使用说明标注同页切换要求
+PASS B7-2-预约邀约新标记 两端和外壳均为 demo-v2.0
+CLICK B7-2-预约邀约新标记 21
+CLICK B7-2-预约邀约新标记 14:00
+CLICK B7-2-预约邀约新标记 提交预约申请
+CLICK B7-2-预约邀约新标记 这次先不用
+CLICK B7-2-预约邀约新标记 个人中心
+CLICK B7-2-预约邀约新标记 确认
+PASS B7-2-预约邀约新标记 老师确认后预约待办显示新
+CLICK B7-2-预约邀约新标记 点预约待办标题打开
+PASS B7-2-预约邀约新标记 打开预约行即读对应消息并进入我的预约
+CLICK B7-2-预约邀约新标记 个人中心
+PASS B7-2-预约邀约新标记 返回首页新标记消失
+CLICK B7-2-预约邀约新标记 ⚡ 演示 · 收到心理中心的邀约卡
+CLICK B7-2-预约邀约新标记 
+PASS B7-2-预约邀约新标记 未读邀约卡也标新
+CLICK B7-2-预约邀约新标记 中
+/ EN
+PASS B7-2-预约邀约新标记 英文新标记
+CLICK B7-2-预约邀约新标记 3
+CLICK B7-2-预约邀约新标记 在消息中心打开邀约消息
+CLICK B7-2-预约邀约新标记 
+CLICK B7-2-预约邀约新标记 My space
+PASS B7-2-预约邀约新标记 从消息中心阅读后邀约新标记同步消失
+PASS B7-2-预约邀约新标记 无浏览器脚本异常 []
+PASS B7-3-后台确认-dismiss-中文 原使用说明标注同页切换要求
+PASS B7-3-后台确认-dismiss-中文 两端和外壳均为 demo-v2.0
+CLICK B7-3-后台确认-dismiss-中文 21
+CLICK B7-3-后台确认-dismiss-中文 14:00
+CLICK B7-3-后台确认-dismiss-中文 提交预约申请
+CLICK B7-3-后台确认-dismiss-中文 这次先不用
+CLICK B7-3-后台确认-dismiss-中文 个人中心
+CLICK B7-3-后台确认-dismiss-中文 确认
+PASS B7-3-后台确认-dismiss-中文 机构端显示时尚未渲染学生提醒卡
+PASS B7-3-后台确认-dismiss-中文 超过短提示时长后后台仍保留重要提醒
+PASS B7-3-后台确认-dismiss-中文 切回后恰好一张确认提醒，没有重复整页弹窗
+PASS B7-3-后台确认-dismiss-中文 老师确认不再使用 2.4 秒短提示
+PASS B7-3-后台确认-dismiss-中文 首页新消息和预约新标记同时出现
+PASS B7-3-后台确认-dismiss-中文 学生端等待三秒后提醒仍持续显示
+CLICK B7-3-后台确认-dismiss-中文 知道了
+PASS B7-3-后台确认-dismiss-中文 知道了仅关闭提醒卡，消息中心仍保留未读
+CLICK B7-3-后台确认-dismiss-中文 ⚡ 演示 · 现在：有号
+PASS B7-3-后台确认-dismiss-中文 学生自己的操作仍使用短提示
+PASS B7-3-后台确认-dismiss-中文 学生操作短提示照旧自动消失
+PASS B7-3-后台确认-dismiss-中文 无浏览器脚本异常 []
+PASS B7-3-后台确认-view-中文 原使用说明标注同页切换要求
+PASS B7-3-后台确认-view-中文 两端和外壳均为 demo-v2.0
+CLICK B7-3-后台确认-view-中文 21
+CLICK B7-3-后台确认-view-中文 14:00
+CLICK B7-3-后台确认-view-中文 提交预约申请
+CLICK B7-3-后台确认-view-中文 这次先不用
+CLICK B7-3-后台确认-view-中文 个人中心
+CLICK B7-3-后台确认-view-中文 确认
+PASS B7-3-后台确认-view-中文 机构端显示时尚未渲染学生提醒卡
+PASS B7-3-后台确认-view-中文 超过短提示时长后后台仍保留重要提醒
+PASS B7-3-后台确认-view-中文 切回后恰好一张确认提醒，没有重复整页弹窗
+PASS B7-3-后台确认-view-中文 老师确认不再使用 2.4 秒短提示
+PASS B7-3-后台确认-view-中文 首页新消息和预约新标记同时出现
+PASS B7-3-后台确认-view-中文 学生端等待三秒后提醒仍持续显示
+CLICK B7-3-后台确认-view-中文 查看
+PASS B7-3-后台确认-view-中文 提醒查看进入我的预约并标记对应消息已读
+PASS B7-3-后台确认-view-中文 查看后提醒卡关闭
+CLICK B7-3-后台确认-view-中文 个人中心
+PASS B7-3-后台确认-view-中文 提醒查看后首页预约新标记消失
+PASS B7-3-后台确认-view-中文 无浏览器脚本异常 []
+PASS B7-3-后台确认-view-英文 原使用说明标注同页切换要求
+PASS B7-3-后台确认-view-英文 两端和外壳均为 demo-v2.0
+CLICK B7-3-后台确认-view-英文 21
+CLICK B7-3-后台确认-view-英文 14:00
+CLICK B7-3-后台确认-view-英文 提交预约申请
+CLICK B7-3-后台确认-view-英文 这次先不用
+CLICK B7-3-后台确认-view-英文 个人中心
+CLICK B7-3-后台确认-view-英文 中
+/ EN
+CLICK B7-3-后台确认-view-英文 确认
+PASS B7-3-后台确认-view-英文 机构端显示时尚未渲染学生提醒卡
+PASS B7-3-后台确认-view-英文 超过短提示时长后后台仍保留重要提醒
+PASS B7-3-后台确认-view-英文 切回后恰好一张确认提醒，没有重复整页弹窗
+PASS B7-3-后台确认-view-英文 老师确认不再使用 2.4 秒短提示
+PASS B7-3-后台确认-view-英文 首页新消息和预约新标记同时出现
+PASS B7-3-后台确认-view-英文 学生端等待三秒后提醒仍持续显示
+PASS B7-3-后台确认-view-英文 英文提醒标题、详情和两个按钮均无中文
+CLICK B7-3-后台确认-view-英文 View
+PASS B7-3-后台确认-view-英文 提醒查看进入我的预约并标记对应消息已读
+PASS B7-3-后台确认-view-英文 查看后提醒卡关闭
+CLICK B7-3-后台确认-view-英文 My space
+PASS B7-3-后台确认-view-英文 提醒查看后首页预约新标记消失
+PASS B7-3-后台确认-view-英文 无浏览器脚本异常 []
+PASS B7-3-预咨询欢迎窗未关闭时收到确认 原使用说明标注同页切换要求
+PASS B7-3-预咨询欢迎窗未关闭时收到确认 两端和外壳均为 demo-v2.0
+CLICK B7-3-预咨询欢迎窗未关闭时收到确认 21
+CLICK B7-3-预咨询欢迎窗未关闭时收到确认 14:00
+CLICK B7-3-预咨询欢迎窗未关闭时收到确认 提交预约申请
+PASS B7-3-预咨询欢迎窗未关闭时收到确认 提交后保留原有预咨询欢迎窗，不先关闭
+CLICK B7-3-预咨询欢迎窗未关闭时收到确认 确认
+PASS B7-3-预咨询欢迎窗未关闭时收到确认 切回后确认卡立即可见，原预咨询欢迎窗保留
+PASS B7-3-预咨询欢迎窗未关闭时收到确认 确认卡按钮实际位于欢迎窗遮罩之上，可以点击
+CLICK B7-3-预咨询欢迎窗未关闭时收到确认 知道了
+PASS B7-3-预咨询欢迎窗未关闭时收到确认 知道了只关闭提醒，仍可继续原预咨询
+CLICK B7-3-预咨询欢迎窗未关闭时收到确认 这次先不用
+PASS B7-3-预咨询欢迎窗未关闭时收到确认 跳过预咨询后预约确认状态保持
+PASS B7-3-预咨询欢迎窗未关闭时收到确认 无浏览器脚本异常 []
+PASS B7-3-已有完整弹窗-move 原使用说明标注同页切换要求
+PASS B7-3-已有完整弹窗-move 两端和外壳均为 demo-v2.0
+CLICK B7-3-已有完整弹窗-move 21
+CLICK B7-3-已有完整弹窗-move 14:00
+CLICK B7-3-已有完整弹窗-move 提交预约申请
+CLICK B7-3-已有完整弹窗-move 这次先不用
+CLICK B7-3-已有完整弹窗-move 个人中心
+CLICK B7-3-已有完整弹窗-move 中
+/ EN
+CLICK B7-3-已有完整弹窗-move 改时间
+PASS B7-3-已有完整弹窗-move 打开只列日期，尚无时段或确认按钮
+CLICK B7-3-已有完整弹窗-move 10/19 周一 · 3 个
+PASS B7-3-已有完整弹窗-move 仅选日期时仍无确认按钮
+CLICK B7-3-已有完整弹窗-move 09:00
+CLICK B7-3-已有完整弹窗-move 发送新时间，等学生确认
+PASS B7-3-已有完整弹窗-move 延迟切回保留既有完整弹窗，不给同一事件重复提醒卡
+PASS B7-3-已有完整弹窗-move 重要事件没有短提示
+PASS B7-3-已有完整弹窗-move 改时间说明学生需要接受
+CLICK B7-3-已有完整弹窗-move Accept new time
+PASS B7-3-已有完整弹窗-move 学生接受新时间后两端确认
+PASS B7-3-已有完整弹窗-move 处理整页弹窗后不补一张同事件提醒卡
+PASS B7-3-已有完整弹窗-move 无浏览器脚本异常 []
+PASS B7-3-已有完整弹窗-decline 原使用说明标注同页切换要求
+PASS B7-3-已有完整弹窗-decline 两端和外壳均为 demo-v2.0
+CLICK B7-3-已有完整弹窗-decline 21
+CLICK B7-3-已有完整弹窗-decline 14:00
+CLICK B7-3-已有完整弹窗-decline 提交预约申请
+CLICK B7-3-已有完整弹窗-decline 这次先不用
+CLICK B7-3-已有完整弹窗-decline 个人中心
+CLICK B7-3-已有完整弹窗-decline 中
+/ EN
+CLICK B7-3-已有完整弹窗-decline 婉拒
+CLICK B7-3-已有完整弹窗-decline 时段冲突
+CLICK B7-3-已有完整弹窗-decline 婉拒
+PASS B7-3-已有完整弹窗-decline 延迟切回保留既有完整弹窗，不给同一事件重复提醒卡
+PASS B7-3-已有完整弹窗-decline 重要事件没有短提示
+PASS B7-3-已有完整弹窗-decline 婉拒完整弹窗保留老师留言
+CLICK B7-3-已有完整弹窗-decline Book again
+PASS B7-3-已有完整弹窗-decline 婉拒后可以继续选时间
+PASS B7-3-已有完整弹窗-decline 处理整页弹窗后不补一张同事件提醒卡
+PASS B7-3-已有完整弹窗-decline 无浏览器脚本异常 []
+PASS B7-3-已有完整弹窗-rearr 原使用说明标注同页切换要求
+PASS B7-3-已有完整弹窗-rearr 两端和外壳均为 demo-v2.0
+CLICK B7-3-已有完整弹窗-rearr 21
+CLICK B7-3-已有完整弹窗-rearr 14:00
+CLICK B7-3-已有完整弹窗-rearr 提交预约申请
+CLICK B7-3-已有完整弹窗-rearr 这次先不用
+CLICK B7-3-已有完整弹窗-rearr 个人中心
+CLICK B7-3-已有完整弹窗-rearr 中
+/ EN
+CLICK B7-3-已有完整弹窗-rearr 确认
+CLICK B7-3-已有完整弹窗-rearr View
+CLICK B7-3-已有完整弹窗-rearr My space
+CLICK B7-3-已有完整弹窗-rearr 排班表
+CLICK B7-3-已有完整弹窗-rearr 登记一次
+CLICK B7-3-已有完整弹窗-rearr 李文
+CLICK B7-3-已有完整弹窗-rearr 病假停诊
+CLICK B7-3-已有完整弹窗-rearr 10/21 周三
+CLICK B7-3-已有完整弹窗-rearr 全天
+CLICK B7-3-已有完整弹窗-rearr 登记
+PASS B7-3-已有完整弹窗-rearr 中心调整保留完整英文弹窗，不叠提醒卡
+CLICK B7-3-已有完整弹窗-rearr Got it
+CLICK B7-3-已有完整弹窗-rearr My space
+CLICK B7-3-已有完整弹窗-rearr 人工咨询
+1
+CLICK B7-3-已有完整弹窗-rearr 中心调整
+1
+CLICK B7-3-已有完整弹窗-rearr 改时间
+PASS B7-3-已有完整弹窗-rearr 打开只列日期，尚无时段或确认按钮
+CLICK B7-3-已有完整弹窗-rearr 10/19 周一 · 3 个
+PASS B7-3-已有完整弹窗-rearr 仅选日期时仍无确认按钮
+CLICK B7-3-已有完整弹窗-rearr 09:00
+CLICK B7-3-已有完整弹窗-rearr 发送新时间，等学生确认
+PASS B7-3-已有完整弹窗-rearr 延迟切回保留既有完整弹窗，不给同一事件重复提醒卡
+PASS B7-3-已有完整弹窗-rearr 重要事件没有短提示
+PASS B7-3-已有完整弹窗-rearr 重新安排明确告诉学生新时间
+CLICK B7-3-已有完整弹窗-rearr Accept new time
+PASS B7-3-已有完整弹窗-rearr 接受重新安排后病假日仍关闭
+PASS B7-3-已有完整弹窗-rearr 处理整页弹窗后不补一张同事件提醒卡
+PASS B7-3-已有完整弹窗-rearr 无浏览器脚本异常 []
+PASS B7-3-cancel-不同意 原使用说明标注同页切换要求
+PASS B7-3-cancel-不同意 两端和外壳均为 demo-v2.0
+CLICK B7-3-cancel-不同意 21
+CLICK B7-3-cancel-不同意 14:00
+CLICK B7-3-cancel-不同意 提交预约申请
+CLICK B7-3-cancel-不同意 这次先不用
+CLICK B7-3-cancel-不同意 个人中心
+CLICK B7-3-cancel-不同意 中
+/ EN
+CLICK B7-3-cancel-不同意 确认
+CLICK B7-3-cancel-不同意 View
+CLICK B7-3-cancel-不同意 Cancel
+CLICK B7-3-cancel-不同意 Cancel appointment
+CLICK B7-3-cancel-不同意 My space
+CLICK B7-3-cancel-不同意 改期 / 取消申请
+1
+CLICK B7-3-cancel-不同意 不同意
+CLICK B7-3-cancel-不同意 发送
+PASS B7-3-cancel-不同意 申请结果不使用短提示
+PASS B7-3-cancel-不同意 不同意结果延迟切回后显示英文持久提醒
+CLICK B7-3-cancel-不同意 View
+PASS B7-3-cancel-不同意 结果入口进入我的预约并已读
+PASS B7-3-cancel-不同意 无浏览器脚本异常 []
+PASS B7-3-cancel-同意 原使用说明标注同页切换要求
+PASS B7-3-cancel-同意 两端和外壳均为 demo-v2.0
+CLICK B7-3-cancel-同意 21
+CLICK B7-3-cancel-同意 14:00
+CLICK B7-3-cancel-同意 提交预约申请
+CLICK B7-3-cancel-同意 这次先不用
+CLICK B7-3-cancel-同意 个人中心
+CLICK B7-3-cancel-同意 中
+/ EN
+CLICK B7-3-cancel-同意 确认
+CLICK B7-3-cancel-同意 View
+CLICK B7-3-cancel-同意 Cancel
+CLICK B7-3-cancel-同意 Cancel appointment
+CLICK B7-3-cancel-同意 My space
+CLICK B7-3-cancel-同意 改期 / 取消申请
+1
+CLICK B7-3-cancel-同意 同意
+PASS B7-3-cancel-同意 申请结果不使用短提示
+PASS B7-3-cancel-同意 同意结果保留完整弹窗，没有重复卡片
+PASS B7-3-cancel-同意 同意弹窗使用英文
+CLICK B7-3-cancel-同意 Got it
+PASS B7-3-cancel-同意 未读的同意结果在待办标新，取消后仍能找到结果
+CLICK B7-3-cancel-同意 Cancellation approved New
+Your appointment has been cancelled
+PASS B7-3-cancel-同意 结果入口进入我的预约并已读
+PASS B7-3-cancel-同意 无浏览器脚本异常 []
+PASS B7-3-resch-不同意 原使用说明标注同页切换要求
+PASS B7-3-resch-不同意 两端和外壳均为 demo-v2.0
+CLICK B7-3-resch-不同意 21
+CLICK B7-3-resch-不同意 14:00
+CLICK B7-3-resch-不同意 提交预约申请
+CLICK B7-3-resch-不同意 这次先不用
+CLICK B7-3-resch-不同意 个人中心
+CLICK B7-3-resch-不同意 中
+/ EN
+CLICK B7-3-resch-不同意 确认
+CLICK B7-3-resch-不同意 View
+CLICK B7-3-resch-不同意 Reschedule
+CLICK B7-3-resch-不同意 Reschedule
+CLICK B7-3-resch-不同意 14 Oct Wed · 3 slots
+CLICK B7-3-resch-不同意 10:30
+CLICK B7-3-resch-不同意 Request this new time
+CLICK B7-3-resch-不同意 View my appointments
+CLICK B7-3-resch-不同意 My space
+CLICK B7-3-resch-不同意 改期 / 取消申请
+1
+CLICK B7-3-resch-不同意 不同意
+CLICK B7-3-resch-不同意 发送
+PASS B7-3-resch-不同意 申请结果不使用短提示
+PASS B7-3-resch-不同意 不同意结果延迟切回后显示英文持久提醒
+CLICK B7-3-resch-不同意 View
+PASS B7-3-resch-不同意 结果入口进入我的预约并已读
+PASS B7-3-resch-不同意 无浏览器脚本异常 []
+PASS B7-3-resch-同意 原使用说明标注同页切换要求
+PASS B7-3-resch-同意 两端和外壳均为 demo-v2.0
+CLICK B7-3-resch-同意 21
+CLICK B7-3-resch-同意 14:00
+CLICK B7-3-resch-同意 提交预约申请
+CLICK B7-3-resch-同意 这次先不用
+CLICK B7-3-resch-同意 个人中心
+CLICK B7-3-resch-同意 中
+/ EN
+CLICK B7-3-resch-同意 确认
+CLICK B7-3-resch-同意 View
+CLICK B7-3-resch-同意 Reschedule
+CLICK B7-3-resch-同意 Reschedule
+CLICK B7-3-resch-同意 14 Oct Wed · 3 slots
+CLICK B7-3-resch-同意 10:30
+CLICK B7-3-resch-同意 Request this new time
+CLICK B7-3-resch-同意 View my appointments
+CLICK B7-3-resch-同意 My space
+CLICK B7-3-resch-同意 改期 / 取消申请
+1
+CLICK B7-3-resch-同意 同意
+PASS B7-3-resch-同意 申请结果不使用短提示
+PASS B7-3-resch-同意 同意结果保留完整弹窗，没有重复卡片
+PASS B7-3-resch-同意 同意弹窗使用英文
+CLICK B7-3-resch-同意 Got it
+PASS B7-3-resch-同意 未读的同意结果在待办标新，取消后仍能找到结果
+CLICK B7-3-resch-同意 Counselling · Intake New Confirmed
+Li Wen, Time Wed 14 Oct 10:30
+PASS B7-3-resch-同意 结果入口进入我的预约并已读
+PASS B7-3-resch-同意 无浏览器脚本异常 []
+PASS B7-3-邀约卡与选时间入口 原使用说明标注同页切换要求
+PASS B7-3-邀约卡与选时间入口 两端和外壳均为 demo-v2.0
+CLICK B7-3-邀约卡与选时间入口 中
+/ EN
+CLICK B7-3-邀约卡与选时间入口 只发 4 级及以上（1）
+CLICK B7-3-邀约卡与选时间入口 确认发送
+PASS B7-3-邀约卡与选时间入口 收到邀约卡保留完整英文卡片，不重复出提醒
+CLICK B7-3-邀约卡与选时间入口 
+CLICK B7-3-邀约卡与选时间入口 ⚡ Demo: slots available
+CLICK B7-3-邀约卡与选时间入口 View
+CLICK B7-3-邀约卡与选时间入口 Accept
+CLICK B7-3-邀约卡与选时间入口 Academic stress
+CLICK B7-3-邀约卡与选时间入口 Next →
+CLICK B7-3-邀约卡与选时间入口 Next →
+CLICK B7-3-邀约卡与选时间入口 A week or two
+CLICK B7-3-邀约卡与选时间入口 I can manage
+CLICK B7-3-邀约卡与选时间入口 Not really
+CLICK B7-3-邀约卡与选时间入口 Yes
+CLICK B7-3-邀约卡与选时间入口 Someone to listen
+CLICK B7-3-邀约卡与选时间入口 Done →
+PASS B7-3-邀约卡与选时间入口 逐题完成预咨询并进入摘要确认
+CLICK B7-3-邀约卡与选时间入口 
+CLICK B7-3-邀约卡与选时间入口 Send to counsellor
+CLICK B7-3-邀约卡与选时间入口 OK
+CLICK B7-3-邀约卡与选时间入口 给入口
+CLICK B7-3-邀约卡与选时间入口 确认给入口
+PASS B7-3-邀约卡与选时间入口 入口在机构端操作时先等待切回
+PASS B7-3-邀约卡与选时间入口 新入口持久提醒为完整英文
+PASS B7-3-邀约卡与选时间入口 入口更新对应的邀约待办标新
+CLICK B7-3-邀约卡与选时间入口 View
+PASS B7-3-邀约卡与选时间入口 入口查看跳到选时间并读对应消息
+CLICK B7-3-邀约卡与选时间入口 None of these work? Tell us when suits you
+CLICK B7-3-邀约卡与选时间入口 Morning
+CLICK B7-3-邀约卡与选时间入口 Afternoon
+CLICK B7-3-邀约卡与选时间入口 Evening
+CLICK B7-3-邀约卡与选时间入口 Morning
+PASS B7-3-邀约卡与选时间入口 学生最多选三项提示仍为英文短提示
+CLICK B7-3-邀约卡与选时间入口 Send
+CLICK B7-3-邀约卡与选时间入口 给入口
+CLICK B7-3-邀约卡与选时间入口 确认给入口
+PASS B7-3-邀约卡与选时间入口 入口在机构端操作时先等待切回
+PASS B7-3-邀约卡与选时间入口 新入口持久提醒为完整英文
+PASS B7-3-邀约卡与选时间入口 入口更新对应的邀约待办标新
+CLICK B7-3-邀约卡与选时间入口 View
+PASS B7-3-邀约卡与选时间入口 入口查看跳到选时间并读对应消息
+CLICK B7-3-邀约卡与选时间入口 My space
+PASS B7-3-邀约卡与选时间入口 读过入口消息后邀约新标记消失
+PASS B7-3-邀约卡与选时间入口 无浏览器脚本异常 []
+PASS B7-3-谈心多条提醒堆叠 原使用说明标注同页切换要求
+PASS B7-3-谈心多条提醒堆叠 两端和外壳均为 demo-v2.0
+CLICK B7-3-谈心多条提醒堆叠 谈心任务总览
+CLICK B7-3-谈心多条提醒堆叠 手动建任务
+CLICK B7-3-谈心多条提醒堆叠 林晓 · 计算与数据科学学院
+CLICK B7-3-谈心多条提醒堆叠 7 天内
+CLICK B7-3-谈心多条提醒堆叠 建任务
+CLICK B7-3-谈心多条提醒堆叠 待谈心（16）
+CLICK B7-3-谈心多条提醒堆叠 在待谈心名单选择林晓
+CLICK B7-3-谈心多条提醒堆叠 发邀约
+CLICK B7-3-谈心多条提醒堆叠 10/14 周三
+CLICK B7-3-谈心多条提醒堆叠 发出邀约
+CLICK B7-3-谈心多条提醒堆叠 已约（2）
+CLICK B7-3-谈心多条提醒堆叠 取消
+CLICK B7-3-谈心多条提醒堆叠 待谈心（16）
+CLICK B7-3-谈心多条提醒堆叠 在待谈心名单选择林晓
+CLICK B7-3-谈心多条提醒堆叠 发邀约
+CLICK B7-3-谈心多条提醒堆叠 10/14 周三
+CLICK B7-3-谈心多条提醒堆叠 发出邀约
+CLICK B7-3-谈心多条提醒堆叠 已约（2）
+CLICK B7-3-谈心多条提醒堆叠 取消
+PASS B7-3-谈心多条提醒堆叠 四条谈心更新只叠三张，多余一条有提示
+CLICK B7-3-谈心多条提醒堆叠 中
+/ EN
+PASS B7-3-谈心多条提醒堆叠 英文溢出提示
+CLICK B7-3-谈心多条提醒堆叠 Got it
+PASS B7-3-谈心多条提醒堆叠 知道了后补上等候的第四条，没有丢失
+PASS B7-3-谈心多条提醒堆叠 堆叠谈心提醒切英文后没有中文
+CLICK B7-3-谈心多条提醒堆叠 View
+PASS B7-3-谈心多条提醒堆叠 谈心查看打开对应邀约，对应提醒卡已关闭
+PASS B7-3-谈心多条提醒堆叠 多次插入新消息后查看仍定位卡片对应的谈心邀约
+PASS B7-3-谈心多条提醒堆叠 谈心查看标记对应消息已读
+CLICK B7-3-谈心多条提醒堆叠 Got it
+CLICK B7-3-谈心多条提醒堆叠 Got it
+CLICK B7-3-谈心多条提醒堆叠 Got it
+CLICK B7-3-谈心多条提醒堆叠 待谈心（16）
+CLICK B7-3-谈心多条提醒堆叠 林晓
+2
+日常关注
+10/19 前
+U2620318A · 计算与数据科学学院 · 大二
+新分给你
+CLICK B7-3-谈心多条提醒堆叠 发邀约
+CLICK B7-3-谈心多条提醒堆叠 10/14 周三
+CLICK B7-3-谈心多条提醒堆叠 发出邀约
+CLICK B7-3-谈心多条提醒堆叠 View
+CLICK B7-3-谈心多条提醒堆叠 已约（2）
+CLICK B7-3-谈心多条提醒堆叠 改时间
+CLICK B7-3-谈心多条提醒堆叠 10/15 周四
+CLICK B7-3-谈心多条提醒堆叠 更新并通知学生
+PASS B7-3-谈心多条提醒堆叠 学生已打开的谈心弹窗收到改时更新，也不排入重复提醒卡
+CLICK B7-3-谈心多条提醒堆叠 关闭谈心弹窗
+PASS B7-3-谈心多条提醒堆叠 关掉更新后的谈心弹窗不会补出同事件卡片
+PASS B7-3-谈心多条提醒堆叠 无浏览器脚本异常 []
+fix_b7: 151 passed, 0 failed

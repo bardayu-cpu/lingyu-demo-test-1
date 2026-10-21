@@ -1,0 +1,169 @@
+CLICK B2-1-普通申请 21
+CLICK B2-1-普通申请 14:00
+CLICK B2-1-普通申请 提交预约申请
+CLICK B2-1-普通申请 改时间
+PASS B2-1-普通申请 打开只列日期，尚无时段或确认按钮
+CLICK B2-1-普通申请 10/19 周一 · 3 个
+PASS B2-1-普通申请 仅选日期时仍无确认按钮
+CLICK B2-1-普通申请 09:00
+CLICK B2-1-普通申请 发送新时间，等学生确认
+PASS B2-1-普通申请 老师提出时间后未提前确认
+PASS B2-1-普通申请 等待学生确认的行只留学生信息
+CLICK B2-1-普通申请 关闭老师改约通知
+CLICK B2-1-普通申请 打开我的预约
+PASS B2-1-普通申请 预约卡不再提示不用操作
+CLICK B2-1-普通申请 接受新时间
+PASS B2-1-普通申请 学生接受后双端已确认
+PASS B2-1-普通申请 老师收到接受通知
+CLICK B2-1-普通申请 改期
+CLICK B2-1-普通申请 确定改期
+PASS B2-1-普通申请 学生改期也先列日期
+CLICK B2-1-普通申请 10 月 13 日 周二 · 4 个
+PASS B2-1-普通申请 选择日期后才显示当天时段
+PASS B2-1-普通申请 无浏览器脚本异常 []
+CLICK B2-1-中心调整 21
+CLICK B2-1-中心调整 14:00
+CLICK B2-1-中心调整 提交预约申请
+CLICK B2-1-中心调整 确认
+CLICK B2-1-中心调整 排班表
+CLICK B2-1-中心调整 登记一次
+CLICK B2-1-中心调整 李文
+CLICK B2-1-中心调整 病假停诊
+CLICK B2-1-中心调整 10/21 周三
+CLICK B2-1-中心调整 全天
+CLICK B2-1-中心调整 登记
+CLICK B2-1-中心调整 人工咨询
+1
+CLICK B2-1-中心调整 中心调整
+1
+CLICK B2-1-中心调整 改时间
+PASS B2-1-中心调整 打开只列日期，尚无时段或确认按钮
+CLICK B2-1-中心调整 10/19 周一 · 3 个
+PASS B2-1-中心调整 仅选日期时仍无确认按钮
+CLICK B2-1-中心调整 09:00
+CLICK B2-1-中心调整 发送新时间，等学生确认
+PASS B2-1-中心调整 老师提出时间后未提前确认
+PASS B2-1-中心调整 等待学生确认的行只留学生信息
+PASS B2-1-中心调整 中心调整通知说明接受动作
+CLICK B2-1-中心调整 接受新时间
+PASS B2-1-中心调整 学生接受后双端已确认
+PASS B2-1-中心调整 老师收到接受通知
+PASS B2-1-中心调整 接受后原病假日四格仍关闭
+CLICK B2-1-中心调整 改期
+CLICK B2-1-中心调整 确定改期
+PASS B2-1-中心调整 学生改期也先列日期
+CLICK B2-1-中心调整 10 月 13 日 周二 · 4 个
+PASS B2-1-中心调整 选择日期后才显示当天时段
+PASS B2-1-中心调整 无浏览器脚本异常 []
+CLICK B2-2-邀约婉拒后重选 ⚡ 演示 · 收到心理中心的邀约卡
+CLICK B2-2-邀约婉拒后重选 接受
+CLICK B2-2-邀约婉拒后重选 学业压力
+CLICK B2-2-邀约婉拒后重选 下一题 →
+CLICK B2-2-邀约婉拒后重选 下一题 →
+CLICK B2-2-邀约婉拒后重选 一两周
+CLICK B2-2-邀约婉拒后重选 还好，能应付
+CLICK B2-2-邀约婉拒后重选 没什么变化
+CLICK B2-2-邀约婉拒后重选 有
+CLICK B2-2-邀约婉拒后重选 想有人听我说说
+CLICK B2-2-邀约婉拒后重选 完成 →
+PASS B2-2-邀约婉拒后重选 逐题完成预咨询并进入摘要确认
+CLICK B2-2-邀约婉拒后重选 
+CLICK B2-2-邀约婉拒后重选 确认发给老师
+CLICK B2-2-邀约婉拒后重选 21
+CLICK B2-2-邀约婉拒后重选 14:00
+CLICK B2-2-邀约婉拒后重选 提交预约申请
+CLICK B2-2-邀约婉拒后重选 婉拒
+CLICK B2-2-邀约婉拒后重选 时段冲突
+CLICK B2-2-邀约婉拒后重选 婉拒
+PASS B2-2-邀约婉拒后重选 弹窗显示实际原因和老师的话
+PASS B2-2-邀约婉拒后重选 站内信也保留老师的话
+PASS B2-2-邀约婉拒后重选 婉拒保留原入口期限
+CLICK B2-2-邀约婉拒后重选 选时间
+PASS B2-2-邀约婉拒后重选 通知按钮返回有效的选时入口
+CLICK B2-2-邀约婉拒后重选 个人中心
+PASS B2-2-邀约婉拒后重选 首页重新出现选时间入口
+PASS B2-2-邀约婉拒后重选 无浏览器脚本异常 []
+CLICK B2-3-草稿隐私 21
+CLICK B2-3-草稿隐私 14:00
+CLICK B2-3-草稿隐私 提交预约申请
+CLICK B2-3-草稿隐私 好的，开始（约 3 分钟）
+CLICK B2-3-草稿隐私 学业压力
+CLICK B2-3-草稿隐私 下一题 →
+CLICK B2-3-草稿隐私 
+CLICK B2-3-草稿隐私 先保存，稍后继续
+PASS B2-3-草稿隐私 学生本地仍保存有内容的草稿
+PASS B2-3-草稿隐私 老师端预约不含草稿摘要
+CLICK B2-3-草稿隐私 AI 预咨询
+PASS B2-3-草稿隐私 草稿行显示状态且无摘要按钮
+PASS B2-3-草稿隐私 接收端也丢弃直接传入的草稿内容
+CLICK B2-3-草稿隐私 继续填写
+CLICK B2-3-草稿隐私 下一题 →
+CLICK B2-3-草稿隐私 一两周
+CLICK B2-3-草稿隐私 还好，能应付
+CLICK B2-3-草稿隐私 想有人听我说说
+CLICK B2-3-草稿隐私 完成 →
+PASS B2-3-草稿隐私 逐题完成预咨询并进入摘要确认
+CLICK B2-3-草稿隐私 
+CLICK B2-3-草稿隐私 确认发给老师
+CLICK B2-3-草稿隐私 看摘要
+PASS B2-3-草稿隐私 学生确认发送后老师能打开完整摘要
+PASS B2-3-草稿隐私 无浏览器脚本异常 []
+CLICK B2-4-续填-text 21
+CLICK B2-4-续填-text 14:00
+CLICK B2-4-续填-text 提交预约申请
+CLICK B2-4-续填-text 好的，开始（约 3 分钟）
+CLICK B2-4-续填-text 学业压力
+CLICK B2-4-续填-text 下一题 →
+CLICK B2-4-续填-text 
+CLICK B2-4-续填-text 先保存，稍后继续
+CLICK B2-4-续填-text 继续填写
+PASS B2-4-续填-text 恢复到保存时的题目
+PASS B2-4-续填-text 未点下一题的输入完整保留
+PASS B2-4-续填-text 无浏览器脚本异常 []
+CLICK B2-4-续填-multi 21
+CLICK B2-4-续填-multi 14:00
+CLICK B2-4-续填-multi 提交预约申请
+CLICK B2-4-续填-multi 好的，开始（约 3 分钟）
+CLICK B2-4-续填-multi 学业压力
+CLICK B2-4-续填-multi 
+CLICK B2-4-续填-multi 先保存，稍后继续
+CLICK B2-4-续填-multi 继续填写
+PASS B2-4-续填-multi 恢复到保存时的题目
+PASS B2-4-续填-multi 未点下一题的输入完整保留
+PASS B2-4-续填-multi 多选题选择也保留
+PASS B2-4-续填-multi 无浏览器脚本异常 []
+CLICK B2-4-续填-invite ⚡ 演示 · 收到心理中心的邀约卡
+CLICK B2-4-续填-invite 接受
+CLICK B2-4-续填-invite 学业压力
+CLICK B2-4-续填-invite 
+PASS B2-4-续填-invite 邀约保存提示指向首页
+CLICK B2-4-续填-invite 先保存，稍后继续
+CLICK B2-4-续填-invite 接着聊
+PASS B2-4-续填-invite 恢复到保存时的题目
+PASS B2-4-续填-invite 未点下一题的输入完整保留
+PASS B2-4-续填-invite 多选题选择也保留
+PASS B2-4-续填-invite 无浏览器脚本异常 []
+CLICK B2-4-续填-probe 21
+CLICK B2-4-续填-probe 14:00
+CLICK B2-4-续填-probe 提交预约申请
+CLICK B2-4-续填-probe 好的，开始（约 3 分钟）
+CLICK B2-4-续填-probe 学业压力
+CLICK B2-4-续填-probe 下一题 →
+CLICK B2-4-续填-probe 下一题 →
+PASS B2-4-续填-probe 短答进入追问
+CLICK B2-4-续填-probe 
+CLICK B2-4-续填-probe 先保存，稍后继续
+CLICK B2-4-续填-probe 继续填写
+PASS B2-4-续填-probe 恢复到保存时的题目
+PASS B2-4-续填-probe 未点下一题的输入完整保留
+PASS B2-4-续填-probe 无浏览器脚本异常 []
+CLICK B2-5-工作量日期 排班表
+PASS B2-5-工作量日期 本周及四周区间明确显示
+CLICK B2-5-工作量日期 21
+CLICK B2-5-工作量日期 14:00
+CLICK B2-5-工作量日期 提交预约申请
+PASS B2-5-工作量日期 10/21 不进入本周，原有本周预约被替换后扣除
+PASS B2-5-工作量日期 四周计入新申请，并扣除原来被替换的预约
+PASS B2-5-工作量日期 开放数使用相同区间并反映申请占位
+PASS B2-5-工作量日期 无浏览器脚本异常 []
+fix_b2: 56 passed, 0 failed

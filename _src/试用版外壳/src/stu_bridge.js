@@ -36,7 +36,7 @@ function LY_in(ev) { const b = S.bk; let msg = '';
   else if (ev.t === 'adjust' && b) { ACT.zAdjust(); msg = '学生端收到「中心调整」通知'; }
   else if (ev.t === 'rearr') { ACT.zRearr(ev); msg = '学生端收到「老师重新为你安排了时间」'; }
   else if (ev.t === 'adjNo') { ACT.zAdjNo(); msg = '学生端收到「请重新选一个时间」'; }
-  else if (ev.t === 'decline' && b && !b.pend) { ACT.zDecline(); msg = '学生端收到「老师这次无法接待」'; }
+  else if (ev.t === 'decline' && b && !b.pend) { ACT.zDecline(ev); msg = '学生端收到「老师这次无法接待」'; }
   else if (ev.t === 'agree' && b && b.pend) { ACT.zPend(); msg = '学生端收到「老师同意了你的申请」'; }
   else if (ev.t === 'deny' && b && b.pend) { const ty = b.pend.type === 'cancel' ? '取消' : '改期'; b.pend = null;
     addMsg('cal', [`你的${ty}申请未通过`, 'Your request was not approved'], ['原预约保持不变。', 'Your original appointment stays.'], 'mybook'); msg = `学生端收到「${ty}申请未通过」`; }

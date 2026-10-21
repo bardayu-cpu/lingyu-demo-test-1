@@ -55,7 +55,43 @@ def moves(browser):
     return total
 
 
-TESTS = {'B2-1': moves}
+def declines(browser):
+    c = Case(browser, 'B2-2-邀约婉拒后重选')
+    try:
+        c.login('c1|L2')
+        c.student('A', 'home')
+        c.s.locator('#zapT').check()
+        c.click(c.s, '[data-act=zIvc]')
+        c.click(c.s, '[data-act=ivAcc]')
+        c.intake()
+        c.click(c.s, '[data-act=day][data-arg="6"]')
+        c.click(c.s, '[data-act=pickSlot][data-arg="c1:6:2"]')
+        c.click(c.s, '[data-act=bookSubmit]')
+        c.wait(c.a, 'LY_snap().lin && LY_snap().lin.st==="confirm"')
+        bid = c.a.evaluate('LY_snap().lin.id')
+        due = c.s.evaluate('S.ivc.edue')
+        c.click(c.a, f'[data-arg="bNo:{bid}"]')
+        c.click(c.a, '[data-act=fset][data-arg="why|时段冲突"]')
+        note = '这周我要出差，下周再约'
+        c.a.locator('[data-bind="form.note"]').fill(note)
+        c.click(c.a, '[data-act=bNoOk]')
+        c.wait(c.s, 'S.bk===null && S.ivc.st==="entry"')
+        c.check(note in c.s.inner_text('#modal') and '原因：时段冲突' in c.s.inner_text('#modal'), '弹窗显示实际原因和老师的话')
+        c.check(note in c.s.evaluate('S.inbox[0].d[0]'), '站内信也保留老师的话')
+        c.check(c.s.evaluate('S.ivc.edue') == due, '婉拒保留原入口期限')
+        c.side('学生端')
+        c.shot('婉拒原因和留言')
+        c.click(c.s, '#modal [data-act=go]')
+        c.check('可以选和老师见面的时间了' in c.s.inner_text('#app'), '通知按钮返回有效的选时入口')
+        c.click(c.s, '[data-act=go][data-arg=home]')
+        c.check('选和老师见面的时间' in c.s.inner_text('#app'), '首页重新出现选时间入口')
+        c.shot('婉拒后首页继续选时')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'B2-1': moves, 'B2-2': declines}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

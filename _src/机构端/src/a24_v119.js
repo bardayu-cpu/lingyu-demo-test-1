@@ -398,3 +398,14 @@ const _lyMoveB2 = LY_in; LY_in = function (ev) {
   notify(b.cid, '站内', `${nm(s)}接受了新时间：${slotTxt(b)}`, b.id); if (S.uid) render();
   return `${s.name}接受了新时间，预约已确认`;
 };
+
+/* B2-2：婉拒原因及给学生的话随同结果回传。 */
+const _bNoB2 = ACT.bNoOk; ACT.bNoOk = function (id) {
+  const b = BOOK.find(x => x.id === id); if (b && S.form.why) { b.noWhy = S.form.why; b.noNote = (S.form.note || '').trim(); }
+  return _bNoB2.apply(this, arguments);
+};
+const _noSnapB2 = LY_snap; LY_snap = function () {
+  const o = _noSnapB2(); Object.entries(LY_CORE()).forEach(([key, s]) => {
+    if (o.__no && o.__no[key]) { const b = BOOK.filter(x => x.sid === s.id).slice(-1)[0]; o.__no[key] = { why: b.noWhy || '', note: b.noNote || '' }; }
+  }); return o;
+};

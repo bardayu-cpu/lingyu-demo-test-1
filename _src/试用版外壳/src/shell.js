@@ -52,8 +52,8 @@ function fromAdm(p, c) {
     else if (a.st === 'adjust' && !b) ev.push({ t: 'adjNo', core: k });
     else if (a.st === 'confirm' && b && b.id === a.id && b.st === 'move') ev.push({ t: 'move', core: k, date: b.date, ti: b.t });
     else if (a.st === 'confirm' && b && b.id === a.id && b.st === 'ok') ev.push(moved ? { t: 'move', core: k, date: b.date, ti: b.t } : { t: 'confirm', core: k });
-    else if (a.st === 'confirm' && !b) ev.push({ t: 'decline', core: k });
-    else if (a.st === 'ok' && !b && c.__no && c.__no[k]) ev.push({ t: 'decline', core: k });
+    else if (a.st === 'confirm' && !b) ev.push(Object.assign({ t: 'decline', core: k }, typeof (c.__no || {})[k] === 'object' ? c.__no[k] : {}));
+    else if (a.st === 'ok' && !b && c.__no && c.__no[k]) ev.push(Object.assign({ t: 'decline', core: k }, typeof (c.__no || {})[k] === 'object' ? c.__no[k] : {}));
     else if (a.st === 'change' && b && b.id === a.id && b.st === 'ok') ev.push(moved ? { t: 'agree', core: k } : { t: 'deny', core: k });
     else if (a.st === 'change' && !b) ev.push({ t: 'agree', core: k });
     else if (a.st === 'ok' && b && b.st === 'ok' && b.id === a.id && moved) ev.push({ t: 'move', core: k, date: b.date, ti: b.t }); });

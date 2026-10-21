@@ -93,3 +93,10 @@ const _ikPage19 = PAGES.intake; PAGES.intake = () => { const h = _ikPage19(), ik
 /* 演示按钮放在首页最下面（不算待办） */
 const _home19 = PAGES.home; PAGES.home = () => { const h = _home19(); if (S.ivc) return h;
   return h.replace(/<\/div><\/div>\s*$/, `<div class="zaps"><span class="zap" data-act="zIvc">⚡ ${L('演示 · 收到心理中心的邀约卡', 'Demo: receive UCC’s invitation')}</span><span class="zap" data-act="zIvQ">⚡ ${S.ivQ ? L('演示 · 现在：没号要排队', 'Demo: now queueing') : L('演示 · 现在：有号', 'Demo: slots available')}</span></div></div></div>`); };
+
+/* B2-2：主动邀约申请被婉拒，保留原入口期限并返回选时间。 */
+const _declineB2 = ACT.zDecline; ACT.zDecline = function (ev) {
+  const r = _declineB2.apply(this, arguments);
+  if (S.ivc && S.ivc.st === 'sub') { S.ivc.st = 'entry'; S.info.btn = ['book', L('选时间', 'Choose a time')]; }
+  return r;
+};

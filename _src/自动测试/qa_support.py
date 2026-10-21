@@ -83,6 +83,27 @@ class Case:
         self.shot('日期与当天时段')
         self.click(self.a, '[data-act=bMoveOk]')
 
+    def intake(self, text='最近学习压力有些大，希望和老师一起聊聊如何安排学习和休息。'):
+        for _ in range(35):
+            state = self.s.evaluate('S.ik && ({phase:S.ik.phase, q:S.ik.qs[S.ik.i], help:S.ik.crisisAt===S.ik.i})')
+            if not state or state['phase'] == 'review':
+                break
+            q = state['q']
+            if state['help']:
+                self.click(self.s, '[data-act=ikGoOn]')
+            elif q['type'] == 'single':
+                self.click(self.s, '[data-act=ikPick]')
+            elif q['type'] == 'multi':
+                self.click(self.s, '[data-act=ikTog]')
+                self.click(self.s, '[data-act=ikNextQ]')
+            else:
+                self.s.locator('#ikTxt').fill(text)
+                self.steps.append({'操作': '填写预咨询简答', '内容': text})
+                self.click(self.s, '[data-act=ikNextQ]')
+        self.check(self.s.evaluate('S.ik.phase') == 'review', '逐题完成预咨询并进入摘要确认')
+        self.click(self.s, '[data-act=ikOkT]')
+        self.click(self.s, '[data-act=ikSendSum]')
+
     def close(self):
         self.shot('最后界面')
         self.check(not self.errors, '无浏览器脚本异常 ' + str(self.errors))

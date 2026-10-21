@@ -22,7 +22,31 @@ def counters(browser):
     return c.checks
 
 
-TESTS = {'B4-1': counters}
+def eligibility(browser):
+    c = Case(browser, 'B4-2-主动邀约等级')
+    try:
+        c.login()
+        before = c.a.evaluate('ivb().list.map(x=>({sid:x.sid,st:x.st}))')
+        student = c.a.evaluate('STU.find(s=>curLv(s)===3 && !ivb().list.some(x=>x.sid===s.id))')
+        c.check(bool(student), '使用未在批次的三级学生验证新增门槛')
+        c.click(c.a, '[data-act=btab][data-arg=pool]')
+        c.select(c.a, '[data-pool=ivLv]', '4')
+        c.click(c.a, '[data-act=btab][data-arg=inv]')
+        c.click(c.a, '[data-arg="ivAdd:"]')
+        c.check(c.a.locator('[data-act=ivPickT]').evaluate_all('(els)=>els.every(e=>curLv(SU(e.dataset.arg))>=4)'), '勾选候选只列四级及以上')
+        c.click(c.a, '[data-act=fset][data-arg="ivt|paste"]')
+        c.a.locator('[data-bind="form.ivIds"]').fill(student['sid'])
+        c.steps.append({'操作':'粘贴三级学生学号','内容':student['sid']})
+        c.click(c.a, '[data-act=ivAddGo]')
+        c.check('未达主动邀约等级（4 级及以上）' in c.a.inner_text('#modal'), '核对解释等级不够，进入对不上')
+        c.check(c.a.evaluate('ivb().list.map(x=>({sid:x.sid,st:x.st}))') == before, '学生未加入且原批次学生与状态不变')
+        c.shot('未达等级核对结果')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'B4-1': counters, 'B4-2': eligibility}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

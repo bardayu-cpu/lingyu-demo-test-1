@@ -199,7 +199,29 @@ def application_copy(browser):
     return c.checks
 
 
-TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications, 'B4-5': audits, 'B4-6': duty_readonly, 'B4-7': high_preview, 'B4-8': application_copy}
+def assistant_overlap(browser):
+    c = Case(browser, 'B4-9-保存按钮避开助理')
+    try:
+        c.login()
+        c.click(c.a, '[data-act=btab][data-arg=sched]')
+        c.click(c.a, '[data-act=schPick][data-arg="c1|10/21"]')
+        c.click(c.a, '[data-act=mslot]')
+        button = c.a.locator('[data-act=mSave]')
+        button.evaluate('(e)=>e.scrollIntoView({block:"end"})')
+        c.steps.append({'操作':'滚动到周排班保存底栏'})
+        rect = button.bounding_box()
+        assistant = c.a.locator('.abtn').bounding_box()
+        hit = rect['x'] < assistant['x']+assistant['width'] and rect['x']+rect['width'] > assistant['x'] and rect['y'] < assistant['y']+assistant['height'] and rect['y']+rect['height'] > assistant['y']
+        c.check(rect['y'] > 90 and rect['y']+rect['height'] <= 1000 and not hit, '1440×1000 保存按钮在可视区，与助理矩形不相交')
+        c.shot('周排班底栏与助理')
+        c.click(c.a, '[data-act=mSave]')
+        c.check('已同步' in c.a.inner_text('#toast') or '已保存' in c.a.inner_text('#toast'), '保存并同步可以正常点击')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles, 'B4-4': pool_notifications, 'B4-5': audits, 'B4-6': duty_readonly, 'B4-7': high_preview, 'B4-8': application_copy, 'B4-9': assistant_overlap}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

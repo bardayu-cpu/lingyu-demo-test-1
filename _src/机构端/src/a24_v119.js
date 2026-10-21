@@ -345,10 +345,17 @@ Object.assign(ACT, {
   ivSendGo(t) { const L = ivMine().filter(x => x.st === 'new' && (t === 'all' || (+t >= 4 ? x.lv >= 4 : x.lv === +t))); if (!L.length) return; L.forEach(x => { x.st = 'sent'; x.at = new Date(NOW); x.due = ivDue(2); });
     log(`主动邀约 · 发邀约卡 ${L.length} 人（${t === 'all' ? '全部' : +t >= 4 ? '4 级及以上' : `${t} 级`}）`, null, { cat: '预约', obj: '主动邀约' }); S.mo = null; toast(`已发给 ${L.length} 位学生，24 小时后自动提醒一次`); },
   ivAddGo() { const B = ivb(), F = S.form, ids = [...new Set([...(F.ivPick || []), ...(F.ivIds || '').split(/[\s,，、]+/).filter(Boolean)])], res = { in: [], bad: [], skip: [], has: [] };
-    ids.forEach(id => { const s = STU.find(x => x.id === id || x.sid === id); if (!s) return res.bad.push(`${id}：不在名册`);
-      if (curLv(s) < RULES.pool.ivLv) return res.bad.push(`${id}：未达主动邀约等级（${RULES.pool.ivLv} 级及以上）`);
-      if (CRISES.some(k => k.sid === s.id && k.st !== 'closed')) return res.skip.push(`${nm(s)}：危机中`);
-      if (B.list.some(x => x.sid === s.id)) return res.has.push(`${nm(s)}：已在批次里`); if (activeBook(s)) return res.has.push(`${nm(s)}：已有在途预约`);
+    const exclude = (key, id, why, s) => {
+      res[key].push(`${s ? nm(s) : id}：${why}`);
+      const row = key === 'bad' ? { id: s ? s.sid : id, why } : { sid: s.id, why };
+      if (!B.piles[key].some(x => key === 'bad' ? x.id === row.id : x.sid === row.sid)) B.piles[key].push(row);
+    };
+    ids.forEach(id => { const s = STU.find(x => x.id === id || x.sid === id);
+      if (!s) return exclude('bad', id, '不在名册');
+      if (curLv(s) < RULES.pool.ivLv) return exclude('bad', id, `未达主动邀约等级（${RULES.pool.ivLv} 级及以上）`, s);
+      if (CRISES.some(k => k.sid === s.id && k.st !== 'closed')) return exclude('skip', id, '危机中', s);
+      if (B.list.some(x => x.sid === s.id)) return exclude('has', id, '已在批次里', s);
+      if (activeBook(s)) return exclude('has', id, '已有在途预约', s);
       B.list.push({ sid: s.id, lv: curLv(s), st: 'new', resp: ivResp(s) }); res.in.push(nm(s)); });
     if (!ids.length) return toast('请勾选学生或粘贴学号'); log(`主动邀约 · 加学生：进入批次 ${res.in.length} · 对不上 ${res.bad.length} · 不走预约队列 ${res.skip.length} · 已有安排 ${res.has.length}`, null, { cat: '预约', obj: '主动邀约' }); S.ivRes = res; S.mo = 'ivRes:'; },
   schedRegGo() { const F = S.form, day = +F.rgd;

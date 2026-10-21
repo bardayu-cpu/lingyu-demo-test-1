@@ -46,7 +46,35 @@ def eligibility(browser):
     return c.checks
 
 
-TESTS = {'B4-1': counters, 'B4-2': eligibility}
+def piles(browser):
+    c = Case(browser, 'B4-3-核对结果留在批次')
+    try:
+        c.login()
+        people = c.a.evaluate("""(()=>{const B=ivb(), crisis=STU.find(s=>curLv(s)>=RULES.pool.ivLv && inCrisis(s.id)), booked=STU.find(s=>curLv(s)>=RULES.pool.ivLv && !inCrisis(s.id) && activeBook(s));
+          // Isolate first-time exclusion of these two seeded students; keep all other existing piles.
+          B.piles.skip=B.piles.skip.filter(x=>x.sid!==crisis.id); B.piles.has=B.piles.has.filter(x=>x.sid!==booked.id);
+          return {crisis,booked,before:Object.fromEntries(Object.entries(B.piles).map(([k,v])=>[k,v.length]))};})()""")
+        ids = 'NO-SUCH-STUDENT\n' + people['crisis']['sid'] + '\n' + people['booked']['sid']
+        c.steps.append({'测试准备':'将两名种子学生从对应核对堆移出，用于验证首次追加；其他既有条目保留'})
+        for repeat in [False, True]:
+            c.click(c.a, '[data-arg="ivAdd:"]')
+            c.click(c.a, '[data-act=fset][data-arg="ivt|paste"]')
+            c.a.locator('[data-bind="form.ivIds"]').fill(ids)
+            c.steps.append({'操作':'粘贴不存在、危机中、已有预约的三个学号','内容':ids})
+            c.click(c.a, '[data-act=ivAddGo]')
+            for label in ['对不上（1）', '不走预约队列（1）', '已有安排（1）']:
+                c.check(label in c.a.inner_text('#modal'), '核对弹窗：' + label)
+            c.click(c.a, '[data-act=moClose]')
+            after = c.a.evaluate('Object.fromEntries(Object.entries(ivb().piles).map(([k,v])=>[k,v.length]))')
+            c.check(all(after[k] == people['before'][k] + 1 for k in ['bad','skip','has']), '关闭后各堆加一；再次加入按学号去重' if repeat else '关闭后批次三堆人数各加一')
+        c.check(c.a.evaluate('ivb().piles.bad.some(x=>x.id==="NO-SUCH-STUDENT" && x.why==="不在名册")'), '对不上保留学号和具体原因')
+        c.shot('关闭弹窗后保留核对人数')
+    finally:
+        c.close()
+    return c.checks
+
+
+TESTS = {'B4-1': counters, 'B4-2': eligibility, 'B4-3': piles}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

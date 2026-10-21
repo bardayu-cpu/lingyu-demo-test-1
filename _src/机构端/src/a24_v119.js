@@ -50,6 +50,20 @@ TALK_RE.test = x => { const { hit } = cwFind(x); if (hit.length) cwHits.push(...
 const _nc19 = newCrisis; newCrisis = function (s, src, type, urgent) {
   if (/谈话记录|追加/.test(src || '') && cwHits.length) urgent = cwHits.some(w => cwL(w) === 1);
   const keep = cwHits; cwHits = []; try { return _nc19.call(this, s, src, type, urgent); } finally { cwHits = keep; } };
+/* B3-2：已有一般危机出现新的一级词，从升级时刻按紧急时限接收。 */
+function cwUpgrade(k0, s) {
+  if (k0.urgent || !cwHits.some(w => cwL(w) === 1)) return false;
+  k0.urgent = true; k0.urgAt = new Date(NOW); k0.esc = 0;
+  k0.src.push({ t: '出现一级风险词，升级为紧急', at: new Date(NOW) });
+  if (!k0.recv) {
+    const duty = dutyNow(); notify(duty, '电话 + 短信', `危机升级为紧急，请 ${RULES.urgentMin} 分钟内确认接收`, k0.id);
+    k0.notified = (k0.notified || []).concat(`${ST(duty).name}（升级为紧急 · 电话 + 短信）`);
+  } else {
+    [...new Set([k0.recv.by, 'c5'])].forEach(u => notify(u, '站内', '出现一级风险词，危机升级为紧急，请及时处理', k0.id));
+  }
+  log('出现一级风险词，升级为紧急', s, { cat: '危机', k: 'report', r: 1 });
+  return true;
+}
 function recCrisisTxt(t) {
   return CRISES.some(k => k.urgent && (k.fromRec === t.id || (k.recs || []).includes(t.id))) ? '已报告紧急情况' : '已报告（一般时限）';
 }

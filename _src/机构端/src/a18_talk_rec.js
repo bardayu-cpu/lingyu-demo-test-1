@@ -132,7 +132,7 @@ function recSave(draft) { const R = S.rec, edit = R.id && TALKS.find(t => t.id =
   if (hitIds.length) { const ks = hitIds.map(id => { const s = SU(id), k0 = CRISES.find(k => k.sid === id && k.st !== 'closed');
       const commonFor = cHit && (!multi || R.cw === 'all' || R.cw === id);
       cwHits = [...new Set([...(commonFor ? newCommon : []), ...(newPersonal[id] || [])])];
-      if (k0) { k0.recs = (k0.recs || []).concat(t.id); s.tl.push({ at: new Date(NOW), t: '谈话记录里又出现安全相关的表达（已附到危机记录，值班可以查看）', who: ST(me()).name, k: 'crisis', r: 1 });
+      if (k0) { cwUpgrade(k0, s); k0.recs = (k0.recs || []).concat(t.id); s.tl.push({ at: new Date(NOW), t: '谈话记录里又出现安全相关的表达（已附到危机记录，值班可以查看）', who: ST(me()).name, k: 'crisis', r: 1 });
         [s.owner || 'c5', dutyNow()].filter((u, i, a) => a.indexOf(u) === i).forEach(u => notify(u, '站内', `${ST(me()).name} 的谈话记录里出现安全相关的表达：${nm(s)}`, s.id)); log(`谈话记录里又出现安全相关的表达，已附到现有危机（${tkId(t)}）`, s, { k: 'report', cat: '危机', noTl: 1 }); return k0; }
       const k = newCrisis(s, `${ST(me()).name} 的谈话记录里出现安全相关的表达（保存时自动报告）`, '学院报告', true); if (k) { k.by = me(); k.fromRec = t.id; } log('谈话记录命中危机词，自动报告紧急情况', s, { k: 'report', cat: '危机', r: 1 }); return k; }).filter(Boolean);
     if (ks[0]) S.mo = `tkCrisis:${ks[0].id}`; return; }

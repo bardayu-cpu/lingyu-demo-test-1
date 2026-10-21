@@ -77,7 +77,56 @@ def new_words(browser):
     return c.checks
 
 
-TESTS = {'B3-1': new_words}
+def upgrade(browser):
+    total = 0
+    for received in [False, True]:
+        c = Case(browser, 'B3-2-已接收后追加升级' if received else 'B3-2-未接收修改升级')
+        try:
+            tid = talk(c, '我感到绝望，希望老师协助。')
+            kid = c.a.evaluate('(id)=>CRISES.find(k=>k.fromRec===id).id', tid)
+            c.click(c.a, '[data-act=moClose]')
+            if received:
+                c.login()
+                c.select(c.a, '#jump', 'crisis')
+                c.click(c.a, f'[data-act=crisisOpen][data-arg="{kid}"]')
+                c.click(c.a, f'[data-act=recv][data-arg="{kid}"]')
+                c.select(c.a, '#roleSel', 'u1|L1')
+            c.side('机构端')
+            c.a.locator('#zapT').check()
+            for _ in range(6 if received else 1):
+                c.click(c.a, '[data-act=zTime]')
+            c.select(c.a, '#jump', 'talk')
+            c.click(c.a, '[data-act=tktab][data-arg=recs]')
+            c.click(c.a, f'[data-act=tkView][data-arg="{tid}"]')
+            before = c.a.evaluate('CRISES.length')
+            n0 = c.a.evaluate('NOTI.length')
+            if received:
+                c.click(c.a, f'[data-arg="tkAdd:{tid}"]')
+                fill(c, '[data-bind="form.add"]', '学生今天说我想死，请老师及时跟进。')
+                c.click(c.a, '[data-act=tkAddGo]')
+            else:
+                c.click(c.a, f'[data-act=tkEdit][data-arg="{tid}"]')
+                fill(c, '[data-rb=situ]', '我感到绝望，希望老师协助。今天学生又说我想死。')
+                c.click(c.a, '[data-act=recSave][data-arg=""]')
+            c.check(c.a.evaluate('CRISES.length') == before, '在原危机上升级，不重复建危机')
+            c.check(c.a.evaluate('(id)=>{const k=CRISES.find(k=>k.id===id);return k.urgent && k.urgAt && k.esc===0 && k.src.some(x=>x.t.includes("升级为紧急"))}', kid), '升级为紧急、记升级时间并重置升级阶段')
+            c.check(c.a.evaluate('(id)=>{const k=CRISES.find(k=>k.id===id);return cLeft(k) > .4 && cLeft(k) <= .5}', kid), '从本次升级起计算约30分钟')
+            new = c.a.evaluate('(n)=>NOTI.slice(0,NOTI.length-n)', n0)
+            if received:
+                c.check(any(n['to'] == 'c5' and '升级为紧急' in n['t'] for n in new), '已接收危机通知接收人和中心负责人')
+            else:
+                c.check(any(n['ch'] == '电话 + 短信' and '30 分钟内确认接收' in n['t'] for n in new), '未接收时值班收到电话加短信')
+                c.a.evaluate('tick()')
+                c.check(c.a.evaluate('(id)=>CRISES.find(k=>k.id===id).esc', kid) == 0, '下一次规则检查不会按旧报告时间立即升级')
+            c.check('30 分钟' in c.a.inner_text('#modal'), '报告弹窗按升级后的紧急危机显示')
+            c.shot('升级紧急及通知')
+        finally:
+            c.close()
+            total += c.checks
+    return total
+
+
+TESTS = {'B3-1': new_words, 'B3-2': upgrade}
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--only', choices=list(TESTS))

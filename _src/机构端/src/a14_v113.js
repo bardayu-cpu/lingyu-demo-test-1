@@ -13,17 +13,20 @@ const IKT_Q = {
   sleep: { k: 'sleep', type: 'single', name: '睡眠和饮食', say: '最近两周，你的睡眠和饮食有变化吗？', sayEn: 'In the last two weeks, have your sleep or eating changed?', opts: ['没什么变化', '有些变化', '变化很大'], optsEn: ['Not really', 'Some change', 'A big change'], skip: 1 },
   support: { k: 'support', type: 'single', name: '身边的支持', say: '遇到困难的时候，身边有可以说话的人吗？', sayEn: 'When things are hard, is there someone you can talk to?', opts: ['有', '不太确定', '没有'], optsEn: ['Yes', 'Not sure', 'No'], skip: 1 },
   expect: { k: 'expect', type: 'single', name: '希望得到的帮助', say: '你希望这次见面帮到你什么？', sayEn: 'What would you like from this first meeting?', opts: ['想有人听我说说', '想要具体的建议', '想解决一个具体问题', '还不确定'], optsEn: ['Someone to listen', 'Practical advice', 'Solve a specific problem', 'Not sure yet'], skip: 1 },
+  /* demo-v2.0：咨询风格和咨询方式的期待（和学生端 IK_Q 保持一致） */
+  style: { k: 'style', type: 'single', name: '希望老师怎么和你聊', say: '你更希望老师怎么和你聊？', sayEn: 'How would you like your counsellor to work with you?', opts: ['多听我说', '给我具体建议', '和我一起想办法', '布置一些练习给我', '还不确定'], optsEn: ['Mostly listen', 'Give concrete advice', 'Work it out together', 'Give me exercises to try', 'Not sure yet'], skip: 1 },
+  school: { k: 'school', type: 'multi', name: '想试试的咨询方式', say: '下面这些咨询方式，有没有你了解过、想试试的？不了解也没关系，可以直接跳过。', sayEn: 'Have you heard of any of these approaches and want to try one? Skip if you’re not sure.', opts: ['认知行为（调整想法和做法）', '正念（练习觉察当下）', '人本倾听（被理解、被接纳）', '家庭系统（从家庭关系看问题）', '没了解过'], optsEn: ['CBT (change thoughts and habits)', 'Mindfulness (notice the present)', 'Person-centred (feel heard and accepted)', 'Family systems (look at family patterns)', 'Not familiar'], skip: 1 },
   extra: { k: 'extra', type: 'text', name: '补充', say: '还有什么想先让老师知道的吗？没有的话可以直接跳过。', sayEn: 'Anything else you’d like your counsellor to know first? Skip if not.', skip: 1 },
 };
-const IKT_MAX = 8, IKT_TYPES = { single: '单选', multi: '多选', text: '简答' };
+const IKT_MAX = 10, IKT_TYPES = { single: '单选', multi: '多选', text: '简答' };
 const iktClone = o => JSON.parse(JSON.stringify(o));
 RULES.ikt = { ver: 1,
   open: '你好，我是预咨询小屿。为了在见面前更好地了解你，我想先问你几个问题，大约 3 分钟。你的回答会整理好给{接待老师}看，也会帮中心之后为你安排更合适的咨询老师。上次普测时，你聊到了{上次聊到的话题}，这次可以从这里聊起，也可以聊完全不同的事。',
   openEn: 'Hi, I’m Xiaoyu on the intake desk. To get to know you a little before you meet, I’d like to ask a few questions — about 3 minutes. I’ll put your answers together for {接待老师}, and it also helps UCC arrange the right counsellor for you later. Last time you talked about {上次聊到的话题} — you can start there, or with something else entirely.',
   close: '谢谢你。我把你说的整理成了下面这张表，你可以直接修改，确认没问题再发给{接待老师}。',
   closeEn: 'Thank you. Here’s what you shared — edit anything you like, then send it to {接待老师}.',
-  t1: ['topics', 'trouble', 'dur', 'impact', 'expect', 'extra'].map(k => iktClone(IKT_Q[k])),
-  t2: ['topics', 'trouble', 'dur', 'impact', 'sleep', 'support', 'expect', 'extra'].map(k => iktClone(IKT_Q[k])), t2on: false };
+  t1: ['topics', 'trouble', 'dur', 'impact', 'expect', 'style', 'school', 'extra'].map(k => iktClone(IKT_Q[k])),
+  t2: ['topics', 'trouble', 'dur', 'impact', 'sleep', 'support', 'expect', 'style', 'school', 'extra'].map(k => iktClone(IKT_Q[k])), t2on: false };
 const iktSnap = () => { const o = iktClone(RULES.ikt); delete o.hist; return o; };
 RULES.ikt.hist = [{ ver: 1, at: ago(24 * 20), by: 'c5', note: '默认模板', snap: iktSnap() }];
 /* 预计用时（秒）：多选 20、单选 10、简答 40，简答追问再加 20（学生端用同一算法） */

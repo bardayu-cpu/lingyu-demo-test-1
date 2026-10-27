@@ -6,7 +6,7 @@ function render() {
   tick();
   if (!S.uid) { $('#app').innerHTML = loginPage(); $('#drawer').innerHTML = ''; $('#modal').innerHTML = ''; $('#toast').innerHTML = S.toast ? `<div class="toast">${I('check', 's')}${esc(S.toast)}</div>` : ''; S._p = null; renderShell(); return; }
   if (!MENUS[S.role].some(m => m[0] === S.page)) S.page = MENUS[S.role][0][0];
-  const pg = $('#pg'), top = pg ? pg.scrollTop : 0, same = S._p === S.page, db = $('.dw .db'), dtop = db ? db.scrollTop : 0;
+  const pg = $('#pg'), top = pg ? pg.scrollTop : 0, same = S._p === S.page, db = $('.dw .db'), dtop = db ? db.scrollTop : 0, mo = $('#modal .mo'), mtop = mo ? mo.scrollTop : 0, moSame = !!S.mo && S._mo === S.mo;
   const dwKey = S.dw ? S.dw.sid : null, dwSame = dwKey && S._dw === dwKey, dtabSame = dwSame && S._dt === S.dw.tab;
   $('#app').innerHTML = shell(PAGES[S.page]());
   if (!same) $('#pg').classList.add('fade');
@@ -15,6 +15,7 @@ function render() {
   $('#toast').innerHTML = S.toast ? `<div class="toast">${I('check', 's')}${esc(S.toast)}</div>` : '';
   if (same && $('#pg')) $('#pg').scrollTop = top;
   if (dtabSame && $('.dw .db')) $('.dw .db').scrollTop = dtop;
+  if (moSame && $('#modal .mo')) $('#modal .mo').scrollTop = mtop;   // 同一个弹窗重画时保留滚动位置
   S._p = S.page; S._dw = dwKey; S._dt = S.dw && S.dw.tab; S._mo = S.mo;
   if (S.dw && S.dw.hl != null && S.dw.tab === 'talk' && S._hl !== S.dw.hl) { const e = document.getElementById('q' + S.dw.hl); if (e) e.scrollIntoView({ block: 'center' }); }
   S._hl = S.dw && S.dw.hl;

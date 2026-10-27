@@ -215,7 +215,7 @@ const IV_F = Object.fromEntries(IV_KPI.map(([k]) => [k, k === 'sent' ? x => x.st
 const ivCnt = L => Object.fromEntries(IV_KPI.map(([k]) => [k, L.filter(IV_F[k]).length]));
 
 /* 预咨询题库：普通咨询（原来的模板）、高危咨询（主动邀约来的学生用） */
-const IKH_Q = ['topics', 'trouble', 'dur', 'impact', 'sleep', 'support', 'expect', 'extra'];
+const IKH_Q = ['topics', 'trouble', 'dur', 'impact', 'sleep', 'support', 'expect', 'style', 'school', 'extra'];
 if (!RULES.ikh) { RULES.ikh = { ver: 1,
   open: '你好，我是预咨询小屿。心理中心邀请你聊一聊，在你选和老师见面的时间之前，我想先问你几个问题，大约 3 分钟。你的回答会整理好给之后接待你的老师看，只收集，不打分。',
   openEn: 'Hi, I’m Xiaoyu on the intake desk. UCC has invited you to talk. Before you pick a time to meet, I’d like to ask a few questions — about 3 minutes. Your answers go to the counsellor who meets you. Nothing is scored.',

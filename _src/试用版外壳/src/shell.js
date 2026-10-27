@@ -30,7 +30,7 @@ function syncNote(t) { if (!t) return; const n = $('#sync'); n.textContent = '�
 function fromStu(p, c) {
   if (!p || p.inst !== c.inst || p.scen !== c.scen) return [];
   const ev = [], a = p.bk, b = c.bk, core = c.core, same = (x, y) => x && y && x.cid === y.cid && x.date === y.date && x.ti === y.ti;
-  if (b && (b.st === '待确认' || b.st === '已确认' && !b.moved && b.kind === '预咨询') && !b.pend && (!a || !same(a, b))) ev.push({ t: 'book', core, cid: b.cid, date: b.date, ti: b.ti, mode: b.mode, kind: b.kind, inv: b.inv });
+  if (b && (b.st === '待确认' || b.st === '已确认' && !b.moved && b.kind === '预咨询') && !b.pend && (!a || !same(a, b)) && !(a && a.wait && !b.wait)) ev.push({ t: 'book', core, cid: b.cid, date: b.date, ti: b.ti, mode: b.mode, kind: b.kind, inv: b.inv, wait: !!b.wait });
   if (b && b.pend && !(a && a.pend)) ev.push({ t: 'req', core, type: b.pend.type, date: b.pend.date, ti: b.pend.ti });
   if (a && !b && a.st === '待确认' && !a.pend) ev.push({ t: 'cancel', core });
   if (a && b && same(a, b) && a.st === '待确认' && b.st === '已确认') ev.push({ t: 'ok', core });
@@ -47,8 +47,9 @@ function fromStu(p, c) {
 }
 function fromAdm(p, c) {
   if (!p) return []; const ev = [];
-  Object.keys(c).forEach(k => { if (k === '__cfg' || k === '__no' || k === '__inv' || k === '__slots' || k === '__ivc') return; const a = p[k], b = c[k]; if (!a) return; if (b && b.id === a.id && !a.iv && b.iv) ev.push({ t: 'intakeViewed', core: k }); const moved = b && (a.day !== b.day || a.t !== b.t);
-    if (['confirm', 'ok', 'change'].includes(a.st) && b && b.id === a.id && b.st === 'adjust') ev.push({ t: 'adjust', core: k });
+  Object.keys(c).forEach(k => { if (k === '__cfg' || k === '__no' || k === '__inv' || k === '__slots' || k === '__ivc' || k === '__quota') return; const a = p[k], b = c[k]; if (!a) return; if (b && b.id === a.id && !a.iv && b.iv) ev.push({ t: 'intakeViewed', core: k }); const moved = b && (a.day !== b.day || a.t !== b.t);
+    if (a.st === 'disp' && b && b.id === a.id && b.st === 'confirm') ev.push({ t: 'assign', core: k, cid: b.cid, date: b.date, ti: b.t });   // demo-v2.0：中心指派了预咨询老师
+    else if (['confirm', 'ok', 'change'].includes(a.st) && b && b.id === a.id && b.st === 'adjust') ev.push({ t: 'adjust', core: k });
     else if (a.st === 'adjust' && b && b.id === a.id && b.st === 'move') ev.push({ t: 'rearr', core: k, date: b.date, ti: b.t });
     else if (a.st === 'adjust' && !b) ev.push({ t: 'adjNo', core: k });
     else if (a.st === 'confirm' && b && b.id === a.id && b.st === 'move') ev.push({ t: 'move', core: k, date: b.date, ti: b.t });
@@ -60,6 +61,7 @@ function fromAdm(p, c) {
     else if (a.st === 'ok' && b && b.st === 'ok' && b.id === a.id && moved) ev.push({ t: 'move', core: k, date: b.date, ti: b.t }); });
   const ia = p.__inv || {}; Object.entries(c.__inv || {}).forEach(([k, L]) => L.forEach(v => { const o = (ia[k] || []).find(x => x.id === v.id);
     if (!o) ev.push({ t: 'invite', core: k, inv: v }); else if (o.st !== v.st || o.ver !== v.ver || o.start !== v.start) ev.push({ t: 'invUpd', core: k, inv: v }); }));
+  const qa = p.__quota || {}, qb = c.__quota || {}; Object.keys(qb).forEach(x => { if ((qa[x] || 0) !== qb[x]) ev.push({ t: 'quota', core: x, extra: qb[x] }); });   // demo-v2.0：加次审批通过
   return ev;
 }
 window.addEventListener('message', e => {

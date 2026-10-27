@@ -23,6 +23,9 @@ const IK_Q = {
   sleep: { k: 'sleep', type: 'single', name: '睡眠和饮食', say: '最近两周，你的睡眠和饮食有变化吗？', sayEn: 'In the last two weeks, have your sleep or eating changed?', opts: ['没什么变化', '有些变化', '变化很大'], optsEn: ['Not really', 'Some change', 'A big change'], skip: 1 },
   support: { k: 'support', type: 'single', name: '身边的支持', say: '遇到困难的时候，身边有可以说话的人吗？', sayEn: 'When things are hard, is there someone you can talk to?', opts: ['有', '不太确定', '没有'], optsEn: ['Yes', 'Not sure', 'No'], skip: 1 },
   expect: { k: 'expect', type: 'single', name: '希望得到的帮助', say: '你希望这次见面帮到你什么？', sayEn: 'What would you like from this first meeting?', opts: ['想有人听我说说', '想要具体的建议', '想解决一个具体问题', '还不确定'], optsEn: ['Someone to listen', 'Practical advice', 'Solve a specific problem', 'Not sure yet'], skip: 1 },
+  /* demo-v2.0：咨询风格和咨询方式的期待（帮中心安排合适的老师） */
+  style: { k: 'style', type: 'single', name: '希望老师怎么和你聊', say: '你更希望老师怎么和你聊？', sayEn: 'How would you like your counsellor to work with you?', opts: ['多听我说', '给我具体建议', '和我一起想办法', '布置一些练习给我', '还不确定'], optsEn: ['Mostly listen', 'Give concrete advice', 'Work it out together', 'Give me exercises to try', 'Not sure yet'], skip: 1 },
+  school: { k: 'school', type: 'multi', name: '想试试的咨询方式', say: '下面这些咨询方式，有没有你了解过、想试试的？不了解也没关系，可以直接跳过。', sayEn: 'Have you heard of any of these approaches and want to try one? Skip if you’re not sure.', opts: ['认知行为（调整想法和做法）', '正念（练习觉察当下）', '人本倾听（被理解、被接纳）', '家庭系统（从家庭关系看问题）', '没了解过'], optsEn: ['CBT (change thoughts and habits)', 'Mindfulness (notice the present)', 'Person-centred (feel heard and accepted)', 'Family systems (look at family patterns)', 'Not familiar'], skip: 1 },
   extra: { k: 'extra', type: 'text', name: '补充', say: '还有什么想先让老师知道的吗？没有的话可以直接跳过。', sayEn: 'Anything else you’d like your counsellor to know first? Skip if not.', skip: 1 },
 };
 const IK_DEF = () => JSON.parse(JSON.stringify({ ver: 1,
@@ -30,8 +33,8 @@ const IK_DEF = () => JSON.parse(JSON.stringify({ ver: 1,
   openEn: 'Hi, I’m Xiaoyu on the intake desk. To get to know you a little before you meet, I’d like to ask a few questions — about 3 minutes. I’ll put your answers together for {接待老师}, and it also helps UCC arrange the right counsellor for you later. Last time you talked about {上次聊到的话题} — you can start there, or with something else entirely.',
   close: '谢谢你。我把你说的整理成了下面这张表，你可以直接修改，确认没问题再发给{接待老师}。',
   closeEn: 'Thank you. Here’s what you shared — edit anything you like, then send it to {接待老师}.',
-  t1: ['topics', 'trouble', 'dur', 'impact', 'expect', 'extra'].map(k => IK_Q[k]),
-  t2: ['topics', 'trouble', 'dur', 'impact', 'sleep', 'support', 'expect', 'extra'].map(k => IK_Q[k]), t2on: false }));
+  t1: ['topics', 'trouble', 'dur', 'impact', 'expect', 'style', 'school', 'extra'].map(k => IK_Q[k]),
+  t2: ['topics', 'trouble', 'dur', 'impact', 'sleep', 'support', 'expect', 'style', 'school', 'extra'].map(k => IK_Q[k]), t2on: false }));
 /* v1.19：高危咨询题库（主动邀约来的学生接受邀约后马上做）；机构端「预约咨询 · AI 预咨询 · 题库配置」下发 */
 var IK_CFG_H = null;
 const IK_DEF_H = () => JSON.parse(JSON.stringify({ ver: 1,
@@ -39,7 +42,7 @@ const IK_DEF_H = () => JSON.parse(JSON.stringify({ ver: 1,
   openEn: 'Hi, I’m Xiaoyu on the intake desk. UCC has invited you to talk. Before you pick a time to meet, I’d like to ask a few questions — about 3 minutes. Your answers go to the counsellor who meets you. Nothing is scored.',
   close: '谢谢你。我把你说的整理成了下面这张表，你可以直接修改，确认没问题再发给老师。发完就可以选和老师见面的时间了。',
   closeEn: 'Thank you. Here’s what you shared — edit anything you like, then send it. After that you can pick a time to meet.',
-  t1: ['topics', 'trouble', 'dur', 'impact', 'sleep', 'support', 'expect', 'extra'].map(k => IK_Q[k]), t2: [], t2on: false }));
+  t1: ['topics', 'trouble', 'dur', 'impact', 'sleep', 'support', 'expect', 'style', 'school', 'extra'].map(k => IK_Q[k]), t2: [], t2on: false }));
 const ikCfg = () => S && (S._ivIk || (S.ik && S.ik.inv)) ? IK_CFG_H || IK_DEF_H() : IK_CFG || IK_DEF();
 const ikTx = (o, k) => LANG === 'en' && o[k + 'En'] ? o[k + 'En'] : o[k];
 const ikOpts = q => q.useTopics ? DATA.topics.map(T) : LANG === 'en' && q.optsEn && q.optsEn.length === (q.opts || []).length ? q.optsEn : (q.opts || []);
@@ -113,10 +116,16 @@ function ikWelcome() { const cfg = ikCfg(), tk = ikNeedT2() ? 't2' : 't1', mins 
   return `<div class="mo ikw"><button class="x" data-act="ikWX" aria-label="${L('关闭', 'Close')}">${I('x')}</button>
     <div class="ikw-l"><img src="${MASCOT_IK_FULL}" alt=""><span>${L('接待台', 'Intake desk')}</span></div>
     <div class="ikw-r">${top}<div class="ikw-name">${IK_NAME()}</div><div class="iksay big">${ikFill(ikTx(cfg, 'open'))}</div>
-      <ul class="ikw-notes"><li>${I('check', 's')}${S.hold ? L('不填也可以直接提交预约', 'You can send your booking without it') : L('不影响你的预约', 'Your booking stands either way')}</li><li>${I('check', 's')}${L('只是帮老师提前了解你，不打分', 'Just helps your counsellor prepare — no scores')}</li><li>${I('check', 's')}${L('最后你看过、确认后才发送', 'Nothing is sent until you check and confirm')}</li></ul>
+      <ul class="ikw-notes"><li>${I('check', 's')}${S.hold ? L('不填也可以直接提交预约', 'You can send your booking without it') : L('不影响你的预约', 'Your booking stands either way')}</li><li>${I('check', 's')}${L('只是帮老师提前了解你，不打分', 'Just helps your counsellor prepare — no scores')}</li><li>${I('check', 's')}${L('最后你看过、确认后才发送', 'Nothing is sent until you check and confirm')}</li></ul>${ikIntro()}
       <div class="ikw-acts"><button class="btn sec" data-act="ikNo">${S.hold ? L('这次先不用，直接提交预约', 'Not now — send my booking') : L('这次先不用', 'Not this time')}</button><button class="btn pri" data-act="ikYes">${L(`好的，开始（约 ${mins} 分钟）`, `OK, let’s start (~${mins} min)`)}</button></div></div></div>`; }
 const ikCdTxt = () => { if (!S.hold || !S.hold.until) return ''; const s = Math.max(0, Math.round((S.hold.until - Date.now()) / 1000)); return L(`还剩 ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`, `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} left`); };
 
+/* demo-v2.0：第一次来咨询的简单介绍（时长、次数、保密和例外、常见咨询方式） */
+const ikIntro = () => `<details class="ikintro"><summary>${L('第一次来咨询？先了解一下', 'First time? What counselling is like')}</summary><ul>
+  <li>${L('咨询是你和一位受过专业训练的老师，一起看看困扰你的事、找到应对的办法。不评判，也不会替你做决定。', 'You and a trained counsellor look at what’s bothering you and find ways to cope. No judging, and no one decides for you.')}</li>
+  <li>${L('第一次是约 30 分钟的预咨询，中心会根据你的情况安排老师；之后每次正式咨询约 50 分钟，每学期可以约 8 次。', 'First comes a 30-minute intake chat; UCC then arranges the right counsellor. Sessions after that are about 50 minutes, 8 per semester.')}</li>
+  <li>${L('你说的内容会保密。只有在你或他人有安全风险时，老师才会按规定联系必要的人。', 'What you share stays confidential — unless you or someone else is at risk, when the counsellor contacts only who they must.')}</li>
+  <li>${L('常见的咨询方式：认知行为（调整想法和做法）、正念（练习觉察当下）、人本倾听（被理解、被接纳）、家庭系统（从家庭关系看问题）。不了解也没关系，老师会和你一起选。', 'Common approaches: CBT, mindfulness, person-centred and family systems. Not sure? Your counsellor will help you choose.')}</li></ul></details>`;
 /* ---------- 接待台页面 ---------- */
 function intakePage() {
   const ik = S.ik; if (!ik) { S.page = 'mybook'; return PAGES.mybook(); }
@@ -133,7 +142,7 @@ function intakePage() {
         <input class="inp" id="ikOwn" data-bind="ik.own" value="${esc(ik.own)}" placeholder="${L('也可以自己写（选填）', 'Or add your own (optional)')}" autocomplete="off">`; }
     else ans = `<textarea class="inp iktxt" id="ikTxt" data-bind="ik.txt" placeholder="${L('写下你想说的…', 'Type here…')}">${esc(ik.txt || '')}</textarea>`;
     const next = help ? '' : q.type === 'single' ? '' : `<button class="btn pri" data-act="ikNextQ">${ik.i === n - 1 ? L('完成', 'Done') : L('下一题', 'Next')} →</button>`;
-    body = `<div class="iksay">${ik.probe ? (LANG === 'en' && q.probeEn ? q.probeEn : q.probeText) : ikTx(q, 'say')}</div>${help}${help ? '' : `<div class="ikans">${ans}</div>`}
+    body = `${ik.i === 0 && !ik.probe ? ikIntro() : ''}<div class="iksay">${ik.probe ? (LANG === 'en' && q.probeEn ? q.probeEn : q.probeText) : ikTx(q, 'say')}</div>${help}${help ? '' : `<div class="ikans">${ans}</div>`}
       ${help ? ans : `<div class="iknav">${ik.i > 0 ? `<button class="btn ghost" data-act="ikPrevQ">${I('left', 's')}${L('上一题', 'Back')}</button>` : ''}<span style="flex:1"></span>${q.skip ? `<button class="lnkb" data-act="ikSkipQ">${L('跳过这题', 'Skip this one')}</button>` : ''}${next}</div>`}
       <span class="zap" data-act="zIk">⚡ ${L('演示 · 快进填写', 'Demo: fill it in')}</span>`; }
   else body = `<div class="iksay">${ikFill(ikTx(ikCfg(), 'close'))}</div>${ikReview()}`;

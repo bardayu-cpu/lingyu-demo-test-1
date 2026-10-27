@@ -27,7 +27,18 @@ const _done20 = ACT.zDone; ACT.zDone = function () { if (S.bk && S.bk.kind === '
 ACT.zQuota = () => { sessSetExtra(Math.min(SESS.cap - SESS.free, sess().extra + 4)); toast(L('演示：加次已通过', 'Demo: extra sessions approved')); };
 
 /* ---------- 2. 预咨询只选时间 ---------- */
-const preMode = () => !S.owner && !S.resch;
+/* 预咨询怎么约：默认先提示由中心安排；学校允许时（PRE.pick，机构端「流转规则」里开关，默认开），学生也可以改成自己选老师 */
+const PRE = { pick: true };
+const preCtx = () => !S.owner && !S.resch;
+const preInv = () => !!(S.ivc && S.ivc.st === 'entry');
+const preWay = () => !PRE.pick || preInv() ? 'center' : (S.preWay || '');
+const preMode = () => preCtx() && preWay() === 'center';
+ACT.preWay = w => { S.preWay = PRE.pick && w === 'self' ? 'self' : 'center'; S.day = null; S.pageTop = true; };
+const _reset20b = reset; reset = function () { const r = _reset20b.apply(this, arguments); S.preWay = null; return r; };
+const _zChg20 = ACT.zChg; ACT.zChg = function () { S.preWay = null; return _zChg20.apply(this, arguments); };
+const preChooser = () => `<div class="page fade"><div class="wrap"><div class="ph"><h2>${L('预约咨询', 'Book a counselling session')}</h2><p>${L('第一次是一次预咨询，约 30 分钟', 'Your first session is a 30-minute intake chat')}</p></div>
+  <div class="strip"><span class="ico">${I('users')}</span><div class="grow"><b>${L('建议由中心为你安排老师', 'We suggest UCC arranges your counsellor')}</b><small>${L('中心会根据你的情况安排合适的老师，你只需要选一个方便的时间。', 'UCC will match you with the right counsellor based on your situation — you just pick a time.')}</small></div></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px"><button class="btn pri" data-act="preWay" data-arg="center">${L('让中心安排（推荐）', 'Let UCC arrange it (recommended)')}</button><button class="btn sec" data-act="preWay" data-arg="self">${L('我想自己选老师', 'I’d like to choose my counsellor')}</button></div></div></div>`;
 const okPre = c => canB(c) && c.pool === 'pre' && c.campus === S.campus;
 const preCampuses = () => DATA.campuses.filter(x => DATA.counsellors.some(c => canB(c) && c.pool === 'pre' && c.campus === x));
 const _cal20 = calendar; calendar = function () { if (!preMode()) return _cal20.apply(this, arguments);
@@ -40,8 +51,11 @@ const _slots20 = daySlots; daySlots = function () { if (!preMode()) return _slot
   const cs = DATA.counsellors.filter(okPre), ts = DATA.times.map((_, ti) => { const c = cs.find(x => slotState(ci(x.id), S.day, ti) === 'open'); return [ti, c, !c && cs.some(x => slotState(ci(x.id), S.day, ti) === 'taken')]; }).filter(x => x[1] || x[2]);
   return `<div class="sect" id="slots" style="margin-top:6px">${fmtDay(DAYS[S.day])}</div><div class="crow"><div class="who"><span class="pre-av">${I('users')}</span><div><b>${L('由中心安排老师', 'UCC arranges your counsellor')}</b><small>${T(S.campus)}${SEP()}${L('预咨询约 30 分钟', 'Intake chat, about 30 min')}</small></div></div>
     <div class="times">${ts.map(([ti, c]) => c ? slotBtn(c, S.day, ti, 'open') : `<button class="tm full" disabled>${DATA.times[ti]} ${L('已约满', 'Full')}</button>`).join('')}</div></div>`; };
-const _book20 = PAGES.book; PAGES.book = function () { const pre = preMode(); if (pre) S.bookTab = 'time';
+const _book20 = PAGES.book; PAGES.book = function () { if (preCtx() && !S.bk && preWay() === '') return preChooser();
+  const pre = preMode(); if (pre) S.bookTab = 'time';
   let h = _book20.apply(this, arguments);
+  const sw = (w, t) => `<div class="note" style="margin:0 0 12px"><button class="lnk" data-act="preWay" data-arg="${w}">${t}</button></div>`;
+  if (preCtx() && !S.bk && PRE.pick && !preInv()) h = h.replace('<div class="tabs">', (pre ? sw('self', L('我想自己选老师', 'I’d like to choose my counsellor')) : sw('center', L('改为让中心安排老师（推荐）', 'Let UCC arrange my counsellor instead (recommended)'))) + '<div class="tabs">');
   if (pre) h = h.replace(/<button class="[^"]*" data-act="bTab" data-arg="\w+">[^<]*<\/button>/g, '').replace(L('只显示你可以预约的老师。需至少提前 24 小时预约。', 'Showing counsellors you can book. Book at least 24 hours ahead.'), L('第一次见面由中心根据你的情况安排老师，你只需要选时间。需至少提前 24 小时预约。', 'For your first meeting, UCC picks the right counsellor for you — just choose a time. Book at least 24 hours ahead.'));
   else if (!S.resch) h = h.replace('<div class="tabs">', sessLine() + '<div class="tabs">');
   return h; };

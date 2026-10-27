@@ -9,6 +9,7 @@
       能看到多少在「权限与设置 · 权限配置」里选配；配置交给中心负责人（兼系统管理员）
 ===================================================================== */
 RULES.quota = { free: 8, add: 4, cap: 20 };
+RULES.prePick = true;   // 学生第一次约预咨询时，除了「让中心安排」，是否也允许自己选老师
 RULES.sup = { name: false, year: false, sms: true, data: true };
 RULES.lim.disp = 24;
 
@@ -54,6 +55,8 @@ const supCard = () => { const ed = isAdm(); return `<div class="card" style="mar
 const QOPT = [['free', '每学期免费咨询次数', 1, 20], ['add', '单次加次上限', 1, 8], ['cap', '每学期总上限（含加次）', 1, 40]];
 const quotaCard = () => { const ed = isAdm(), q = RULES.quota; return `<div class="card" style="margin-top:14px"><h3>${I('cal')}咨询次数<span class="sp"></span><small>${ed ? '中心负责人修改，改动记入操作记录' : '只读：由中心负责人修改'}</small></h3>
   <table class="t">${QOPT.map(([k, n]) => `<tr><td>${n}</td><td style="width:170px">${ed ? `<button class="btn ghost xs" data-act="qCfg" data-arg="${k}|-1">−</button> <b style="display:inline-block;min-width:28px;text-align:center">${q[k]}</b> <button class="btn ghost xs" data-act="qCfg" data-arg="${k}|1">+</button>` : `<b>${q[k]}</b>`} 次</td></tr>`).join('')}</table>
+  <p style="margin:12px 0 0"><span class="sw ${RULES.prePick ? 'on' : ''} ${ed ? '' : 'lk'}" ${ed ? 'data-act="prePickT"' : ''} style="cursor:${ed ? 'pointer' : 'default'};vertical-align:middle"></span> 允许学生第一次约预咨询时自己选老师（默认开）</p>
+  <p class="note">学生约预咨询时，先建议「由中心安排老师」，学生只选时间；开着这一项时，学生仍可以改成自己选老师，按原来的方式直接约初级咨询师，不进「预咨询分派」。关掉后只能走中心安排。两种方式都不计入咨询次数。</p>
   <p class="note">只算正式咨询：完成或爽约计 1 次；预咨询、老师改约、学生按规则取消不计（开始前 24 小时内取消只用掉一次取消机会）。加次由负责咨询师申请，上级咨询师审批（负责咨询师是 L3 时由中心负责人审批）。危机干预中的学生不计次数。</p></div>`; };
 const _settings20 = PAGES.settings; PAGES.settings = function () { let h = _settings20.apply(this, arguments);
   const on = k => h.includes(`class="on" data-act="settab" data-arg="${k}"`);
@@ -61,6 +64,7 @@ const _settings20 = PAGES.settings; PAGES.settings = function () { let h = _sett
   return h; };
 Object.assign(ACT, {
   supT(k) { if (!isAdm()) return; RULES.sup[k] = !RULES.sup[k]; supMenu(); log(`行政督导可见范围：${SUPOPT.find(x => x[0] === k)[1]} → ${RULES.sup[k] ? '开' : '关'}`, null, { cat: '配置' }); toast('已保存'); },
+  prePickT() { if (!isAdm()) return; RULES.prePick = !RULES.prePick; log(`预咨询：允许学生自己选老师 → ${RULES.prePick ? '开' : '关'}`, null, { cat: '配置' }); toast('已保存'); },
   qCfg(a) { if (!isAdm()) return; const [k, d] = a.split('|'), o = QOPT.find(x => x[0] === k), q = RULES.quota, v = Math.max(o[2], Math.min(o[3], q[k] + +d));
     if (k === 'cap' && v < q.free || k === 'free' && v > q.cap) return toast('总上限不能少于免费次数'); q[k] = v; log(`咨询次数：${o[1]} 改为 ${v} 次`, null, { cat: '配置' }); },
 });
@@ -188,4 +192,4 @@ const _lyIn20 = LY_in; LY_in = function (ev) { const r = _lyIn20.apply(this, arg
     if (b && b.kind === '预咨询') { b.st = 'disp'; b.fresh = false; b.src = '学生端提交 · 待中心分派'; for (let i = NOTI.length - 1; i >= 0; i--) if (NOTI[i].ref === b.id && NOTI[i].to === b.cid) NOTI.splice(i, 1);
       notify('c5', '站内', `${nm(s)} 选好了预咨询时间，等中心分派老师`, b.id); render();   /* 未登录也重画一次，让外壳拿到「待分派」的状态 */ return `${s.name} 选好了预咨询时间，已出现在「预约咨询 · 预咨询分派」里`; } }
   return r; };
-const _lySnap20 = LY_snap; LY_snap = function () { const o = _lySnap20.apply(this, arguments); o.__quota = Object.fromEntries(Object.entries(LY_CORE()).map(([k, s]) => [k, qExtra(s)])); return o; };
+const _lySnap20 = LY_snap; LY_snap = function () { const o = _lySnap20.apply(this, arguments); o.__cfg = Object.assign({}, o.__cfg, { prePick: RULES.prePick }); o.__quota = Object.fromEntries(Object.entries(LY_CORE()).map(([k, s]) => [k, qExtra(s)])); return o; };

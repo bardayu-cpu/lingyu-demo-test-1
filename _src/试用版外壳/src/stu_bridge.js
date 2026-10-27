@@ -28,7 +28,7 @@ const _bookSubmitB1 = ACT.bookSubmit; ACT.bookSubmit = function () {
 };
 const lyIso = di => di == null || !DAYS[di] ? null : DAYS[di].toISOString();
 function LY_snap() { const b = S.bk, ts = S.tasks || []; S._ly = S._ly || Math.random().toString(36).slice(2);
-  return { inst: S._ly, scen: S.scen, core: LY_CK[S.scen], bk: b ? { cid: b.cid, date: lyIso(b.di), ti: b.ti, mode: b.mode, kind: b.kind, inv: !!b.inv, st: b.st, moved: !!b.moved, pend: b.pend ? { type: b.pend.type, date: lyIso(b.pend.di), ti: b.pend.ti } : null, intake: b.intake ? { st: b.intake.st, ver: b.intake.ver || 0, sum: b.intake.sum || null, crisis: !!b.intake.crisis, mode: b.intake.mode || IK_MODE, tk: b.intake.tk || 't1', tv: b.intake.tv || 1, adds: (b.intake.adds || []).map(a => ({ at: a.at, t: a.t })) } : null } : null,
+  return { inst: S._ly, scen: S.scen, core: LY_CK[S.scen], bk: b ? { cid: b.cid, wait: !!b.wait, date: lyIso(b.di), ti: b.ti, mode: b.mode, kind: b.kind, inv: !!b.inv, st: b.st, moved: !!b.moved, pend: b.pend ? { type: b.pend.type, date: lyIso(b.pend.di), ti: b.pend.ti } : null, intake: b.intake ? { st: b.intake.st, ver: b.intake.ver || 0, sum: b.intake.sum || null, crisis: !!b.intake.crisis, mode: b.intake.mode || IK_MODE, tk: b.intake.tk || 't1', tv: b.intake.tv || 1, adds: (b.intake.adds || []).map(a => ({ at: a.at, t: a.t })) } : null } : null,
     ivc: S.ivc ? { st: S.ivc.st, fit: (S.ivc.fit || []).slice(), ik: S.ivc.ik ? (S.ivc.ik.st === 'sent' ? { st: 'sent', ver: S.ivc.ik.ver || 1, sum: S.ivc.ik.sum } : { st: S.ivc.ik.st }) : null } : null,
     cb: !!S.callback, crisis: ts.some(t => t.crisis) || !!(S.ik && S.ik.crisis), done: ts.filter(isDone).map(t => DATA_ZH.tasks.find(d => d.id === t.id).name), decl: ts.filter(t => t.declined).map(t => DATA_ZH.tasks.find(d => d.id === t.id).name), inv: (S.invs || []).map(v => ({ id: v.id, r: v.r, rv: v.rv, slots: v.slots, why: v.why })) }; }
 function LY_ctx() { return { 端: '学生端', 场景: SCENES[S.scen].name, 页面: ((typeof JUMPS !== 'undefined' && JUMPS.find(j => j[0] === S.page)) || [0, S.page])[1].replace(/^\d+b? /, ''), 弹窗: S.modal || '', 语言: LANG === 'en' ? 'English' : '中文' }; }
@@ -57,8 +57,10 @@ function LY_in(ev) { const b = S.bk; let msg = '';
     else if (ev.st === 'entry' && S.ivc && ['queue', 'nofit'].includes(S.ivc.st)) { ACT.zIvTurn(ev.edue); msg = '学生收到选时间入口'; }
   }
   else if (ev.t === 'slots') { LY_SLOTS = ev.slots; msg = ''; }
+  else if (ev.t === 'assign' && b && b.wait) { ACT.zAssign(ev.cid); msg = `学生端收到「中心为你安排了${whoZ(ev.cid)}」`; }   // demo-v2.0
+  else if (ev.t === 'quota') { sessSetExtra(ev.extra); msg = '学生端收到「咨询次数已增加」'; }
   render(); return msg; }
 const _inB7 = LY_in; LY_in = function (ev) {
-  const important = ['confirm', 'adjust', 'rearr', 'adjNo', 'decline', 'agree', 'deny', 'move', 'invite', 'invUpd', 'ivc'].includes(ev.t);
+  const important = ['assign', 'quota', 'confirm', 'adjust', 'rearr', 'adjNo', 'decline', 'agree', 'deny', 'move', 'invite', 'invUpd', 'ivc'].includes(ev.t);
   return important ? withImportantNotice(() => _inB7(ev)) : _inB7(ev);
 };
